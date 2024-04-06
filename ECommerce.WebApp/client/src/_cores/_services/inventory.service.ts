@@ -51,7 +51,7 @@ export default class InventoryService {
   }
 
   public static getAttributes(param?: any) {
-    return api.post(INVENTORY_API_URL.ATTRIBUTES, { id: param?.id });
+    return api.post(INVENTORY_API_URL.ATTRIBUTES, param || {});
   }
 
   public static saveAttributes(params: any) {

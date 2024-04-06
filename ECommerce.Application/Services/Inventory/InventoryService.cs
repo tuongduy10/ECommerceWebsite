@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Option = ECommerce.Data.Entities.Option;
 
 namespace ECommerce.Application.Services.Inventory
 {
@@ -392,7 +393,8 @@ namespace ECommerce.Application.Services.Inventory
             try
             {
                 var opts = await _optionRepo
-                    .Queryable()
+                    .Queryable(_ => (request.id == -1 || _.OptionId == request.id)
+                        && (string.IsNullOrEmpty(request.name) || request.name == _.OptionName))
                     .Select(opt => new OptionModel
                     {
                         id = opt.OptionId,
@@ -405,6 +407,111 @@ namespace ECommerce.Application.Services.Inventory
             catch (Exception error)
             {
                 return new FailResponse<List<OptionModel>>(error.Message);
+            }
+        }
+        public async Task<Response<bool>> addOptions(OptionModel request)
+        {
+            if (string.IsNullOrEmpty(request.name))
+                return new FailResponse<bool>("Nhập tên");
+            var isExisted = await _optionRepo.AnyAsyncWhere(_ => _.OptionName == request.name.Trim());
+            if (isExisted)
+                return new FailResponse<bool>("Tên đã tồn tại");
+
+            var transaction = await _DbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // options
+                var entity =  new Option()
+                {
+                    OptionName = request.name
+                };
+                await _optionRepo.AddAsync(entity);
+                await _optionRepo.SaveChangesAsync();
+
+                // option values
+                var optionValues = request.values
+                    .Select(_ => new Data.Entities.OptionValue
+                    {
+                        IsBaseValue = true,
+                        OptionValueName = _.name,
+                        OptionId = entity.OptionId
+                    })
+                    .ToList();
+                await _optionValueRepo.AddRangeAsync(optionValues);
+                await _optionValueRepo.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return new SuccessResponse<bool>();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return new FailResponse<bool>(ex.Message);
+            }
+        }
+        public async Task<Response<bool>> updateOptions(OptionModel request)
+        {
+            if (request.id == -1)
+                return new FailResponse<bool>("Chọn tùy chọn");
+            if (string.IsNullOrEmpty(request.name))
+                return new FailResponse<bool>("Nhập tên");
+            var option = await _optionRepo.GetAsyncWhere(_ => _.OptionId == request.id, "OptionValues.ProductOptionValues");
+            if (option == null)
+                return new FailResponse<bool>("Không tồn tại");
+
+            var transaction = await _DbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // options
+                option.OptionName = request.name;
+                _optionRepo.Update(option);
+                await _optionRepo.SaveChangesAsync();
+
+                // option values
+                var existingValues = option.OptionValues.ToDictionary(v => v.OptionValueName);
+                foreach (var newValue in request.values)
+                {
+                    // Update to isBase
+                    if (existingValues.TryGetValue(newValue.name, out var existingValue))
+                    {
+                        if (existingValue.IsBaseValue == false)
+                        {
+                            existingValue.IsBaseValue = true;
+                            _optionValueRepo.Update(existingValue);
+                        }
+                    }
+                    // Add new
+                    else
+                    {
+                        await _optionValueRepo.AddAsync(new Data.Entities.OptionValue
+                        {
+                            OptionId = option.OptionId,
+                            OptionValueName = newValue.name,
+                            IsBaseValue = true
+                        });
+                        await _optionRepo.SaveChangesAsync();
+                    }
+                }
+                // Remove Option Values not in request.values
+                var valuesToRemove = option.OptionValues
+                    .Where(v => !request.values.Any(nv => nv.name == v.OptionValueName) && v.IsBaseValue == true)
+                    .ToList();
+                foreach (var value in valuesToRemove)
+                {
+                    var proOptValues = value.ProductOptionValues;
+                    _productOptionValuesRepo.RemoveRange(proOptValues);
+                    await _productOptionValuesRepo.SaveChangesAsync();
+                }
+                _optionValueRepo.RemoveRange(valuesToRemove);
+                await _optionValueRepo.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return new SuccessResponse<bool>();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return new FailResponse<bool>(ex.Message);
             }
         }
         public async Task<Response<List<OptionModel>>> getProductOptions(InventoryRequest request)
@@ -482,9 +589,8 @@ namespace ECommerce.Application.Services.Inventory
             try
             {
                 var subCategoryAttrs = await _attributeRepo
-                    .Queryable(_ => 
-                        request.id == -1 || _.AttributeId == request.id
-                    )
+                    .Queryable(_ => (request.id == -1 || _.AttributeId == request.id)
+                        && (string.IsNullOrEmpty(request.keyword) || _.AttributeName.Contains(request.keyword.Trim())))
                     .Select(_ => (AttributeModel)_)
                     .ToListAsync();
                 return new SuccessResponse<List<AttributeModel>>(subCategoryAttrs);

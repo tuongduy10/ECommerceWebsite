@@ -15,6 +15,7 @@ using System;
 using System.Threading.Tasks;
 using ECommerce.Application.Services.User.Dtos;
 using ECommerce.Application.Services.Inventory.Dtos;
+using ECommerce.Application.Common;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -108,6 +109,19 @@ namespace ECommerce.WebApp.Controllers
             if (!result.isSucceed)
                 return BadRequest(result);
             return Ok(result);
+        }
+        [HttpPost("save-options")]
+        public async Task<IActionResult> saveOptions(OptionModel request)
+        {
+            var res = new Response<bool>();
+            if (request.id > -1)
+                res = await _inventoryService.updateOptions(request);
+            if (request.id == -1)
+                res = await _inventoryService.addOptions(request);
+
+            if (!res.isSucceed)
+                return BadRequest(res.Message);
+            return Ok(res);
         }
         [HttpPost("product-options")]
         public async Task<IActionResult> getProductOptions(InventoryRequest request)

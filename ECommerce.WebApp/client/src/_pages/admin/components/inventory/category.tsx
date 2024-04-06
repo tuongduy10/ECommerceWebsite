@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Popper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Popper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { FormEvent, Fragment, useEffect, useState } from "react";
 import { ICategory } from "src/_cores/_interfaces/inventory.interface";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
@@ -305,28 +305,16 @@ export default function Category() {
                             value={formData.categoryName || ''}
                             onChange={handleChange}
                         />
-                        <Autocomplete
-                            multiple
-                            size="small"
-                            disablePortal
-                            options={subCategories}
-                            getOptionLabel={(_) => _.name}
-                            value={subCategories.length > 0 ? subCategories.filter(_ => _.categoryId === formData.categoryId) : []}
-                            renderInput={(params) => <TextField {...params} name="subCategory" label="Loại sản phẩm" />}
-                            renderOption={(props, _, { selected }) => (
-                                <li {...props}>
-                                    <Checkbox
-                                        icon={icon}
-                                        checkedIcon={checkedIcon}
-                                        style={{ marginRight: 8 }}
-                                        checked={selected}
-                                        size="small"
-                                    />
-                                    {_.name}
-                                </li>
-                            )}
-                        // onChange={(event, value) => onChangeShop(value)}
-                        />
+                        {subCategories.length > 0 && subCategories
+                            .filter(_ => _.categoryId === formData.categoryId)
+                            .map((_) => (
+                                <Chip
+                                    key={`value-${_.id}`}
+                                    label={_.name}
+                                    sx={{ marginRight: 1, marginBottom: 1 }}
+                                />
+                            ))
+                        }
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Đóng</Button>

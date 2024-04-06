@@ -19,11 +19,8 @@ export class ProductHelper {
         price: item.pricePreOrder ?? item.priceAvailable,
         priceOnSell: item.discountPreOrder ?? item.discountAvailable,
         nameType:
-          item.pricePreOrder != null || item.discountAvailable != null
-            ? "Hàng đặt trước"
-            : item.pricePreOrder != null || item.discountAvailable != null
-            ? "Hàng có sẵn"
-            : "",
+          item.pricePreOrder != null || item.discountPreOrder != null ? "Hàng đặt trước" : 
+          item.priceAvailable != null || item.discountAvailable != null ? "Hàng có sẵn" : "",
       };
 
       formattedList.push(pro);

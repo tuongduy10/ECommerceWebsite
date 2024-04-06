@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Option = ECommerce.Data.Entities.Option;
 
 namespace ECommerce.Application.Services.Inventory
 {
@@ -22,6 +23,8 @@ namespace ECommerce.Application.Services.Inventory
         Task<Response<SubCategory>> updateSubCategory(SubCategoryModel request);
         Task<Response<SubCategory>> addSubCategory(SubCategoryModel request);
         Task<Response<List<OptionModel>>> getOptions(InventoryRequest request);
+        Task<Response<bool>> addOptions(OptionModel request);
+        Task<Response<bool>> updateOptions(OptionModel request);
         Task<Response<List<OptionModel>>> getProductOptions(InventoryRequest request);
         Task<Response<List<AttributeModel>>> getAttributes(InventoryRequest request);
         Task<Response<bool>> saveAttributes(InventoryRequest request);

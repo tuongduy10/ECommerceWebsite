@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ECommerce.Dtos.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ECommerce.Application.Services.Inventory.Dtos
 {
-    public class InventoryRequest
+    public class InventoryRequest : PagingRequest
     {
         public int id { get; set; }
         public string name { get; set; }

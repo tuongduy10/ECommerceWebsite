@@ -296,6 +296,27 @@ namespace ECommerce.Application.Services.Product
 
                 var record = await extQuery.CountAsync();
                 var data = await PaginatedList<ProductModel>.CreateAsync(list, pageindex, pagesize);
+                foreach (var item in data)
+                {
+                    item.options = _optionRepo.Entity()
+                        .Where(opt => _productOptionValueRepo.Entity()
+                            .Any(pov => pov.ProductId == item.id && pov.OptionValue.OptionId == opt.OptionId))
+                        .Select(opt => new OptionModel
+                        {
+                            id = opt.OptionId,
+                            name = opt.OptionName,
+                            values = _productOptionValueRepo.Entity()
+                                .Where(pov =>
+                                    pov.ProductId == item.id && pov.OptionValue.OptionId == opt.OptionId)
+                                .Select(pov => new OptionValueModel
+                                {
+                                    id = pov.OptionValue.OptionValueId,
+                                    name = pov.OptionValue.OptionValueName,
+                                })
+                                .ToList()
+                        })
+                        .ToList();
+                }
                 var result = new PageResult<ProductModel>()
                 {
                     Items = data,

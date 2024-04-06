@@ -8,6 +8,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
+import { GlobalConfig } from "src/_configs/global.config";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -114,6 +115,12 @@ function Row(props: TableRowProps) {
 }
 
 export default function Attributes() {
+    const [params, setParams] = useState<any>({
+        keyword: "",
+        pageIndex: 1,
+        pageSize: GlobalConfig.MAX_PAGE_SIZE,
+        totalPage: 1,
+    });
     const [open, setOpen] = useState(false);
     const [attributes, setAttributes] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -151,7 +158,7 @@ export default function Attributes() {
     };
 
     const search = async (_params?: any) => {
-        const response = await InventoryService.getAttributes() as any;
+        const response = await InventoryService.getAttributes(_params) as any;
         if (response?.isSucceed) {
             setAttributes(response.data);
         }
@@ -232,6 +239,20 @@ export default function Attributes() {
             <Box>
                 <Grid container spacing={2} sx={{ marginBottom: 2 }}>
                     <Grid item xs={12} sm={4}>
+                        <TextField
+                            onChange={(event) => setParams({ ...params, keyword: event?.target.value ?? '' })}
+                            autoComplete='off'
+                            name="keyword"
+                            fullWidth
+                            size="small"
+                            label="Tên thuộc tính"
+                            autoFocus
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Button variant="contained" sx={{ marginRight: 2 }} onClick={() => search(params)}>Tìm kiếm</Button>
+                    </Grid>
+                    <Grid item xs={12} sm={12}>
                         <Button variant="contained" sx={{ marginRight: 2 }} onClick={handleClickOpen}>Thêm</Button>
                     </Grid>
                 </Grid>

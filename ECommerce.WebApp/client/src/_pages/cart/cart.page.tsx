@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
-import { changeItemQty, removeItem } from "src/_cores/_reducers/cart.reducer";
-import { useCartStore } from "src/_cores/_store/root-store";
+import { changeItemQty, removeItem, updateProductPrice } from "src/_cores/_reducers/cart.reducer";
+import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import MuiIcon from "src/_shares/_components/mui-icon/mui-icon.component";
@@ -12,8 +12,12 @@ import { ProductHelper } from "src/_shares/_helpers/product-helper";
 
 const CartPage = () => {
   const cartStore = useCartStore();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(updateProductPrice(cartStore.productsInCart.map(_ => _.id)));
+  }, []);
 
   const backToHome = () => {
     navigate(-1)

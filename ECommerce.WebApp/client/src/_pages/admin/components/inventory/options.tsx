@@ -8,6 +8,8 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
+import { Each } from "src/_shares/_components";
+import { GlobalConfig } from "src/_configs/global.config";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -114,10 +116,16 @@ function Row(props: TableRowProps) {
 }
 
 export default function Options() {
+    const [params, setParams] = useState<any>({
+        keyword: "",
+        pageIndex: 1,
+        pageSize: GlobalConfig.MAX_PAGE_SIZE,
+        totalPage: 1,
+    });
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
-    const [tempValues, setTempValues] = useState<number[]>([]);
+    const [tempValues, setTempValues] = useState<any[]>([]);
     const [newValue, setNewValue] = useState<string>("");
     const [formData, setFormData] = useState({
         id: -1,
@@ -192,11 +200,16 @@ export default function Options() {
         }
     }
 
-    const deleteValue = (id?: number) => {
-        const _params = {
-            ids: selectedItems.length > 0 ? selectedItems : [id ?? -1]
+    const deleteValue = (id?: number, type: 'current' | 'new' = 'current') => {
+        if (type === 'current') {
+            setFormData({
+                ...formData,
+                values: formData.values.filter(_ => _.id !== id)
+            });
         }
-
+        if (type === 'new') {
+            setTempValues(tempValues.filter(_ => _.id !== id))
+        }
     }
 
     const selectCategory = (id: number) => {
@@ -211,16 +224,14 @@ export default function Options() {
 
     const viewDetail = async (id: number) => {
         const response = await InventoryService.getOptions({ id: id }) as any;
-        if (response?.isSucceed) {
+        if (response?.isSucceed && response?.data.length > 0) {
             const _data = response?.data[0];
-            const _values = _data.values.filter((_: any) => _.isBase);
             const _value = {
                 ...formData,
                 id: _data.id,
                 name: _data.name,
                 values: _data.values.filter((_: any) => _.isBase)
             }
-            setTempValues(_values);
             setFormData(_value);
             if (_data)
                 handleClickOpen();
@@ -235,13 +246,13 @@ export default function Options() {
         }
         const param = {
             id: formData.id,
-            name: formData.name
+            name: formData.name,
+            values: formData.values.concat(tempValues)
         }
         const res = await InventoryService.saveOptions(param) as any;
         if (res?.isSucceed) {
             await returnToList();
         }
-
     };
 
     return (
@@ -249,6 +260,20 @@ export default function Options() {
             <Box>
                 <Grid container spacing={2} sx={{ marginBottom: 2 }}>
                     <Grid item xs={12} sm={4}>
+                        <TextField
+                            onChange={(event) => setParams({ ...params, keyword: event?.target.value ?? '' })}
+                            autoComplete='off'
+                            name="keyword"
+                            fullWidth
+                            size="small"
+                            label="Tên danh mục"
+                            autoFocus
+                        />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Button variant="contained" sx={{ marginRight: 2 }} onClick={handleClickOpen}>Tìm kiếm</Button>
+                    </Grid>
+                    <Grid item xs={12} sm={12}>
                         <Button variant="contained" sx={{ marginRight: 2 }} onClick={handleClickOpen}>Thêm</Button>
                     </Grid>
                 </Grid>
@@ -314,14 +339,21 @@ export default function Options() {
                                 key={`value-${_.id}`}
                                 label={_.name}
                                 sx={{ marginRight: 1, marginBottom: 1 }}
-                                onDelete={() => deleteValue(_.id)}
+                                onDelete={() => deleteValue(_.id, 'current')}
+                            />
+                        ))}
+                        {tempValues.length > 0 && tempValues.map((_: any) => (
+                            <Chip
+                                key={`new-${_.id}`}
+                                label={_.name}
+                                sx={{ marginRight: 1, marginBottom: 1 }}
+                                onDelete={() => deleteValue(_.id, 'new')}
                             />
                         ))}
                         <Grid container spacing={2} sx={{ marginBottom: 2 }}>
                             <Grid item xs={12} sm={10}>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="name"
                                     label="Giá trị"
@@ -333,7 +365,11 @@ export default function Options() {
                                 />
                             </Grid>
                             <Grid item xs={12} sm={2}>
-                                <Button variant="contained" onClick={() => { }}>Thêm</Button>
+                                <Button variant="contained" onClick={() => {
+                                    const _val = newValue.trim();
+                                    setTempValues([...tempValues, { id: -1, name: _val }]);
+                                    setNewValue('');
+                                }}>Thêm</Button>
                             </Grid>
                         </Grid>
                     </DialogContent>
