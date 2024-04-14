@@ -1,5 +1,5 @@
 ﻿using ECommerce.Application.BaseServices.User.Dtos;
-using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.ProductSchema;
 using System;
 using System.Collections.Generic;
 using System.Text;

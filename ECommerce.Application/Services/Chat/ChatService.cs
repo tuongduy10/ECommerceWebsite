@@ -8,7 +8,7 @@ using ECommerce.Application.Repositories.User;
 using ECommerce.Application.Services.Chat.Dtos;
 using ECommerce.Application.Services.User;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.UserSchema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;

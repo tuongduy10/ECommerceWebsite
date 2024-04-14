@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using ECommerce.Data.Entities;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using ECommerce.Data.Entities.Common;

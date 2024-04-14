@@ -17,6 +17,7 @@ using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.HttpClient;
 using ECommerce.Application.Services.Inventory;
 using ECommerce.Application.Services.Notification;
+using ECommerce.Application.Services.Oms;
 using ECommerce.Application.Services.Product;
 using ECommerce.Application.Services.User;
 using ECommerce.Data.Abstractions;
@@ -47,6 +48,7 @@ namespace ECommerce.Application.Extensions
             services.AddTransient<IUserBaseService, UserBaseService>();
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IShopService, ShopService>();
+            services.AddTransient<IOmsService, OmsService>();
         }
         public static void AddScopedServices(this IServiceCollection services)
         {

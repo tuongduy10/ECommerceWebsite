@@ -5,7 +5,6 @@ using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Inventory;
 using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -21,6 +20,7 @@ using ECommerce.Application.Services.Common;
 using ECommerce.Utilities.Constants;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Data.Entities.OmsSchema;
 
 namespace ECommerce.Application.Services.Product
 {

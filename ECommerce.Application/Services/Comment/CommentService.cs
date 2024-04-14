@@ -9,7 +9,6 @@ using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ECommerce.Application.Repositories.Product;
 using PostCommentRequest = ECommerce.Application.Services.Comment.Request.PostCommentRequest;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.Services.Comment
 {
@@ -117,7 +117,7 @@ namespace ECommerce.Application.Services.Comment
                 var replied = await _commentRepo.GetAsyncWhere(i => i.RateId == request.repliedId);
                 if (replied != null)
                     idsToDelete = string.IsNullOrEmpty(replied.IdsToDelete) ? request.repliedId.ToString() : (replied.IdsToDelete + "," + replied.RateId);
-                var comment = new Data.Entities.Rate()
+                var comment = new Data.Entities.ProductSchema.Rate()
                 {
                     Comment = request.comment,
                     ProductId = request.productId,

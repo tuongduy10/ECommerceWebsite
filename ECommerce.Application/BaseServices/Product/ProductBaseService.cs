@@ -9,7 +9,6 @@ using ECommerce.Application.BaseServices.Rate;
 using ECommerce.Application.BaseServices.SubCategory.Dtos;
 using ECommerce.Application.BaseServices.User;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
 using Microsoft.EntityFrameworkCore;

@@ -5,20 +5,20 @@ using ECommerce.Application.BaseServices.Rate.Models;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Application.Services.User.Dtos;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.Repositories.Notification
 {
-    public class NotificationRepository : RepositoryBase<Data.Entities.Notification>, INotificationRepository
+    public class NotificationRepository : RepositoryBase<Data.Entities.UserSchema.Notification>, INotificationRepository
     {
         public NotificationRepository(ECommerceContext DbContext):base(DbContext) { }
-        public async Task<Data.Entities.Notification> CreateCommentNotiAsync(Rate comment)
+        public async Task<Data.Entities.UserSchema.Notification> CreateCommentNotiAsync(Rate comment)
         {
             if (comment.RepliedId == null)
                 return null;
@@ -27,7 +27,7 @@ namespace ECommerce.Application.Repositories.Notification
             if (notification == null)
             {
                 // create new
-                var newNotification = new Data.Entities.Notification()
+                var newNotification = new Data.Entities.UserSchema.Notification()
                 {
                     TextContent = comment.Comment,
                     CreateDate = DateTime.Now,
@@ -54,7 +54,7 @@ namespace ECommerce.Application.Repositories.Notification
                 return notification;
             }
         }
-        public async Task<Data.Entities.Notification> CreateLikeDislikeNotiAsync(Rate comment)
+        public async Task<Data.Entities.UserSchema.Notification> CreateLikeDislikeNotiAsync(Rate comment)
         {
             var notification = await GetAsyncWhere(item => item.InfoId == comment.RateId && item.TypeId == (int)Enums.NotificationType.Like);
             var userNames = await _DbContext.Interests
@@ -73,7 +73,7 @@ namespace ECommerce.Application.Repositories.Notification
             if (notification == null && textConent != "")
             {
                 // add new
-                var newNotification = new Data.Entities.Notification()
+                var newNotification = new Data.Entities.UserSchema.Notification()
                 {
                     TextContent = textConent,
                     ReceiverId = comment.UserId,
@@ -110,10 +110,10 @@ namespace ECommerce.Application.Repositories.Notification
                 }
             }
         }
-        public async Task<Data.Entities.Notification> CreateMessageHistoryAsync(MessageModel message)
+        public async Task<Data.Entities.UserSchema.Notification> CreateMessageHistoryAsync(MessageModel message)
         {
             // add new
-            var newNotification = new Data.Entities.Notification()
+            var newNotification = new Data.Entities.UserSchema.Notification()
             {
                 TextContent = message.Message,
                 ReceiverId = message.ToUserId,

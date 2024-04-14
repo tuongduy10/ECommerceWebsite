@@ -4,7 +4,6 @@ using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Application.Services.User.Dtos;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
 using Microsoft.AspNetCore.Mvc;

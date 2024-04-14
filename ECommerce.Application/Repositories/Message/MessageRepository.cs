@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Application.Repositories.Message
 {
-    public class MessageRepository : RepositoryBase<Data.Entities.MessageHistory>, IMessageRepository
+    public class MessageRepository : RepositoryBase<Data.Entities.UserSchema.MessageHistory>, IMessageRepository
     {
         public MessageRepository(ECommerceContext DbContext) : base(DbContext) { }
     }

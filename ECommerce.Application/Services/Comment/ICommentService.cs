@@ -7,12 +7,12 @@ using ECommerce.Application.Repositories.User;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
-using ECommerce.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.Services.Comment
 {

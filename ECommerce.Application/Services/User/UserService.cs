@@ -21,6 +21,7 @@ using ECommerce.Data.Entities.Common;
 using ECommerce.Application.Enums;
 using UserUpdateRequest = ECommerce.Application.Services.User.Dtos.UserUpdateRequest;
 using ECommerce.Data.Entities.UserSchema;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.Services.User
 {
