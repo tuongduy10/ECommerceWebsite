@@ -1,6 +1,6 @@
 ﻿using ECommerce.Application.BaseServices.Brand.Dtos;
 using ECommerce.Application.BaseServices.SubCategory.Dtos;
-using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.ProductSchema;
 using System;
 using System.Collections.Generic;
 
@@ -46,8 +46,8 @@ namespace ECommerce.Application.BaseServices.Product.Dtos
         public List<string> ProductImages { get; set; } // for view only
         public List<string> ProductUserImages { get; set; } // for view only
 
-        public List<Data.Entities.ProductImage> SystemImages { get; set; }
-        public List<Data.Entities.ProductUserImage> UserImages { get; set; }
+        public List<Data.Entities.ProductSchema.ProductImage> SystemImages { get; set; }
+        public List<Data.Entities.ProductSchema.ProductUserImage> UserImages { get; set; }
 
         public byte? DiscountPercent { get; set; } //
         public List<ProductPrice> Prices { get; set; } //

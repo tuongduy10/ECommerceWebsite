@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Application.Repositories.Product
 {
-    public class ProductRepository : RepositoryBase<Data.Entities.Product>, IProductRepository
+    public class ProductRepository : RepositoryBase<Data.Entities.ProductSchema.Product>, IProductRepository
     {
         public ProductRepository(ECommerceContext DbContext) : base(DbContext)
         {

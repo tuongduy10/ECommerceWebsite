@@ -2,12 +2,11 @@
 using ECommerce.Application.Common;
 using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Application.Services.User.Dtos;
-using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Option = ECommerce.Data.Entities.Option;
 
 namespace ECommerce.Application.Services.Inventory
 {

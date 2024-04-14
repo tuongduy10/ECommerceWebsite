@@ -5,6 +5,8 @@ using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Application.Services.User.Dtos;
 using ECommerce.Data.Context;
 using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.Inventory;
+using ECommerce.Data.Entities.ProductSchema;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,16 +14,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Option = ECommerce.Data.Entities.Option;
+using Option = ECommerce.Data.Entities.Inventory.Option;
 
 namespace ECommerce.Application.Services.Inventory
 {
     public class InventoryService : IInventoryService
     {
         private readonly ECommerceContext _DbContext;
-        private readonly IRepositoryBase<Data.Entities.Product> _productRepo;
-        private readonly IRepositoryBase<Data.Entities.Option> _optionRepo;
-        private readonly IRepositoryBase<Data.Entities.OptionValue> _optionValueRepo;
+        private readonly IRepositoryBase<Data.Entities.ProductSchema.Product> _productRepo;
+        private readonly IRepositoryBase<Option> _optionRepo;
+        private readonly IRepositoryBase<Data.Entities.Inventory.OptionValue> _optionValueRepo;
         private readonly IRepositoryBase<Brand> _brandRepo;
         private readonly IRepositoryBase<Category> _categoryRepo;
         private readonly IRepositoryBase<BrandCategory> _brandCategoryRepo;
@@ -32,11 +34,11 @@ namespace ECommerce.Application.Services.Inventory
         private readonly IRepositoryBase<ProductOptionValue> _productOptionValuesRepo;
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
         private readonly IRepositoryBase<SizeGuide> _sizeGuideRepo;
-        private readonly IRepositoryBase<Data.Entities.Attribute> _attributeRepo;
+        private readonly IRepositoryBase<Data.Entities.Inventory.Attribute> _attributeRepo;
         public InventoryService(ECommerceContext DbContext,
-            IRepositoryBase<Data.Entities.Product> productRepo,
-            IRepositoryBase<Data.Entities.Option> optionRepo,
-            IRepositoryBase<Data.Entities.OptionValue> optionValueRepo,
+            IRepositoryBase<Data.Entities.ProductSchema.Product> productRepo,
+            IRepositoryBase<Option> optionRepo,
+            IRepositoryBase<Data.Entities.Inventory.OptionValue> optionValueRepo,
             IRepositoryBase<Brand> brandRepo,
             IRepositoryBase<Category> categoryRepo,
             IRepositoryBase<BrandCategory> brandCategoryRepo,
@@ -47,7 +49,7 @@ namespace ECommerce.Application.Services.Inventory
             IRepositoryBase<ProductOptionValue> productOptionValuesRepo,
             IRepositoryBase<ProductAttribute> productAttributeRepo,
             IRepositoryBase<SizeGuide> sizeGuideRepo,
-            IRepositoryBase<Data.Entities.Attribute> attributeRepo)
+            IRepositoryBase<Data.Entities.Inventory.Attribute> attributeRepo)
         {
             _DbContext = DbContext;
             _productRepo = productRepo;
@@ -430,7 +432,7 @@ namespace ECommerce.Application.Services.Inventory
 
                 // option values
                 var optionValues = request.values
-                    .Select(_ => new Data.Entities.OptionValue
+                    .Select(_ => new Data.Entities.Inventory.OptionValue
                     {
                         IsBaseValue = true,
                         OptionValueName = _.name,
@@ -483,7 +485,7 @@ namespace ECommerce.Application.Services.Inventory
                     // Add new
                     else
                     {
-                        await _optionValueRepo.AddAsync(new Data.Entities.OptionValue
+                        await _optionValueRepo.AddAsync(new Data.Entities.Inventory.OptionValue
                         {
                             OptionId = option.OptionId,
                             OptionValueName = newValue.name,
@@ -617,7 +619,7 @@ namespace ECommerce.Application.Services.Inventory
                 }
                 else
                 {
-                    var newEntity = new Data.Entities.Attribute
+                    var newEntity = new Data.Entities.Inventory.Attribute
                     {
                         AttributeName = name
                     };

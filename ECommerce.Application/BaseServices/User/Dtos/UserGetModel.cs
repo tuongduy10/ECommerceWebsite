@@ -1,5 +1,4 @@
-﻿using ECommerce.Data.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,7 +25,7 @@ namespace ECommerce.Application.BaseServices.User.Dtos
         public DateTime LastOnline { get; set; }
         public string LastOnlineLabel { get; set; }
         public List<Data.Entities.Shop> Shops { get; set; }
-        public static explicit operator UserGetModel(Data.Entities.User data)
+        public static explicit operator UserGetModel(Data.Entities.UserSchema.User data)
         {
             return new UserGetModel()
             {

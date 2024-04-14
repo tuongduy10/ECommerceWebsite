@@ -9,7 +9,7 @@ namespace ECommerce.Application.Services.Inventory.Dtos
         public int id { get; set; }
         public string name { get; set; }
         public string value { get; set; }
-        public static explicit operator AttributeModel(Data.Entities.Attribute data)
+        public static explicit operator AttributeModel(Data.Entities.Inventory.Attribute data)
         {
             return new AttributeModel
             {

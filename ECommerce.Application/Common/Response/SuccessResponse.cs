@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Constants;
+﻿using ECommerce.Utilities.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;

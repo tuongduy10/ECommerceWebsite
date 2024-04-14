@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ECommerce.Data.Entities.Inventory;
 
 namespace ECommerce.Data.Entities
 {

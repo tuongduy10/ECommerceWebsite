@@ -1,5 +1,5 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Helpers;
+using ECommerce.Utilities.Helpers;
 using ECommerce.Application.BaseServices.Brand.Dtos;
 using ECommerce.Application.BaseServices.Product.Dtos;
 using ECommerce.Application.BaseServices.Product.Enum;
@@ -10,6 +10,8 @@ using ECommerce.Application.BaseServices.SubCategory.Dtos;
 using ECommerce.Application.BaseServices.User;
 using ECommerce.Data.Context;
 using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.Inventory;
+using ECommerce.Data.Entities.ProductSchema;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
@@ -562,7 +564,7 @@ namespace ECommerce.Application.BaseServices.Product
                 /*
                  * None relationship data
                  */
-                var product = new Data.Entities.Product
+                var product = new Data.Entities.ProductSchema.Product
                 {
                     ProductCode = request.code.Trim(),
                     ProductName = request.name.Trim(), // required
@@ -679,7 +681,7 @@ namespace ECommerce.Application.BaseServices.Product
                     {
                         if (!string.IsNullOrEmpty(attr.value))
                         {
-                            var attribute = new Data.Entities.ProductAttribute
+                            var attribute = new Data.Entities.ProductSchema.ProductAttribute
                             {
                                 ProductId = product.ProductId,
                                 AttributeId = attr.id,
@@ -696,7 +698,7 @@ namespace ECommerce.Application.BaseServices.Product
                 {
                     foreach (var file in request.systemFileName)
                     {
-                        var systemImage = new Data.Entities.ProductImage
+                        var systemImage = new Data.Entities.ProductSchema.ProductImage
                         {
                             ProductId = product.ProductId,
                             ProductImagePath = file
@@ -709,7 +711,7 @@ namespace ECommerce.Application.BaseServices.Product
                 {
                     foreach (var file in request.userFileName)
                     {
-                        var userImage = new Data.Entities.ProductUserImage
+                        var userImage = new Data.Entities.ProductSchema.ProductUserImage
                         {
                             ProductId = product.ProductId,
                             ProductUserImagePath = file
@@ -832,7 +834,7 @@ namespace ECommerce.Application.BaseServices.Product
                                 .FirstOrDefaultAsync();
                         if (attribute == null) // Add new if not existed
                         {
-                            var newAttribute = new Data.Entities.ProductAttribute
+                            var newAttribute = new Data.Entities.ProductSchema.ProductAttribute
                             {
                                 ProductId = product.ProductId,
                                 AttributeId = attr.id,
@@ -916,7 +918,7 @@ namespace ECommerce.Application.BaseServices.Product
                 {
                     foreach (var file in request.systemFileName)
                     {
-                        var systemImage = new Data.Entities.ProductImage
+                        var systemImage = new Data.Entities.ProductSchema.ProductImage
                         {
                             ProductId = product.ProductId,
                             ProductImagePath = file
@@ -929,7 +931,7 @@ namespace ECommerce.Application.BaseServices.Product
                 {
                     foreach (var file in request.userFileName)
                     {
-                        var userImage = new Data.Entities.ProductUserImage
+                        var userImage = new Data.Entities.ProductSchema.ProductUserImage
                         {
                             ProductId = product.ProductId,
                             ProductUserImagePath = file
@@ -985,7 +987,7 @@ namespace ECommerce.Application.BaseServices.Product
         }
         private async Task AddProductOptionValueByProductId(int productId, int optValId)
         {
-            var productOptionValue = new ProductOptionValue
+            var productOptionValue = new Data.Entities.ProductSchema.ProductOptionValue
             {
                 ProductId = productId,
                 OptionValueId = optValId

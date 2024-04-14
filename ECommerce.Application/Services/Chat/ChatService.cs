@@ -1,6 +1,6 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Constants;
-using ECommerce.Application.Helpers;
+using ECommerce.Utilities.Constants;
+using ECommerce.Utilities.Helpers;
 using ECommerce.Application.Repositories.Message;
 using ECommerce.Application.Repositories.Message.Dtos;
 using ECommerce.Application.Repositories.Notification;

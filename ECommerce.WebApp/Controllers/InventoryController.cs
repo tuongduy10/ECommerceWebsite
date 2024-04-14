@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Constants;
+﻿using ECommerce.Utilities.Constants;
 using ECommerce.Application.BaseServices.Brand;
 using ECommerce.Application.BaseServices.Product;
 using ECommerce.Application.BaseServices.Product.Dtos;

@@ -1,6 +1,6 @@
 ﻿using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.Common;
-using ECommerce.Application.Constants;
+using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.Services.Product;

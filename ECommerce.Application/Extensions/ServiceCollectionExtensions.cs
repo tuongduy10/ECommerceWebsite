@@ -19,6 +19,7 @@ using ECommerce.Application.Services.Inventory;
 using ECommerce.Application.Services.Notification;
 using ECommerce.Application.Services.Product;
 using ECommerce.Application.Services.User;
+using ECommerce.Data.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,7 @@ namespace ECommerce.Application.Extensions
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
 }

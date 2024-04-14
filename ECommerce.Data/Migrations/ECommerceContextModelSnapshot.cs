@@ -611,150 +611,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("OptionValue");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Order", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<byte?>("Amount")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("DiscountCode")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("DiscountType")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<decimal?>("DiscountValue")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int?>("PaymentMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Recipient")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<decimal?>("Temporary")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("Total")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OrderDetail", b =>
-                {
-                    b.Property<int>("OrderDetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShopId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AttributeValue")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("OptionValue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<bool?>("Paid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("PayForAdmin")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("PriceOnSell")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("ShopName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<decimal?>("Total")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<DateTime?>("VerifiedDate")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("OrderDetailId", "OrderId", "ShopId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderDetail");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.PaymentMethod", b =>
-                {
-                    b.Property<int>("PaymentMethodId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("PaymentMethod1")
-                        .HasColumnName("PaymentMethod")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.HasKey("PaymentMethodId");
-
-                    b.ToTable("PaymentMethod");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Product", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema", b =>
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
@@ -876,7 +733,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaAttribute", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -895,7 +752,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductAttribute");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaImage", b =>
                 {
                     b.Property<int>("ProductImageId")
                         .ValueGeneratedOnAdd()
@@ -918,7 +775,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductImage");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductOptionValue", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaOptionValue", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -933,7 +790,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductOptionValue");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductPrice", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaPrice", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -954,7 +811,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductPrice");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductType", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaType", b =>
                 {
                     b.Property<int>("ProductTypeId")
                         .ValueGeneratedOnAdd()
@@ -970,7 +827,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductType");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductUserImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaUserImage", b =>
                 {
                     b.Property<int>("ProductUserImageId")
                         .ValueGeneratedOnAdd()
@@ -1462,29 +1319,7 @@ namespace ECommerce.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Order", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.PaymentMethod", "PaymentMethod")
-                        .WithMany("Orders")
-                        .HasForeignKey("PaymentMethodId")
-                        .HasConstraintName("FK_Order_PaymentMethod");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Order_User");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OrderDetail", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
-                        .HasConstraintName("FK_OrderDetail_Order")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Product", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema", b =>
                 {
                     b.HasOne("ECommerce.Data.Entities.Brand", "Brand")
                         .WithMany("Products")
@@ -1505,7 +1340,7 @@ namespace ECommerce.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaAttribute", b =>
                 {
                     b.HasOne("ECommerce.Data.Entities.Attribute", "Attribute")
                         .WithMany("ProductAttributes")
@@ -1513,23 +1348,23 @@ namespace ECommerce.Data.Migrations
                         .HasConstraintName("FK_ProductAttribute_Attribute")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("ProductAttributes")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_ProductAttribute_Product")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaImage", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("ProductImages")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_ProductImage_Product")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductOptionValue", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaOptionValue", b =>
                 {
                     b.HasOne("ECommerce.Data.Entities.OptionValue", "OptionValue")
                         .WithMany("ProductOptionValues")
@@ -1537,31 +1372,31 @@ namespace ECommerce.Data.Migrations
                         .HasConstraintName("FK_ProductOptionValue_OptionValue")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("ProductOptionValues")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_ProductOptionValue_Product")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductPrice", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaPrice", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("ProductPrices")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_ProductPrice_Product")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.ProductType", "ProductType")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchemaType", "ProductType")
                         .WithMany("ProductPrices")
                         .HasForeignKey("ProductTypeId")
                         .HasConstraintName("FK_ProductPrice_ProductType")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductUserImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchemaUserImage", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("ProductUserImages")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_ProductUserImage_Product");
@@ -1569,7 +1404,7 @@ namespace ECommerce.Data.Migrations
 
             modelBuilder.Entity("ECommerce.Data.Entities.Rate", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema", "Product")
                         .WithMany("Rates")
                         .HasForeignKey("ProductId")
                         .HasConstraintName("FK_Rate_Product");

@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.Bank.Dtos;
-using ECommerce.Data.Entities;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +31,7 @@ namespace ECommerce.Application.BaseServices.Bank
             if (BankAccountName == null) return new ApiFailResponse("Tên tài khoản không được để trống");
             if (BankAccountNumber == null) return new ApiFailResponse("Số tài khoản không được để trống");
 
-            Data.Entities.Bank bank = new Data.Entities.Bank();
+            Data.Entities.Cms.Bank bank = new Data.Entities.Cms.Bank();
             bank.BankAccountName = BankAccountName;
             bank.BankAccountNumber = BankAccountNumber;
             bank.BankImage = BankImage;
