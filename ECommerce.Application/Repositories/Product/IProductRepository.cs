@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Application.Repositories.Product
 {
-    public interface IProductRepository : IRepositoryBase<Data.Entities.Product>
+    public interface IProductRepository : IRepositoryBase<Data.Entities.ProductSchema.Product>
     {
     }
 }

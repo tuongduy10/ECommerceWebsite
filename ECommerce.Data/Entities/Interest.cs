@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ECommerce.Data.Entities.UserSchema;
+using System;
 using System.Collections.Generic;
 
 namespace ECommerce.Data.Entities

@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Constants;
+﻿using ECommerce.Utilities.Constants;
 using ECommerce.Application.BaseServices.Brand;
 using ECommerce.Application.BaseServices.Product;
 using ECommerce.Application.BaseServices.Product.Dtos;
@@ -15,6 +15,7 @@ using System;
 using System.Threading.Tasks;
 using ECommerce.Application.Services.User.Dtos;
 using ECommerce.Application.Services.Inventory.Dtos;
+using ECommerce.Application.Common;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -52,12 +53,74 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(res);
             return Ok(res);
         }
+        [HttpGet("get-category/{id}")]
+        public async Task<IActionResult> getCategories(int id)
+        {
+            var res = await _inventoryService.getCategory(id);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("update-category")]
+        public async Task<IActionResult> updateCategory(CategoryModelRequest req)
+        {
+            var res = await _inventoryService.updateCategory(req);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("add-category")]
+        public async Task<IActionResult> addCategory(CategoryModelRequest req)
+        {
+            var res = await _inventoryService.addCategory(req);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("add-sub-category")]
+        public async Task<IActionResult> addSubCategory(SubCategoryModel request)
+        {
+            var res = await _inventoryService.addSubCategory(request);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("update-sub-category")]
+        public async Task<IActionResult> updateSubCategory(SubCategoryModel request)
+        {
+            var res = await _inventoryService.updateSubCategory(request);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+
         [HttpGet("get-brand/{id}")]
         public async Task<IActionResult> getBrand(int id)
         {
             var res = await _inventoryService.getBrand(id);
             if (!res.isSucceed)
                 return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("options")]
+        public async Task<IActionResult> getOptions(InventoryRequest request)
+        {
+            var result = await _inventoryService.getOptions(request);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("save-options")]
+        public async Task<IActionResult> saveOptions(OptionModel request)
+        {
+            var res = new Response<bool>();
+            if (request.id > -1)
+                res = await _inventoryService.updateOptions(request);
+            if (request.id == -1)
+                res = await _inventoryService.addOptions(request);
+
+            if (!res.isSucceed)
+                return BadRequest(res.Message);
             return Ok(res);
         }
         [HttpPost("product-options")]
@@ -72,6 +135,22 @@ namespace ECommerce.WebApp.Controllers
         public async Task<IActionResult> getProductAttributes(InventoryRequest request)
         {
             var result = await _inventoryService.getProductAttributes(request);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("attributes")]
+        public async Task<IActionResult> getAttributes(InventoryRequest request)
+        {
+            var result = await _inventoryService.getAttributes(request);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("save-attributes")]
+        public async Task<IActionResult> saveAttributes(InventoryRequest request)
+        {
+            var result = await _inventoryService.saveAttributes(request);
             if (!result.isSucceed)
                 return BadRequest(result);
             return Ok(result);

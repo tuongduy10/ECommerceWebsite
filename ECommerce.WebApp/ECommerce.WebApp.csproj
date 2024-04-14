@@ -58,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\images\brand\brand_7d3e21da-863b-4f1c-9d9c-bf7f4e6af7e5.webp" />
     <None Include="wwwroot\images\icon\award.svg" />
     <None Include="wwwroot\images\icon\chevron-down.svg" />
     <None Include="wwwroot\images\icon\chevron-left.svg" />
@@ -90,6 +91,34 @@
     <None Include="wwwroot\images\icon\smartphone.svg" />
     <None Include="wwwroot\images\icon\user.svg" />
     <None Include="wwwroot\images\icon\x.svg" />
+    <None Include="wwwroot\images\products\product_035b1b21-15ad-4355-aa88-7c3b320f4337.webp" />
+    <None Include="wwwroot\images\products\product_0c002307-aecb-4c6b-8a44-646d13bfd289.webp" />
+    <None Include="wwwroot\images\products\product_18629cb2-54ea-4e44-b31c-4da2cb1600fb.webp" />
+    <None Include="wwwroot\images\products\product_2808723c-5885-402e-b6db-52073881a867.webp" />
+    <None Include="wwwroot\images\products\product_29df9e09-24ea-43f8-b392-b7376e68d880.webp" />
+    <None Include="wwwroot\images\products\product_38a6fea5-5ca4-4ea3-b5ca-6174d93221ed.webp" />
+    <None Include="wwwroot\images\products\product_3ca16dbf-23c5-4792-be4f-a5cddf5e3fd9.webp" />
+    <None Include="wwwroot\images\products\product_4dd9c829-7fa4-45d2-b6f3-51276f9969ae.webp" />
+    <None Include="wwwroot\images\products\product_4dd9f249-fd9f-40b6-97e1-cc1061707f58.webp" />
+    <None Include="wwwroot\images\products\product_52279bb2-724e-4144-85f3-281de805a316.webp" />
+    <None Include="wwwroot\images\products\product_546f2fbd-4cce-431b-955b-45186eb040ee.webp" />
+    <None Include="wwwroot\images\products\product_566e4600-736b-4115-be30-d2fe5bab15c9.webp" />
+    <None Include="wwwroot\images\products\product_66c6f43a-ae1b-46b2-98b2-3ca3aa7a5c0c.webp" />
+    <None Include="wwwroot\images\products\product_7ce0a270-51da-41e5-8663-fdc99df7499b.webp" />
+    <None Include="wwwroot\images\products\product_7d2a6e72-d52b-4f22-837a-2933b73249a7.webp" />
+    <None Include="wwwroot\images\products\product_81848c75-8cf6-4400-b5bb-dbbcd3df9061.webp" />
+    <None Include="wwwroot\images\products\product_8683b0b8-ba55-41c3-bbfb-159bf68754c4.webp" />
+    <None Include="wwwroot\images\products\product_9813e61b-9946-40f6-8f62-b3eb03b83e98.webp" />
+    <None Include="wwwroot\images\products\product_9fa95608-e281-4f50-bcf7-81f3774902ca.webp" />
+    <None Include="wwwroot\images\products\product_ad79f855-38f1-48f4-861a-5059f37007b6.webp" />
+    <None Include="wwwroot\images\products\product_aee1c44d-519f-4415-bb41-c6b5d32d24d3.webp" />
+    <None Include="wwwroot\images\products\product_ba31dcf2-4b31-4690-98b6-7e91dca11ae7.webp" />
+    <None Include="wwwroot\images\products\product_c5429b22-0091-484d-b0b9-326c6556f1bf.webp" />
+    <None Include="wwwroot\images\products\product_c8dbb0e0-04f8-460b-a3ea-c19cb9b621e0.webp" />
+    <None Include="wwwroot\images\products\product_df04a01a-9885-48d0-a0af-bb94273b140f.webp" />
+    <None Include="wwwroot\images\products\product_e221e169-61de-4e9f-aef4-da0293464225.webp" />
+    <None Include="wwwroot\images\products\product_e22aacb5-96e4-45d5-9713-cc803ab10db9.webp" />
+    <None Include="wwwroot\images\products\product_e7b45250-e4ae-4b7d-9fde-a8bd7a0650ec.webp" />
   </ItemGroup>
 
 </Project>

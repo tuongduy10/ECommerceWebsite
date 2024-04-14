@@ -57,11 +57,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="3.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ECommerce.Data\ECommerce.Data.csproj" />
+    <ProjectReference Include="..\ECommerce.Dtos\ECommerce.Dtos.csproj" />
+    <ProjectReference Include="..\ECommerce.Utilities\ECommerce.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

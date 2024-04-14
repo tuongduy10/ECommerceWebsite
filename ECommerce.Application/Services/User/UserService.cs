@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using ECommerce.Application.Constants;
+using ECommerce.Utilities.Constants;
 using ECommerce.Data.Entities;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Repositories.OnlineHistory;
@@ -20,6 +20,7 @@ using ECommerce.Application.Services.Product.Dtos;
 using ECommerce.Data.Entities.Common;
 using ECommerce.Application.Enums;
 using UserUpdateRequest = ECommerce.Application.Services.User.Dtos.UserUpdateRequest;
+using ECommerce.Data.Entities.UserSchema;
 
 namespace ECommerce.Application.Services.User
 {
@@ -168,21 +169,21 @@ namespace ECommerce.Application.Services.User
                 return new ApiFailResponse(error.ToString());
             }
         }
-        public async Task<Response<Data.Entities.User>> UpdateUserStatus(UserUpdateRequest request)
+        public async Task<Response<Data.Entities.UserSchema.User>> UpdateUserStatus(UserUpdateRequest request)
         {
             try
             {
                 var user = await _userRepo.GetAsyncWhere(_ => _.UserId == request.id);
                 if (user == null)
-                    return new FailResponse<Data.Entities.User>("Không tìm thấy người dùng");
+                    return new FailResponse<Data.Entities.UserSchema.User>("Không tìm thấy người dùng");
                 user.Status = request.status;
                 _userRepo.Update(user);
                 await _userRepo.SaveChangesAsync();
-                return new SuccessResponse<Data.Entities.User>(user);
+                return new SuccessResponse<Data.Entities.UserSchema.User>(user);
             }
             catch (Exception error)
             {
-                return new FailResponse<Data.Entities.User>(error.Message);
+                return new FailResponse<Data.Entities.UserSchema.User>(error.Message);
             }
         }
         public async Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline)
@@ -270,7 +271,8 @@ namespace ECommerce.Application.Services.User
                     }
                 }
 
-                var result = await _DbContext.Users
+                var result = await _userRepo
+                    .Entity()
                     .Where(i => i.UserPhone == phonenumber && i.Password == request.Password)
                     .FirstOrDefaultAsync();
 
@@ -365,7 +367,7 @@ namespace ECommerce.Application.Services.User
 
                 var seller = await _userRepo.GetAsyncWhere(_ => _.UserId == request.id);
                 if (seller == null)
-                    seller = new Data.Entities.User();
+                    seller = new Data.Entities.UserSchema.User();
 
                 seller.UserMail = request.email.Trim();
                 seller.UserCityCode = request.cityCode;

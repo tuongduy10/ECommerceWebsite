@@ -4,6 +4,9 @@ const handleError = (error: any) => {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     switch(error.response.satus) {
+      case 400:
+        alert("lỗi")
+        return;
       case 401: 
         window.location.href = '/login';
         return;

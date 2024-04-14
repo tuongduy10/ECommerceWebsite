@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Data.Entities.UserSchema;
+using System;
 using System.Collections.Generic;
 
 #nullable disable

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Application.Repositories.ProductImage
 {
-    public interface IProductImageRepository : IRepositoryBase<Data.Entities.ProductImage>
+    public interface IProductImageRepository : IRepositoryBase<Data.Entities.ProductSchema.ProductImage>
     {
     }
 }

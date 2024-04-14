@@ -365,3 +365,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /ECommerce.WebApp/client/build
+/ECommerce.WebApp/wwwroot/images

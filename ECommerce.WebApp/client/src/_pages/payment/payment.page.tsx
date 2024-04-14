@@ -1,10 +1,12 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces";
+import { showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
 import CommonService from "src/_cores/_services/common.service";
-import { useCartStore } from "src/_cores/_store/root-store";
+import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { MuiIcon, WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
@@ -12,6 +14,7 @@ import { ProductHelper } from "src/_shares/_helpers/product-helper";
 const PaymentPage = () => {
     const navigate = useNavigate();
     const cartStore = useCartStore();
+    const dispatch = useDispatch<AppDispatch>();
     const [open, setOpen] = useState(false);
     const [cities, setCitites] = useState<ICity[]>([]);
     const [districts, setDistricts] = useState<IDistrict[]>([]);
@@ -22,8 +25,25 @@ const PaymentPage = () => {
         getCities();
     }, []);
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleProcessOrder = () => {
+        if (!dataDetail['phoneNumber'] || !dataDetail['cityCode'] || !dataDetail['districtCode'] || !dataDetail['wardCode'] || !dataDetail['address']) {
+            dispatch(showError('Vui lòng nhập đầy đủ thông tin'));
+            return;
+        }
+        if (!dataDetail['paymentMethod']) {
+            dispatch(showError('Vui lòng phương thức thanh toán'));
+            return;
+        }
+
+        const param = {
+            deliveryInfo: dataDetail,
+            products: cartStore.productsInCart
+        }
+        console.log(param);
+        if (dataDetail['paymentMethod'] === 'bank') {            
+            setOpen(true);
+        }
+        dispatch(showSuccess(`Đặt hàng thành công`));
     };
 
     const handleClose = () => {
@@ -45,6 +65,8 @@ const PaymentPage = () => {
             wardCode: ''
         }
         setDataDetail(_dataDetail);
+        setDistricts([]);
+        setWards([]);
         await getDistricts(code);
     }
 
@@ -62,6 +84,7 @@ const PaymentPage = () => {
             wardCode: ''
         }
         setDataDetail(_dataDetail);
+        setWards([]);
         await getWards(code);
     }
 
@@ -77,9 +100,7 @@ const PaymentPage = () => {
     }
 
     const onChangeFieldValue = (field: string, value: any) => {
-        if (dataDetail[field]) {
-            setDataDetail({ ...dataDetail, [field]: value });
-        }
+        setDataDetail({ ...dataDetail, [field]: value });
     }
 
     const getFormatedPrice = (price: number) => {
@@ -185,43 +206,48 @@ const PaymentPage = () => {
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Họ tên" />
+                                    <input className="w-full" type="text" placeholder="Họ tên" 
+                                        onChange={e => onChangeFieldValue('fullName', e.target.value)} value={dataDetail['fullName'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Số điện thoại" />
+                                    <input className="w-full" type="text" placeholder="Số điện thoại" 
+                                        onChange={e => onChangeFieldValue('phoneNumber', e.target.value)} value={dataDetail['phoneNumber'] || ""} />
                                 </div>
                                 <div
                                     className="payment-info__line payment-bank w-full flex items-center justify-between flex-wrap">
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="city-select w-full" onChange={e => onChangeCity(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['cityCode']}>Tỉnh/Thành...</option>
+                                        <select className="city-select w-full" 
+                                            onChange={e => onChangeCity(e.target.value)} defaultValue={""} value={dataDetail['cityCode']}>
+                                            <option value="" disabled>Tỉnh/Thành...</option>
                                             {cities.length > 0 && (
                                                 cities.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['cityCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
                                     </div>
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="district-select w-full" onChange={e => onChangeDistrict(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['districtCode']}>Quận/Huyện...</option>
+                                        <select className="district-select w-full" 
+                                            onChange={e => onChangeDistrict(e.target.value)} defaultValue={""} value={dataDetail['districtCode']}>
+                                            <option value="" disabled>Quận/Huyện...</option>
                                             {districts.length > 0 && (
                                                 districts.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['districtCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
                                     </div>
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="ward-select w-full" onChange={e => onChangeWard(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['wardCode']}>Phường/Xã...</option>
+                                        <select className="ward-select w-full" 
+                                            onChange={e => onChangeWard(e.target.value)} defaultValue={""} value={dataDetail['wardCode']}>
+                                            <option value="" disabled>Phường/Xã...</option>
                                             {wards.length > 0 && (
                                                 wards.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['wardCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
@@ -229,13 +255,16 @@ const PaymentPage = () => {
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Địa chỉ" />
+                                    <input className="w-full" type="text" placeholder="Địa chỉ" 
+                                        onChange={e => onChangeFieldValue('address', e.target.value)} value={dataDetail['address'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
-                                    <input className="w-full" type="text" placeholder="Email" />
+                                    <input className="w-full" type="text" placeholder="Email" 
+                                    onChange={e => onChangeFieldValue('email', e.target.value)} value={dataDetail['email'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
-                                    <input className="w-full" type="text" placeholder="Ghi chú" />
+                                    <input className="w-full" type="text" placeholder="Ghi chú" 
+                                    onChange={e => onChangeFieldValue('remark', e.target.value)} value={dataDetail['remark'] || ""} />
                                 </div>
                             </Grid>
                             <Grid className="payment-method" item xs={5}>
@@ -243,17 +272,20 @@ const PaymentPage = () => {
                                     <strong>PHƯƠNG THỨC THANH TOÁN</strong>
                                 </div>
                                 <div className="payment-info__line w-full items-center flex">
-                                    <input name="payment-method" type="radio" style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} />
-                                    <label className="ml-2 mb-0 cursor-pointer">Thanh toán khi nhận hàng</label>
+                                    <input name="payment-method" id="pmt-01" type="radio" value="cash" checked={dataDetail['paymentMethod'] === 'cash'}
+                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} 
+                                        onChange={e => onChangeFieldValue('paymentMethod', 'cash')} />
+                                    <label className="ml-2 mb-0 cursor-pointer" htmlFor="pmt-01">Thanh toán khi nhận hàng</label>
                                 </div>
                                 <div className="payment-info__line w-full items-center flex">
-                                    <input name="payment-method" type="radio"
-                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} />
-                                    <label className="ml-2 mb-0 cursor-pointer">Chuyển khoản</label>
+                                    <input name="payment-method" id="pmt-02" type="radio" value="bank" checked={dataDetail['paymentMethod'] === 'bank'}
+                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} 
+                                        onChange={e => onChangeFieldValue('paymentMethod', 'bank')} />
+                                    <label className="ml-2 mb-0 cursor-pointer" htmlFor="pmt-02">Chuyển khoản</label>
                                 </div>
                                 <div className="payment-checkout text-center block">
                                     <button className="inline-block btn-black" data-toggle="modal" data-target="#exampleModal" style={{ border: '1px solid #333' }}
-                                        onClick={handleClickOpen}
+                                        onClick={handleProcessOrder}
                                     >
                                         Đặt hàng
                                     </button>

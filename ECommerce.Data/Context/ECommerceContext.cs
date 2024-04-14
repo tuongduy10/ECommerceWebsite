@@ -5,6 +5,11 @@ using ECommerce.Data.Entities;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using ECommerce.Data.Entities.Common;
+using ECommerce.Data.Entities.UserSchema;
+using ECommerce.Data.Entities.Cms;
+using ECommerce.Data.Entities.Inventory;
+using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Data.Entities.OmsSchema;
 
 #nullable disable
 
@@ -21,7 +26,7 @@ namespace ECommerce.Data.Context
         {
         }
 
-        public virtual DbSet<Entities.Attribute> Attributes { get; set; }
+        public virtual DbSet<Entities.Inventory.Attribute> Attributes { get; set; }
         public virtual DbSet<Bank> Banks { get; set; }
         public virtual DbSet<Banner> Banners { get; set; }
         public virtual DbSet<Blog> Blogs { get; set; }
@@ -37,10 +42,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<NotificationType> NotificationTypes { get; set; }
         public virtual DbSet<Option> Options { get; set; }
         public virtual DbSet<OptionValue> OptionValues { get; set; }
-        public virtual DbSet<Order> Orders { get; set; }
-        public virtual DbSet<OrderDetail> OrderDetails { get; set; }
         public virtual DbSet<OnlineHistory> OnlineHistories { get; set; }
-        public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
         public virtual DbSet<ProductImage> ProductImages { get; set; }
@@ -64,6 +66,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<Ward> Wards { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -79,7 +82,7 @@ namespace ECommerce.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entities.Attribute>(entity =>
+            modelBuilder.Entity<Entities.Inventory.Attribute>(entity =>
             {
                 entity.ToTable("Attribute");
 
@@ -327,89 +330,6 @@ namespace ECommerce.Data.Context
                     .HasForeignKey(d => d.OptionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OptionValue_Option");
-            });
-
-            modelBuilder.Entity<Order>(entity =>
-            {
-                entity.ToTable("Order");
-
-                entity.Property(e => e.Address).HasColumnType("text");
-
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.DiscountCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DiscountType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.DiscountValue).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.PhoneNumber)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Recipient).HasMaxLength(100);
-
-                entity.Property(e => e.Temporary).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.Total).HasColumnType("decimal(18, 0)");
-
-                entity.HasOne(d => d.PaymentMethod)
-                    .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.PaymentMethodId)
-                    .HasConstraintName("FK_Order_PaymentMethod");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Orders)
-                    .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK_Order_User");
-            });
-
-            modelBuilder.Entity<OrderDetail>(entity =>
-            {
-                entity.HasKey(e => new { e.OrderDetailId, e.OrderId, e.ShopId });
-
-                entity.ToTable("OrderDetail");
-
-                entity.Property(e => e.OrderDetailId).ValueGeneratedOnAdd();
-
-                entity.Property(e => e.AttributeValue).HasMaxLength(50);
-
-                entity.Property(e => e.OptionValue)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.PayForAdmin).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.PriceOnSell).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.ProductName).HasMaxLength(100);
-
-                entity.Property(e => e.ShopName).HasMaxLength(100);
-
-                entity.Property(e => e.Total).HasColumnType("decimal(18, 0)");
-
-                entity.Property(e => e.VerifiedDate).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Order)
-                    .WithMany(p => p.OrderDetails)
-                    .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_OrderDetail_Order");
-            });
-
-            modelBuilder.Entity<PaymentMethod>(entity =>
-            {
-                entity.ToTable("PaymentMethod");
-
-                entity.Property(e => e.PaymentMethod1)
-                    .HasMaxLength(50)
-                    .HasColumnName("PaymentMethod");
             });
 
             modelBuilder.Entity<Product>(entity =>
