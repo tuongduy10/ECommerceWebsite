@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Comment;
 using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Repositories.Notification.Dtos;
 using ECommerce.Application.Repositories.User;

@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Comment;
 using ECommerce.Application.Repositories.Interest;
 using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Repositories.User;
@@ -19,10 +18,7 @@ namespace ECommerce.Application.Services.Comment
     public interface ICommentService
     {
         // Repository get
-        ICommentRepository Comment { get; }
         INotificationRepository Notification { get; }
-        IRepositoryBase<RatingImage> CommentImage { get; }
-        IUserRepository User { get; }
         IInterestRepository Interest { get; }
         // Service methods
         Task<Response<bool>> postComment(PostCommentRequest request);
@@ -33,6 +29,5 @@ namespace ECommerce.Application.Services.Comment
         Task<Response<List<string>>> GetUsersFavor(UserFavorRequest request);
         Task<Response<List<string>>> DeleteByProductId(int _productId);
         Task<Response<List<string>>> DeleteByUserId(int _userId);
-        Task SaveChangesAsync();
     }
 }

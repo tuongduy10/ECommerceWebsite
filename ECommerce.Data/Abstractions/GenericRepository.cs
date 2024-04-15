@@ -30,6 +30,10 @@ namespace ECommerce.Data.Abstractions
         {
             await _dbSet.AddAsync(entity);
         }
+        public async Task AddAsync(IEnumerable<TEntity> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
         public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter)
         {
             return await _dbSet.Where(filter).AnyAsync();
@@ -42,12 +46,24 @@ namespace ECommerce.Data.Abstractions
             }
             _dbSet.Remove(entity);
         }
+        public virtual void Delete(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                var entry = _dbContext.Entry(entity);
+                if (entry.State == EntityState.Detached)
+                {
+                    _dbSet.Attach(entity);
+                }
+            }
+            _dbSet.RemoveRange(entities);
+        }
         public virtual void Update(TEntity entity)
         {
             _dbSet.Update(entity);
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
-        public virtual IQueryable<TEntity> Query(
+        public virtual IQueryable<TEntity> QueryableAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
@@ -71,7 +87,26 @@ namespace ECommerce.Data.Abstractions
             }
             return query;
         }
-        public virtual async Task<IEnumerable<TEntity>> GetByQuery(
+        public virtual async Task<TEntity> FindByAsync(
+            Expression<Func<TEntity, bool>> filter = null,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            return await query.FirstOrDefaultAsync();
+        }
+        public virtual async Task<IEnumerable<TEntity>> GetByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
