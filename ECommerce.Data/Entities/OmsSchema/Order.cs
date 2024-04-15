@@ -14,11 +14,11 @@ namespace ECommerce.Data.Entities.OmsSchema
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Remark { get; set; }
-        public int CityId { get; set; }
+        public string CityCode { get; set; }
         public virtual Province City { get; set; }
-        public int DistrictId { get;    set; }
+        public string DistrictCode { get; set; }
         public virtual District District { get; set; }
-        public int WardId { get; set; }
+        public string WardCode { get; set; }
         public virtual Ward Ward { get; set; }
     }
 }
