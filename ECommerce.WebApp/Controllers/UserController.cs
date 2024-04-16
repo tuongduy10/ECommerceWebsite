@@ -1,7 +1,7 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.User.Dtos;
 using ECommerce.Application.BaseServices.User;
-using ECommerce.Application.Services.User;
+using ECommerce.Application.Services.UserSrv;
 using ECommerce.WebApp.Configs.AppSettings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,8 +16,8 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using ECommerce.WebApp.Utils;
-using ECommerce.Application.Services.User.Dtos;
-using UserUpdateRequest = ECommerce.Application.Services.User.Dtos.UserUpdateRequest;
+using ECommerce.Application.Services.UserSrv.Dtos;
+using UserUpdateRequest = ECommerce.Application.Services.UserSrv.Dtos.UserUpdateRequest;
 
 namespace ECommerce.WebApp.Controllers
 {

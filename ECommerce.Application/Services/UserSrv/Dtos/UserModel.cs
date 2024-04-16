@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ECommerce.Application.Services.User.Dtos
+namespace ECommerce.Application.Services.UserSrv.Dtos
 {
     public class UserModel
     {

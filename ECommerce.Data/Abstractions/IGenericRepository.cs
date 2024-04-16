@@ -14,6 +14,7 @@ namespace ECommerce.Data.Abstractions
         Task AddAsync(TEntity entity);
         Task AddAsync(IEnumerable<TEntity> entities);
         void Update(TEntity entity);
+        void Update(IEnumerable<TEntity> entities);
         void Delete(TEntity entity);
         void Delete(IEnumerable<TEntity> entities);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter);

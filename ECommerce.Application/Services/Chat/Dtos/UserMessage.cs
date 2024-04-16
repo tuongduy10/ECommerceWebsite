@@ -1,9 +1,8 @@
-﻿using ECommerce.Application.Services.Chat.Dtos;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ECommerce.Application.Repositories.Message.Dtos
+namespace ECommerce.Application.Services.Chat.Dtos
 {
     public class UserMessage
     {

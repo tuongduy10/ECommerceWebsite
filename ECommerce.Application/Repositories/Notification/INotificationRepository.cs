@@ -2,7 +2,7 @@
 using ECommerce.Application.Repositories.Notification.Dtos;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
-using ECommerce.Application.Services.User.Dtos;
+using ECommerce.Application.Services.UserSrv.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;

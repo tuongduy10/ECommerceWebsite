@@ -63,6 +63,11 @@ namespace ECommerce.Data.Abstractions
             _dbSet.Update(entity);
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
+        public virtual void Update(IEnumerable<TEntity> entities)
+        {
+            _dbSet.UpdateRange(entities);
+            _dbContext.Entry(entities).State = EntityState.Modified;
+        }
         public virtual IQueryable<TEntity> QueryableAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

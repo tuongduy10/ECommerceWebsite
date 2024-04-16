@@ -3,7 +3,7 @@ using ECommerce.Application.Repositories.Notification.Dtos;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
 using ECommerce.Application.BaseServices.User.Enums;
-using ECommerce.Application.Services.User.Dtos;
+using ECommerce.Application.Services.UserSrv.Dtos;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;

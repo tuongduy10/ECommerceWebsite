@@ -2,7 +2,7 @@
 using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Inventory.Dtos;
-using ECommerce.Application.Services.User.Dtos;
+using ECommerce.Application.Services.UserSrv.Dtos;
 using ECommerce.Data.Context;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
