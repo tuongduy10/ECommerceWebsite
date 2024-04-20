@@ -3,8 +3,8 @@ using ECommerce.Application.Common;
 using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Comment.Request;
-using ECommerce.Application.Services.Product;
-using ECommerce.Application.Services.Product.Dtos;
+using ECommerce.Application.Services.ProductSrv;
+using ECommerce.Application.Services.ProductSrv.Dtos;
 using ECommerce.WebApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -36,7 +36,6 @@ namespace ECommerce.WebApp.Controllers
             _commentService = commentService;
             _manageFiles = new ManageFiles(webHostEnvironment);
         }
-        [AllowAnonymous]
         [HttpPost("product-managed-list")]
         public async Task<IActionResult> getProductManagedList(ProductGetRequest request)
         {
@@ -99,7 +98,6 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [AllowAnonymous]
         [HttpPost("update-status")]
         public async Task<IActionResult> updateStatus(UpdateStatusRequest request)
         {
@@ -108,7 +106,6 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [AllowAnonymous]
         [HttpPost("save")]
         public async Task<IActionResult> save(ProductSaveRequest request)
         {
@@ -120,7 +117,6 @@ namespace ECommerce.WebApp.Controllers
             }
             return BadRequest(result);
         }
-        [AllowAnonymous]
         [HttpPost("delete")]
         public async Task<IActionResult> delete(ProductDeleteRequest request)
         {

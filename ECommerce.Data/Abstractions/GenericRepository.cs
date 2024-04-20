@@ -111,6 +111,10 @@ namespace ECommerce.Data.Abstractions
 
             return await query.FirstOrDefaultAsync();
         }
+        public virtual async Task<TEntity> FindLastAsync()
+        {
+            return await _dbSet.LastOrDefaultAsync();
+        }
         public virtual async Task<IEnumerable<TEntity>> GetByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

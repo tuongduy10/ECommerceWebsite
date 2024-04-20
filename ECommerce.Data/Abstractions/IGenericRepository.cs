@@ -25,6 +25,7 @@ namespace ECommerce.Data.Abstractions
         Task<TEntity> FindByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             string includeProperties = "");
+        Task<TEntity> FindLastAsync();
         Task<IEnumerable<TEntity>> GetByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,

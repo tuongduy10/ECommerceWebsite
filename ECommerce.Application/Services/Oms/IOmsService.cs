@@ -1,5 +1,5 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Services.Product.Dtos;
+using ECommerce.Application.Services.ProductSrv.Dtos;
 using ECommerce.Data.Entities.OmsSchema;
 using System;
 using System.Collections.Generic;

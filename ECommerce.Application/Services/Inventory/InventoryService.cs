@@ -3,6 +3,7 @@ using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Application.Services.UserSrv.Dtos;
+using ECommerce.Data.Abstractions;
 using ECommerce.Data.Context;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
@@ -34,8 +35,9 @@ namespace ECommerce.Application.Services.Inventory
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
         private readonly IRepositoryBase<SizeGuide> _sizeGuideRepo;
         private readonly IRepositoryBase<Data.Entities.Inventory.Attribute> _attributeRepo;
+        private readonly IUnitOfWork _uow;
         public InventoryService(ECommerceContext DbContext,
-            IRepositoryBase<Data.Entities.ProductSchema.Product> productRepo,
+            IRepositoryBase<Product> productRepo,
             IRepositoryBase<Option> optionRepo,
             IRepositoryBase<Data.Entities.Inventory.OptionValue> optionValueRepo,
             IRepositoryBase<Brand> brandRepo,
@@ -48,7 +50,8 @@ namespace ECommerce.Application.Services.Inventory
             IRepositoryBase<ProductOptionValue> productOptionValuesRepo,
             IRepositoryBase<ProductAttribute> productAttributeRepo,
             IRepositoryBase<SizeGuide> sizeGuideRepo,
-            IRepositoryBase<Data.Entities.Inventory.Attribute> attributeRepo)
+            IRepositoryBase<Data.Entities.Inventory.Attribute> attributeRepo,
+            IUnitOfWork uow)
         {
             _DbContext = DbContext;
             _productRepo = productRepo;
@@ -65,6 +68,7 @@ namespace ECommerce.Application.Services.Inventory
             _productAttributeRepo = productAttributeRepo;
             _sizeGuideRepo = sizeGuideRepo;
             _attributeRepo = attributeRepo;
+            _uow = uow;
         }
         public async Task<Response<BrandModel>> getBrand(int brandId = 0) 
         {
@@ -165,7 +169,7 @@ namespace ECommerce.Application.Services.Inventory
                     if (!string.IsNullOrEmpty(req.name))
                         entity.CategoryName = req.name;
                     _categoryRepo.Update(entity);
-                    await _categoryRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 return new SuccessResponse<Category>(entity);
             }
@@ -186,7 +190,7 @@ namespace ECommerce.Application.Services.Inventory
                     if (!string.IsNullOrEmpty(req.name))
                         newEntity.CategoryName = req.name;
                     await _categoryRepo.AddAsync(newEntity);
-                    await _categoryRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                     return new SuccessResponse<Category>(newEntity);
                 }
                 return new SuccessResponse<Category>();
@@ -268,7 +272,7 @@ namespace ECommerce.Application.Services.Inventory
         {
             if (string.IsNullOrEmpty(request.name))
                 return new FailResponse<SubCategory>("Nhập tên loại");
-            var check = await _subCategoryRepo.AnyAsyncWhere(_ => _.SubCategoryName == request.name.Trim());
+            var check = await _uow.Repository<SubCategory>().AnyAsync(_ => _.SubCategoryName == request.name.Trim());
             if (check)
                 return new FailResponse<SubCategory>("Loại đã tồn tại");
 
@@ -279,7 +283,7 @@ namespace ECommerce.Application.Services.Inventory
                 entity.SubCategoryName = request.name.Trim();
                 entity.CategoryId = request.categoryId;
                 await _subCategoryRepo.AddAsync(entity);
-                await _subCategoryRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 // attributes
                 if (request.attributes.Count > 0)
@@ -292,7 +296,7 @@ namespace ECommerce.Application.Services.Inventory
                         })
                         .ToList();
                     await _subCategoryAttributeRepo.AddRangeAsync(attrs);
-                    await _subCategoryAttributeRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 // options
                 if (request.optionList.Count > 0)
@@ -305,7 +309,7 @@ namespace ECommerce.Application.Services.Inventory
                         })
                         .ToList();
                     await _subCategoryOptionRepo.AddRangeAsync(opts);
-                    await _subCategoryOptionRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
                 return new SuccessResponse<SubCategory>();
@@ -332,11 +336,11 @@ namespace ECommerce.Application.Services.Inventory
                 entity.SubCategoryName = request.name.Trim();
                 entity.CategoryId = request.categoryId;
                 _subCategoryRepo.Update(entity);
-                await _subCategoryRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 // attributes
                 await _subCategoryAttributeRepo.RemoveRangeAsyncWhere(_ => _.SubCategoryId == entity.SubCategoryId);
-                await _subCategoryAttributeRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 if (request.attributes.Count > 0)
                 {
                     var attrs = request.attributes
@@ -347,12 +351,12 @@ namespace ECommerce.Application.Services.Inventory
                         })
                         .ToList();
                     await _subCategoryAttributeRepo.AddRangeAsync(attrs);
-                    await _subCategoryAttributeRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
 
                 // options
                 await _subCategoryOptionRepo.RemoveRangeAsyncWhere(_ => _.SubCategoryId == entity.SubCategoryId);
-                await _subCategoryOptionRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 if (request.optionList.Count > 0)
                 {
                     var opts = request.optionList
@@ -363,7 +367,7 @@ namespace ECommerce.Application.Services.Inventory
                         })
                         .ToList();
                     await _subCategoryOptionRepo.AddRangeAsync(opts);
-                    await _subCategoryOptionRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
                 return new SuccessResponse<SubCategory>();
@@ -414,7 +418,7 @@ namespace ECommerce.Application.Services.Inventory
         {
             if (string.IsNullOrEmpty(request.name))
                 return new FailResponse<bool>("Nhập tên");
-            var isExisted = await _optionRepo.AnyAsyncWhere(_ => _.OptionName == request.name.Trim());
+            var isExisted = await _uow.Repository<Option>().AnyAsync(_ => _.OptionName == request.name.Trim());
             if (isExisted)
                 return new FailResponse<bool>("Tên đã tồn tại");
 
@@ -427,7 +431,7 @@ namespace ECommerce.Application.Services.Inventory
                     OptionName = request.name
                 };
                 await _optionRepo.AddAsync(entity);
-                await _optionRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 // option values
                 var optionValues = request.values
@@ -439,7 +443,7 @@ namespace ECommerce.Application.Services.Inventory
                     })
                     .ToList();
                 await _optionValueRepo.AddRangeAsync(optionValues);
-                await _optionValueRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 await transaction.CommitAsync();
                 return new SuccessResponse<bool>();
@@ -466,7 +470,7 @@ namespace ECommerce.Application.Services.Inventory
                 // options
                 option.OptionName = request.name;
                 _optionRepo.Update(option);
-                await _optionRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 // option values
                 var existingValues = option.OptionValues.ToDictionary(v => v.OptionValueName);
@@ -490,7 +494,7 @@ namespace ECommerce.Application.Services.Inventory
                             OptionValueName = newValue.name,
                             IsBaseValue = true
                         });
-                        await _optionRepo.SaveChangesAsync();
+                        await _uow.SaveChangesAsync();
                     }
                 }
                 // Remove Option Values not in request.values
@@ -501,10 +505,10 @@ namespace ECommerce.Application.Services.Inventory
                 {
                     var proOptValues = value.ProductOptionValues;
                     _productOptionValuesRepo.RemoveRange(proOptValues);
-                    await _productOptionValuesRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 _optionValueRepo.RemoveRange(valuesToRemove);
-                await _optionValueRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 await transaction.CommitAsync();
                 return new SuccessResponse<bool>();
@@ -624,7 +628,7 @@ namespace ECommerce.Application.Services.Inventory
                     };
                     await _attributeRepo.AddAsync(newEntity);
                 }
-                await _attributeRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 return new SuccessResponse<bool>();
             }
             catch (Exception error)

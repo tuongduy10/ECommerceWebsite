@@ -18,7 +18,7 @@ using ECommerce.Application.Services.HttpClient;
 using ECommerce.Application.Services.Inventory;
 using ECommerce.Application.Services.Notifications;
 using ECommerce.Application.Services.Oms;
-using ECommerce.Application.Services.Product;
+using ECommerce.Application.Services.ProductSrv;
 using ECommerce.Application.Services.UserSrv;
 using ECommerce.Data.Abstractions;
 using Microsoft.Extensions.DependencyInjection;

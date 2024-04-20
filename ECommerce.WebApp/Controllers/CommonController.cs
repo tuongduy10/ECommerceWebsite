@@ -3,7 +3,7 @@ using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.Common.DTOs.Requests;
-using ECommerce.Application.Services.Product;
+using ECommerce.Application.Services.ProductSrv;
 using ECommerce.Dtos.Common;
 using ECommerce.WebApp.Utils;
 using Microsoft.AspNetCore.Authorization;

@@ -1,12 +1,12 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Services.Product.Dtos;
+using ECommerce.Application.Services.ProductSrv.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerce.Application.Services.Product
+namespace ECommerce.Application.Services.ProductSrv
 {
     public interface IProductService
     {

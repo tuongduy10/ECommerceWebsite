@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Services.Product.Dtos;
+﻿using ECommerce.Application.Services.ProductSrv.Dtos;
 using ECommerce.Application.Common;
 using ECommerce.Application.Enums;
 using ECommerce.Application.Repositories;
@@ -21,13 +21,13 @@ using ECommerce.Utilities.Constants;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Entities.OmsSchema;
+using ECommerce.Data.Abstractions;
 
-namespace ECommerce.Application.Services.Product
+namespace ECommerce.Application.Services.ProductSrv
 {
     public class ProductService : IProductService
     {
         private readonly ECommerceContext _DbContext;
-        private readonly IRepositoryBase<Data.Entities.ProductSchema.Product> _productRepo;
         private readonly IRepositoryBase<Option> _optionRepo;
         private readonly IRepositoryBase<OptionValue> _optionValueRepo;
         private readonly IRepositoryBase<Brand> _brandRepo;
@@ -45,19 +45,19 @@ namespace ECommerce.Application.Services.Product
         private readonly IRateService _rateService;
         private readonly ICommonService _commonService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUnitOfWork _uow;
         public ProductService(ECommerceContext DbContext,
             IInventoryService inventoryService,
             IRateService rateService,
             ICommonService commonService,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            IUnitOfWork uow)
         {
             _DbContext = DbContext;
             _inventoryService = inventoryService;
             _rateService = rateService;
             _commonService = commonService;
             _webHostEnvironment = webHostEnvironment;
-            if (_productRepo == null)
-                _productRepo = new RepositoryBase<Data.Entities.ProductSchema.Product>(_DbContext);
             if (_brandCategoryRepo == null)
                 _brandCategoryRepo = new RepositoryBase<BrandCategory>(_DbContext);
             if (_subCategoryRepo == null)
@@ -84,6 +84,7 @@ namespace ECommerce.Application.Services.Product
                 _rateRepo = new RepositoryBase<Rate>(_DbContext);
             if (_discountRepo == null)
                 _discountRepo = new RepositoryBase<Discount>(_DbContext);
+            _uow = uow;
         }
         public async Task<Response<ProductModel>> getProductDetail(int id)
         {
@@ -152,69 +153,68 @@ namespace ECommerce.Application.Services.Product
                     rates = rates
                 };
 
-                var product = await _productRepo.Entity()
-                    .Where(i => i.ProductId == id)
-                    .Select(i => new ProductModel
+                var proEntity = await _uow.Repository<Product>()
+                    .FindByAsync(i => i.ProductId == id, "Brand,Shop,SubCategory");
+                var product = new ProductModel
+                {
+                    id = proEntity.ProductId,
+                    code = proEntity.ProductCode,
+                    ppc = proEntity.Ppc,
+                    name = proEntity.ProductName,
+                    description = proEntity.ProductDescription,
+                    sizeGuide = proEntity.SizeGuide,
+                    size = proEntity.SizeGuide,
+                    stock = proEntity.ProductStock,
+
+                    delivery = proEntity.Delivery,
+                    repay = proEntity.Repay,
+                    insurance = proEntity.Insurance,
+                    isLegit = proEntity.Legit,
+                    isHighlight = proEntity.Highlights,
+                    isNew = proEntity.New,
+
+                    shopId = proEntity.ShopId,
+                    shop = new ShopModel
                     {
-                        id = i.ProductId,
-                        code = i.ProductCode,
-                        ppc = i.Ppc,
-                        name = i.ProductName,
-                        description = i.ProductDescription,
-                        sizeGuide = i.SizeGuide,
-                        size = i.SizeGuide,
-                        stock = i.ProductStock,
+                        id = proEntity.ShopId,
+                        name = proEntity.Shop.ShopName,
+                    },
+                    brandId = proEntity.BrandId,
+                    brand = new BrandModel
+                    {
+                        id = proEntity.BrandId,
+                        name = proEntity.Brand.BrandName,
+                        description = proEntity.Brand.Description,
+                        descriptionTitle = proEntity.Brand.DescriptionTitle,
+                        imagePath = proEntity.Brand.BrandImagePath,
+                    },
+                    subCategoryId = proEntity.SubCategoryId,
+                    subCategory = new SubCategoryModel
+                    {
+                        id = proEntity.SubCategoryId,
+                        name = proEntity.SubCategory.SubCategoryName,
+                    },
 
-                        delivery = i.Delivery,
-                        repay = i.Repay,
-                        insurance = i.Insurance,
-                        isLegit = i.Legit,
-                        isHighlight = i.Highlights,
-                        isNew = i.New,
+                    attributes = attributes,
+                    options = options,
+                    importDate = proEntity.ProductImportDate,
 
-                        shopId = i.ShopId,
-                        shop = new ShopModel
-                        {
-                            id = i.ShopId,
-                            name = i.Shop.ShopName,
-                        },
-                        brandId = i.BrandId,
-                        brand = new BrandModel
-                        {
-                            id = i.BrandId,
-                            name = i.Brand.BrandName,
-                            description = i.Brand.Description,
-                            descriptionTitle = i.Brand.DescriptionTitle,
-                            imagePath = i.Brand.BrandImagePath,
-                        },
-                        subCategoryId = i.SubCategoryId,
-                        subCategory = new SubCategoryModel
-                        {
-                            id = i.SubCategoryId,
-                            name = i.SubCategory.SubCategoryName,
-                        },
+                    priceAvailable = proEntity.PriceAvailable,
+                    pricePreOrder = proEntity.PricePreOrder,
+                    priceForSeller = proEntity.PriceForSeller,
+                    priceImport = proEntity.PriceImport,
+                    isDiscountPercent = proEntity.DiscountPercent != null || proEntity.DiscountPercent > 0,
+                    discountPercent = proEntity.DiscountPercent,
+                    discountAvailable = proEntity.DiscountAvailable,
+                    discountPreOrder = proEntity.DiscountPreOrder,
 
-                        attributes = attributes,
-                        options = options,
-                        importDate = i.ProductImportDate,
+                    imagePaths = imagePaths,
+                    userImagePaths = userImagePaths,
 
-                        priceAvailable = i.PriceAvailable,
-                        pricePreOrder = i.PricePreOrder,
-                        priceForSeller = i.PriceForSeller,
-                        priceImport = i.PriceImport,
-                        isDiscountPercent = i.DiscountPercent != null || i.DiscountPercent > 0,
-                        discountPercent = i.DiscountPercent,
-                        discountAvailable = i.DiscountAvailable,
-                        discountPreOrder = i.DiscountPreOrder,
-
-                        imagePaths = imagePaths,
-                        userImagePaths = userImagePaths,
-
-                        review = review,
-                        note = i.Note,
-                        link = i.Link,
-                    })
-                    .FirstOrDefaultAsync();
+                    review = review,
+                    note = proEntity.Note,
+                    link = proEntity.Link,
+                };
 
                 return new SuccessResponse<ProductModel>(product);
             }
@@ -244,26 +244,20 @@ namespace ECommerce.Application.Services.Product
                     .Distinct()
                     .ToList();
 
-                var extQuery = _productRepo.Queryable(_ =>
+                Func<IQueryable<Product>, IOrderedQueryable<Product>> orderByReq = _ => _.OrderByDescending(i => i.ProductAddedDate);
+                if (orderBy == "asc")
+                    orderByReq = _ => _.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
+                if (orderBy == "desc")
+                    orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
+
+                var extQuery = _uow.Repository<Product>().QueryableAsync(_ =>
                     (ids.Count == 0 || ids.Contains(_.ProductId)) &&
                     (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
                     (brandId == -1 || _.BrandId == brandId) &&
                     (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
                     (orderBy == "newest" ? _.New == true : _.New != null) &&
-                    (orderBy == "discount" ? _.DiscountPercent != null : (_.DiscountPercent > (byte)0 || _.DiscountPercent == null)), "Brand");
-
-                if (orderBy == "asc")
-                {
-                    extQuery = extQuery.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
-                }
-                else if (orderBy == "desc")
-                {
-                    extQuery = extQuery.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
-                } 
-                else
-                {
-                    extQuery = extQuery.OrderByDescending(i => i.ProductAddedDate);
-                }
+                    (orderBy == "discount" ? _.DiscountPercent != null : (_.DiscountPercent > (byte)0 || _.DiscountPercent == null)), 
+                    orderByReq, "Brand");
 
                 var list = extQuery.Select(i => new ProductModel()
                 {
@@ -348,20 +342,23 @@ namespace ECommerce.Application.Services.Product
                 int pageIndex = request.PageIndex;
                 int pageSize = request.PageSize;
 
-                var list = _productRepo
-                    .Entity()
-                    .Where(product =>
-                        (id == -1 || product.ProductId == id) &&
-                        (shopId == -1 || product.ShopId == shopId) &&
-                        (brandId == -1 || product.BrandId == brandId) && 
-                        (subCategoryId == -1 || product.SubCategoryId == subCategoryId) &&
-                        (categoryId == -1 || 
-                            (product.SubCategory != null &&
-                             product.SubCategory.Category != null && 
-                             product.SubCategory.Category.CategoryId == categoryId)) &&
-                        (EF.Functions.Like(product.ProductCode, $"%{keyword}%") ||
-                            EF.Functions.Like(product.Ppc, $"%{keyword}%") ||
-                            EF.Functions.Like(product.ProductName, $"%{keyword}%")))
+                var extQuery = _uow.Repository<Product>()
+                    .QueryableAsync(
+                        product =>
+                            (id == -1 || product.ProductId == id) &&
+                            (shopId == -1 || product.ShopId == shopId) &&
+                            (brandId == -1 || product.BrandId == brandId) &&
+                            (subCategoryId == -1 || product.SubCategoryId == subCategoryId) &&
+                            (categoryId == -1 ||
+                                (product.SubCategory != null &&
+                                 product.SubCategory.Category != null &&
+                                 product.SubCategory.Category.CategoryId == categoryId)) &&
+                            (EF.Functions.Like(product.ProductCode, $"%{keyword}%") ||
+                                EF.Functions.Like(product.Ppc, $"%{keyword}%") ||
+                                EF.Functions.Like(product.ProductName, $"%{keyword}%")),
+                        _ => _.OrderByDescending(_ => _.ProductId),
+                        "Brand,Shop,SubCategory");
+                var list = extQuery
                     .Select(i => new ProductModel()
                     {
                         id = i.ProductId,
@@ -397,10 +394,9 @@ namespace ECommerce.Application.Services.Product
                         shop = new ShopModel(i.ShopId, i.Shop.ShopName),
                         note = i.Note,
                         link = i.Link
-                    })
-                    .OrderByDescending(i => i.id);
+                    });
 
-                var record = await list.CountAsync();
+                var record = await extQuery.CountAsync();
                 var data = await PaginatedList<ProductModel>.CreateAsync(list, pageIndex, pageSize); // execute the query here
                 var result = new PageResult<ProductModel>()
                 {
@@ -443,9 +439,8 @@ namespace ECommerce.Application.Services.Product
             using var transaction = await _DbContext.Database.BeginTransactionAsync();
             try
             {
-                var hasCode = await _productRepo.Entity()
-                    .Where(i => request.code != null && i.ProductCode == request.code.Trim())
-                    .AnyAsync();
+                var hasCode = await _uow.Repository<Product>()
+                    .AnyAsync(i => request.code != null && i.ProductCode == request.code.Trim());
                 if (hasCode && request.id == -1)
                     return new FailResponse<bool>("Mã này đã tồn tại !");
 
@@ -453,7 +448,7 @@ namespace ECommerce.Application.Services.Product
                 /*
                  * None relationship data
                  */
-                var product = await _productRepo.GetAsyncWhere(_ => _.ProductId == request.id);
+                var product = await _uow.Repository<Product>().FindByAsync(_ => _.ProductId == request.id);
                 if (product == null)
                     product = new Data.Entities.ProductSchema.Product();
                 product.ProductCode = request.code.Trim();
@@ -500,22 +495,22 @@ namespace ECommerce.Application.Services.Product
                         : (request.pricePreOrder - request.priceImport);
                 if (request.id > -1)
                 {
-                    _productRepo.Update(product);
+                    _uow.Repository<Product>().Update(product);
                 } 
                 else
                 {
-                    await _productRepo.AddAsync(product);
+                    await _uow.Repository<Product>().AddAsync(product);
                 }
-                await _productRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 /*
                  * Relationship data
                  */
                 // Options
                 // Remove all current option values
-                var optionvaluelist = await _productOptionValueRepo.ToListAsync();
+                var optionvaluelist = await _uow.Repository<ProductOptionValue>().GetAllAsync();
                 await _productOptionValueRepo.RemoveRangeAsyncWhere(_ => _.ProductId == request.id);
-                await _productOptionValueRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 // Add or Update
                 if (request.options.Count > 0)
                 {
@@ -552,7 +547,7 @@ namespace ECommerce.Application.Services.Product
                                 })
                                 .ToList();
                             await _optionValueRepo.AddRangeAsync(newOptionValueEntities);
-                            await _optionValueRepo.SaveChangesAsync();
+                            await _uow.SaveChangesAsync();
 
                             // Migrate product to new option value added
                             var newOptionValueIds = newOptionValueEntities.Select(e => e.OptionValueId).ToList();
@@ -564,7 +559,7 @@ namespace ECommerce.Application.Services.Product
                 // Attribute
                 // Remove
                 await _productAttributeRepo.RemoveRangeAsyncWhere(_ => _.ProductId == request.id);
-                await _productAttributeRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 // Add or Update
                 var attributes = request.attributes.Where(a => !string.IsNullOrEmpty(a.value));
                 if (attributes != null && attributes.Any())
@@ -579,7 +574,7 @@ namespace ECommerce.Application.Services.Product
                         })
                         .ToList();
                     await _productAttributeRepo.AddRangeAsync(attrAddReq);
-                    await _productAttributeRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
 
                 // Images
@@ -590,7 +585,7 @@ namespace ECommerce.Application.Services.Product
                 var images = imagesFromDb.Where(_ => !request.systemFileNames.Contains(_)).ToList();
                 _commonService.DeleteFiles(_webHostEnvironment, images, FilePathConstant.PRODUCT_FILEPATH);
                 await _productImageRepo.RemoveRangeAsyncWhere(_ => _.ProductId == request.id && images.Contains(_.ProductImagePath));
-                await _productImageRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 // Add
                 if (request.systemFileNames != null)
                 {
@@ -604,7 +599,7 @@ namespace ECommerce.Application.Services.Product
                         })
                         .ToList();
                     await _productImageRepo.AddRangeAsync(sysImgAddReq);
-                    await _productImageRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
 
                 // User Images
@@ -615,7 +610,7 @@ namespace ECommerce.Application.Services.Product
                 var userImages = userImagesFromDb.Where(_ => !request.userFileNames.Contains(_)).ToList();
                 _commonService.DeleteFiles(_webHostEnvironment, userImages, FilePathConstant.PRODUCT_FILEPATH);
                 await _productUserImageRepo.RemoveRangeAsyncWhere(_ => _.ProductId == request.id && userImages.Contains(_.ProductUserImagePath));
-                await _productUserImageRepo.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
                 // Add
                 if (request.userFileNames != null)
                 {
@@ -629,7 +624,7 @@ namespace ECommerce.Application.Services.Product
                         })
                         .ToList();
                     await _productUserImageRepo.AddRangeAsync(userImgAddReq);
-                    await _productUserImageRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 await transaction.CommitAsync();
                 return new SuccessResponse<bool>();
@@ -679,8 +674,8 @@ namespace ECommerce.Application.Services.Product
                 };
 
                 // Remove product and save changes
-                _productRepo.Entity().RemoveRange(products);
-                _productRepo.SaveChangesAsync().Wait();
+                _uow.Repository<Product>().Delete(products);
+                _uow.SaveChangesAsync().Wait();
 
                 await transaction.CommitAsync();
                 return new SuccessResponse<ProductDeleteResponse>(data);
@@ -730,14 +725,14 @@ namespace ECommerce.Application.Services.Product
 
                 if (ids.Count == 0) 
                     return new FailResponse<bool>("Vui lòng chọn sản phẩm cần cập nhật");
-                var productsToUpdate = await _productRepo.ToListAsyncWhere(i => ids.Contains(i.ProductId));
+                var productsToUpdate = await _uow.Repository<Product>().GetByAsync(i => ids.Contains(i.ProductId));
                 if (productsToUpdate.Count() > 0)
                 {
                     foreach (var product in productsToUpdate)
                     {
                         product.Status = (byte?)status;
                     }
-                    await _productRepo.SaveChangesAsync();
+                    await _uow.SaveChangesAsync();
                 }
                 return new SuccessResponse<bool>("Cập nhật thành công");
             }
@@ -752,12 +747,13 @@ namespace ECommerce.Application.Services.Product
             {
                 if (ids.Count > 0)
                 {
-                    var userImages = await _productUserImageRepo.Entity().Where(i => ids.Contains(i.ProductId)).ToListAsync();
-                    if (userImages.Count > 0) _productUserImageRepo.RemoveRange(userImages);
-                    await _productUserImageRepo.RemoveAsyncWhere(i => ids.Contains(i.ProductId));
-                    await _productUserImageRepo.SaveChangesAsync();
-
+                    var userImages = await _uow.Repository<ProductUserImage>().GetByAsync(i => ids.Contains(i.ProductId));
                     var result = userImages.Select(_ => _.ProductUserImagePath).ToList();
+                    if (userImages.Count() > 0)
+                    {
+                        _uow.Repository<ProductUserImage>().Delete(userImages);
+                        await _uow.SaveChangesAsync();
+                    }
                     return new SuccessResponse<List<string>>(result);
                 }
                 return new SuccessResponse<List<string>>();
@@ -771,8 +767,12 @@ namespace ECommerce.Application.Services.Product
         {
             try
             {
-                await _productUserImageRepo.RemoveAsyncWhere(i => fileNames.Contains(i.ProductUserImagePath));
-                await _productUserImageRepo.SaveChangesAsync();
+                var ents = await _uow.Repository<ProductUserImage>().GetByAsync(i => fileNames.Contains(i.ProductUserImagePath));
+                if (ents.Count() > 0)
+                {
+                    _uow.Repository<ProductUserImage>().Delete(ents);
+                    await _uow.SaveChangesAsync();
+                }
                 return new SuccessResponse<List<string>>();
             }
             catch (Exception error)
@@ -786,12 +786,13 @@ namespace ECommerce.Application.Services.Product
             {
                 if (ids.Count > 0)
                 {
-                    var sysImages = await _productImageRepo.Entity().Where(i => ids.Contains(i.ProductId)).ToListAsync();
-                    if (sysImages.Count > 0) _productImageRepo.RemoveRange(sysImages);
-                    await _productImageRepo.RemoveAsyncWhere(i => ids.Contains(i.ProductId));
-                    await _productImageRepo.SaveChangesAsync();
-
-                    var result = sysImages.Select(_ => _.ProductImagePath).ToList();
+                    var userImages = await _uow.Repository<ProductImage>().GetByAsync(i => ids.Contains(i.ProductId));
+                    var result = userImages.Select(_ => _.ProductImagePath).ToList();
+                    if (userImages.Count() > 0)
+                    {
+                        _uow.Repository<ProductImage>().Delete(userImages);
+                        await _uow.SaveChangesAsync();
+                    }
                     return new SuccessResponse<List<string>>(result);
                 }
                 return new SuccessResponse<List<string>>();
@@ -805,8 +806,12 @@ namespace ECommerce.Application.Services.Product
         {
             try
             {
-                await _productImageRepo.RemoveAsyncWhere(i => fileNames.Contains(i.ProductImagePath));
-                await _productImageRepo.SaveChangesAsync();
+                var ents = await _uow.Repository<ProductImage>().GetByAsync(i => fileNames.Contains(i.ProductImagePath));
+                if (ents.Count() > 0)
+                {
+                    _uow.Repository<ProductImage>().Delete(ents);
+                    await _uow.SaveChangesAsync();
+                }
                 return new SuccessResponse<List<string>>();
             }
             catch (Exception error)
@@ -824,7 +829,7 @@ namespace ECommerce.Application.Services.Product
             });
 
             await _productOptionValueRepo.AddRangeAsync(productOptionValues);
-            await _productOptionValueRepo.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
         }
         private decimal? getDiscountPrice(decimal? price, byte? percent)
         {
@@ -833,11 +838,8 @@ namespace ECommerce.Application.Services.Product
         }
         private async Task<string> getNewPPC()
         {
-            var newestId = await _productRepo
-                .Entity()
-                .OrderByDescending(s => s.ProductId)
-                .Select(i => i.ProductId)
-                .FirstOrDefaultAsync();
+            var newestId = (await _uow.Repository<Product>()
+                .FindLastAsync()).ProductId;
 
             byte[] buffer = Guid.NewGuid().ToByteArray();
             string guid = BitConverter.ToUInt32(buffer, 8).ToString();

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ECommerce.Application.Services.Product.Dtos
+namespace ECommerce.Application.Services.ProductSrv.Dtos
 {
     public class ProductModel
     {
