@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Interest;
 using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
@@ -23,20 +22,16 @@ namespace ECommerce.Application.Services.Comment
     {
         private ECommerceContext _DbContext;
         private INotificationRepository _notificationRepo;
-        private IInterestRepository _interestRepo;
         private readonly IUnitOfWork _uow;
         public CommentService(ECommerceContext DbContext, IUnitOfWork uow)
         {
             _DbContext = DbContext;
             if (_notificationRepo == null)
                 _notificationRepo = new NotificationRepository(_DbContext);
-            if (_interestRepo == null)
-                _interestRepo = new InterestRepository(_DbContext);
             _uow = uow;
         }
         // Repositories
         public INotificationRepository Notification { get => _notificationRepo; }
-        public IInterestRepository Interest { get => _interestRepo; }
         // Service methods
         public async Task<Response<bool>> postComment(PostCommentRequest request)
         {
@@ -194,7 +189,34 @@ namespace ECommerce.Application.Services.Comment
             try
             {
                 // Like
-                var result = await _interestRepo.LikeComment(request);
+                var currObj = await _uow.Repository<Interest>().FindByAsync(i => i.UserId == request.userId && i.RateId == request.rateId);
+                int rateId = 0;
+                if (currObj == null)
+                {
+                    var _obj = new Interest
+                    {
+                        RateId = request.rateId,
+                        UserId = request.userId,
+                        Liked = request.liked
+                    };
+                    await _uow.Repository<Interest>().AddAsync(_obj);
+                    rateId = _obj.RateId;
+                }
+                else
+                {
+                    if (currObj.Liked == request.liked) currObj.Liked = null;
+                    else currObj.Liked = request.liked;
+
+                    rateId = currObj.RateId;
+                }
+                await _uow.SaveChangesAsync();
+                var interestObj = await _uow.Repository<Interest>().GetByAsync(item => item.RateId == rateId);
+                var result = new LikeAndDislike
+                {
+                    RateId = rateId,
+                    LikeCount = interestObj == null ? 0 : interestObj.Where(item => item.Liked == true).Count(),
+                    DislikeCount = interestObj == null ? 0 : interestObj.Where(item => item.Liked == false).Count()
+                };
 
                 // Notification
                 var comment = await _uow.Repository<Rate>().FindByAsync(item => item.RateId == request.rateId);
@@ -330,10 +352,10 @@ namespace ECommerce.Application.Services.Comment
         {
             try
             {
-                var userNames = await _interestRepo
-                    .Query(item => item.RateId == request.id && item.Liked == request.liked)
+                var userNames = (await _uow.Repository<Interest>()
+                    .GetByAsync(item => item.RateId == request.id && item.Liked == request.liked))
                     .Select(item => item.User.UserFullName)
-                    .ToListAsync();
+                    .ToList();
                 return new SuccessResponse<List<string>>("success", userNames);
             }
             catch(Exception e)
@@ -361,9 +383,9 @@ namespace ECommerce.Application.Services.Comment
                         _uow.Repository<RatingImage>().Delete(ents);
                     }
 
-                    var interestes = await _interestRepo.ToListAsyncWhere(i => commentIds.Contains((int)i.RateId));
+                    var interestes = await _uow.Repository<Interest>().GetByAsync(i => commentIds.Contains((int)i.RateId));
                     if (interestes != null && interestes.Count() > 0)
-                        _interestRepo.RemoveRange(interestes);
+                        _uow.Repository<Interest>().Delete(interestes);
 
                     _uow.Repository<Rate>().Delete(comments);
                     await _uow.SaveChangesAsync();
