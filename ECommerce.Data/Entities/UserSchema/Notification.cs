@@ -10,13 +10,12 @@ namespace ECommerce.Data.Entities.UserSchema
         public string TextContent { get; set; }
         public DateTime? CreateDate { get; set; }
         public string JsLink { get; set; }
-        public int? TypeId { get; set; }
+        public string TypeCode { get; set; }
         public int? ReceiverId { get; set; }
         public int? SenderId { get; set; }
         public int? InfoId { get; set; }
 
         public virtual User Receiver { get; set; }
         public virtual User Sender { get; set; }
-        public virtual NotificationType Type { get; set; }
     }
 }

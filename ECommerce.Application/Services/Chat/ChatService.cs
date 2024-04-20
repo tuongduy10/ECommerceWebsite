@@ -1,7 +1,6 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Helpers;
-using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Services.Chat.Dtos;
 using ECommerce.Application.Services.UserSrv;
 using ECommerce.Data.Context;
@@ -19,14 +18,9 @@ namespace ECommerce.Application.Services.Chat
 {
     public class ChatService : IChatService
     {
-        private ECommerceContext _DbContext;
-        private INotificationRepository _notiRepo;
         private readonly IUnitOfWork _uow;
-        public ChatService(ECommerceContext DbContext, IUnitOfWork uow)
+        public ChatService(IUnitOfWork uow)
         {
-            _DbContext = DbContext;
-            if(_notiRepo == null)
-                _notiRepo = new NotificationRepository(_DbContext);
             _uow = uow;
         }
         public async Task<Response<MessageModel>> SendMessage(MessageModel request)
@@ -136,14 +130,19 @@ namespace ECommerce.Application.Services.Chat
         {
             try
             {
-                var list = (await _uow.Repository<User>().GetAllAsync())
+                var list = (await _uow.Repository<User>().GetByAsync(_ => _.UserId == userId))
                     .Select(i => new UserMessage() { 
                         UserId = i.UserId,
                         FromName = i.UserFullName,
                         FromPhoneNumber = i.UserPhone,
-                        MessageList = _DbContext.MessageHistories
-                            .Where(msg => msg.FromPhoneNumber == i.UserPhone)
-                            .Select(msg => new MessageModel() { 
+                    })
+                    .ToList();
+                foreach (var user in list)
+                {
+                    user.MessageList = (await _uow.Repository<MessageHistory>()
+                            .GetByAsync(msg => msg.FromPhoneNumber == user.FromPhoneNumber))
+                            .Select(msg => new MessageModel()
+                            {
                                 Id = msg.Id,
                                 Message = msg.Message,
                                 Attachment = msg.Attachment,
@@ -151,13 +150,9 @@ namespace ECommerce.Application.Services.Chat
                                 ToPhoneNumber = msg.ToPhoneNumber,
                                 Status = msg.Status
                             })
-                            .ToList()
-                    })
-                    .ToList();
+                            .ToList();
+                }
                 list = list.Where(item => item.MessageList.Count > 0).ToList();
-                if(userId != 0)
-                    list = list.Where(item => item.UserId == userId).ToList();
-
                 return new SuccessResponse<List<UserMessage>>("", list);
             }
             catch (Exception error)

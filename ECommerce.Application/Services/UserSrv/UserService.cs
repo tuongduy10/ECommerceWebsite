@@ -1,23 +1,15 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.User.Dtos;
-using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using ECommerce.Utilities.Constants;
-using ECommerce.Data.Entities;
-using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.UserSrv.Dtos;
-using ECommerce.Application.Repositories.Notification;
-using ECommerce.Application.BaseServices.Shop.Dtos;
-using ECommerce.Application.Services.Product.Dtos;
 using ECommerce.Data.Entities.Common;
 using ECommerce.Application.Enums;
-using UserUpdateRequest = ECommerce.Application.Services.UserSrv.Dtos.UserUpdateRequest;
 using ECommerce.Data.Entities.UserSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Abstractions;
@@ -136,21 +128,21 @@ namespace ECommerce.Application.Services.UserSrv
                 return new ApiFailResponse(error.ToString());
             }
         }
-        public async Task<Response<Data.Entities.UserSchema.User>> UpdateUserStatus(UserUpdateRequest request)
+        public async Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request)
         {
             try
             {
                 var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == request.id);
                 if (user == null)
-                    return new FailResponse<Data.Entities.UserSchema.User>("Không tìm thấy người dùng");
+                    return new FailResponse<User>("Không tìm thấy người dùng");
                 user.Status = request.status;
                 _uow.Repository<User>().Update(user);
                 await _uow.SaveChangesAsync();
-                return new SuccessResponse<Data.Entities.UserSchema.User>(user);
+                return new SuccessResponse<User>(user);
             }
             catch (Exception error)
             {
-                return new FailResponse<Data.Entities.UserSchema.User>(error.Message);
+                return new FailResponse<User>(error.Message);
             }
         }
         public async Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline)

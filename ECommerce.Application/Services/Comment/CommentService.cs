@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
@@ -15,24 +14,20 @@ using System.Threading.Tasks;
 using PostCommentRequest = ECommerce.Application.Services.Comment.Request.PostCommentRequest;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Abstractions;
+using ECommerce.Application.Services.Notifications;
 
 namespace ECommerce.Application.Services.Comment
 {
     public class CommentService : ICommentService
     {
         private ECommerceContext _DbContext;
-        private INotificationRepository _notificationRepo;
+        private readonly INotificationService _notificationService;
         private readonly IUnitOfWork _uow;
         public CommentService(ECommerceContext DbContext, IUnitOfWork uow)
         {
             _DbContext = DbContext;
-            if (_notificationRepo == null)
-                _notificationRepo = new NotificationRepository(_DbContext);
             _uow = uow;
         }
-        // Repositories
-        public INotificationRepository Notification { get => _notificationRepo; }
-        // Service methods
         public async Task<Response<bool>> postComment(PostCommentRequest request)
         {
             try
@@ -130,7 +125,7 @@ namespace ECommerce.Application.Services.Comment
                 await _uow.SaveChangesAsync();
 
                 // Add Notification
-                var noti = await _notificationRepo.CreateCommentNotiAsync(comment);
+                var noti = await _notificationService.CreateCommentNotiAsync(comment);
                 await _uow.SaveChangesAsync();
                 return new SuccessResponse<List<string>>("Phản hồi thành công");
             }
@@ -175,7 +170,7 @@ namespace ECommerce.Application.Services.Comment
                 }
 
                 // Notification
-                await _notificationRepo.CreateCommentNotiAsync(comment);
+                await _notificationService.CreateCommentNotiAsync(comment);
 
                 return new SuccessResponse<List<string>>("Cập nhật thành công");
             }
@@ -220,7 +215,7 @@ namespace ECommerce.Application.Services.Comment
 
                 // Notification
                 var comment = await _uow.Repository<Rate>().FindByAsync(item => item.RateId == request.rateId);
-                await _notificationRepo.CreateLikeDislikeNotiAsync(comment);
+                await _notificationService.CreateLikeDislikeNotiAsync(comment);
 
                 return new SuccessResponse<LikeAndDislike>("Đánh giá thành công", result);
             }

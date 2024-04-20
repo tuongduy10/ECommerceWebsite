@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
-using UserUpdateRequest = ECommerce.Application.Services.UserSrv.Dtos.UserUpdateRequest;
+using ECommerce.Data.Entities.UserSchema;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -22,6 +22,6 @@ namespace ECommerce.Application.Services.UserSrv
         Task<Response<UserModel>> ValidateUser(SignInRequest request);
         Task<Response<List<ShopModel>>> GetShops();
         Task<Response<UserShopModel>> UpdateUser(UserShopModel request);
-        Task<Response<Data.Entities.UserSchema.User>> UpdateUserStatus(UserUpdateRequest request);
+        Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request);
     }
 }

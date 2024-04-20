@@ -16,7 +16,7 @@ using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.HttpClient;
 using ECommerce.Application.Services.Inventory;
-using ECommerce.Application.Services.Notification;
+using ECommerce.Application.Services.Notifications;
 using ECommerce.Application.Services.Oms;
 using ECommerce.Application.Services.Product;
 using ECommerce.Application.Services.UserSrv;

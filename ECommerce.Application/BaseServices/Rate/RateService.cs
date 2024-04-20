@@ -1,20 +1,17 @@
 ﻿
 using ECommerce.Application.Common;
 using ECommerce.Utilities.Constants;
-using ECommerce.Application.Repositories.Notification.Dtos;
-using ECommerce.Application.Repositories.Notification.Enums;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
-using ECommerce.Application.BaseServices.User;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.UserSchema;
 
 namespace ECommerce.Application.BaseServices.Rate
 {
@@ -330,14 +327,14 @@ namespace ECommerce.Application.BaseServices.Rate
                 }
 
                 // Notification
-                var notification = new Data.Entities.UserSchema.Notification()
+                var notification = new Notification()
                 {
                     TextContent = comment.Comment,
                     IsRead = false,
                     ReceiverId = comment.UserRepliedId,
                     SenderId = comment.UserId,
                     JsLink = $"/Product/ProductDetail?ProductId={comment.ProductId}&isScrolledTo=true&commentId={comment.RateId}",
-                    TypeId = (int?)NotificationType.Comment,
+                    TypeCode = NotificationConstant.COMMNENT,
                 };
                 await _DbContext.Notifications.AddAsync(notification);
                 await _DbContext.SaveChangesAsync();

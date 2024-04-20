@@ -1,6 +1,5 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
@@ -15,9 +14,6 @@ namespace ECommerce.Application.Services.Comment
 {
     public interface ICommentService
     {
-        // Repository get
-        INotificationRepository Notification { get; }
-        // Service methods
         Task<Response<bool>> postComment(PostCommentRequest request);
         Task<Response<LikeAndDislike>> LikeComment(LikeAndDislikeCount request);
         Task<Response<List<string>>> ReplyCommentAsync(ReplyCommentRequest request);
