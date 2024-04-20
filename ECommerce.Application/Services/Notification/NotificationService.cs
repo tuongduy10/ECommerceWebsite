@@ -2,7 +2,6 @@
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Repositories.Notification;
 using ECommerce.Application.Repositories.Notification.Dtos;
-using ECommerce.Application.Repositories.User;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
@@ -18,27 +17,17 @@ namespace ECommerce.Application.Services.Notification
     {
         private ECommerceContext _DbContext;
         private INotificationRepository _notificationRepo;
-        private IUserRepository _userRepo;
         public NotificationService(ECommerceContext DbContext)
         {
             _DbContext = DbContext;
             if (_notificationRepo == null)
                 _notificationRepo = new NotificationRepository(_DbContext);
-            if (_userRepo == null)
-                _userRepo = new UserRepository(_DbContext);
         }
         public INotificationRepository Notification
         {
             get
             {
                 return _notificationRepo;
-            }
-        }
-        public IUserRepository User
-        {
-            get
-            {
-                return _userRepo;
             }
         }
         public async Task<List<NotificationModel>> GetAllByUserIdAsync(int userId = 0)

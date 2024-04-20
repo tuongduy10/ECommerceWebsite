@@ -2,7 +2,6 @@
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Repositories.Interest;
 using ECommerce.Application.Repositories.Notification;
-using ECommerce.Application.Repositories.User;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;

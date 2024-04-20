@@ -2,7 +2,6 @@
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Helpers;
 using ECommerce.Application.Repositories.Notification;
-using ECommerce.Application.Repositories.User;
 using ECommerce.Application.Services.Chat.Dtos;
 using ECommerce.Application.Services.UserSrv;
 using ECommerce.Data.Context;
