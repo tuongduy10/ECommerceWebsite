@@ -3,6 +3,7 @@ using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Common.DTOs;
 using ECommerce.Application.Services.Common.DTOs.Requests;
 using ECommerce.Application.Services.HttpClient;
+using ECommerce.Data.Abstractions;
 using ECommerce.Data.Context;
 using ECommerce.Data.Entities.Common;
 using ECommerce.Dtos.Common;
@@ -21,22 +22,13 @@ namespace ECommerce.Application.Services.Common
 {
     public class CommonService : ICommonService
     {
-        private readonly ECommerceContext _DbContext;
-        private readonly IRepositoryBase<Province> _provinceRepo;
-        private readonly IRepositoryBase<District> _districtRepo;
-        private readonly IRepositoryBase<Ward> _wardRepo;
         private readonly IHttpClientService _httpClientService;
-        public CommonService(ECommerceContext DbContext,
+        private readonly IUnitOfWork _uow;
+        public CommonService(IUnitOfWork uow,
             IHttpClientService httpClientService)
         {
-            _DbContext = DbContext;
             _httpClientService = httpClientService;
-            if (_provinceRepo == null)
-                _provinceRepo = new RepositoryBase<Province>(_DbContext);
-            if (_districtRepo == null)
-                _districtRepo = new RepositoryBase<District>(_DbContext);
-            if (_wardRepo == null)
-                _wardRepo = new RepositoryBase<Ward>(_DbContext);
+            _uow = uow;
         }
         public async void AddFiles(IWebHostEnvironment webHostEnviroment, List<IFormFile> files, List<string> filesName, string path)
         {
@@ -114,7 +106,7 @@ namespace ECommerce.Application.Services.Common
         {
             try
             {
-                var result = (await _provinceRepo.ToListAsync()).Select(_ => (ProvinceResponse)_).ToList();
+                var result = (await _uow.Repository<Province>().GetAllAsync()).Select(_ => (ProvinceResponse)_).ToList();
                 return new SuccessResponse<List<ProvinceResponse>>(result);
             }
             catch (Exception error)
@@ -126,8 +118,8 @@ namespace ECommerce.Application.Services.Common
         {
             try
             {
-                var result = (await _districtRepo
-                        .ToListAsyncWhere(_ => _.ProvinceCode == request.provinceCode))
+                var result = (await _uow.Repository<District>()
+                        .GetByAsync(_ => _.ProvinceCode == request.provinceCode))
                     .Select(_ => (DistrictResponse)_)
                     .ToList();
                 return new SuccessResponse<List<DistrictResponse>>(result);
@@ -141,8 +133,8 @@ namespace ECommerce.Application.Services.Common
         {
             try
             {
-                var result = (await _wardRepo
-                        .ToListAsyncWhere(_ => _.DistrictCode == request.districtCode))
+                var result = (await _uow.Repository<Ward>()
+                        .GetByAsync(_ => _.DistrictCode == request.districtCode))
                     .Select(_ => (WardResponse)_)
                     .ToList();
                 return new SuccessResponse<List<WardResponse>>(result);

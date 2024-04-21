@@ -28,17 +28,14 @@ namespace ECommerce.Data.Abstractions
         {
             return await _dbContext.SaveChangesAsync();
         }
-
         public void Dispose()
         {
             _dbContext.Dispose();
         }
-
         public async Task DisposeAsync()
         {
             await _dbContext.DisposeAsync();
         }
-
         public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class
         {
             return new GenericRepository<TEntity>(_dbContext);

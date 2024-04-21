@@ -1,13 +1,13 @@
-﻿ using ECommerce.Application.Common;
+﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.Brand.Dtos;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.BaseServices.Brand
 {
@@ -30,7 +30,7 @@ namespace ECommerce.Application.BaseServices.Brand
                 if (name.Count() > 0) return new ApiFailResponse("Tên đã tồn tại");
 
                 // create new brand
-                var brand = new Data.Entities.Brand
+                var brand = new Data.Entities.ProductSchema.Brand
                 {
                     BrandName = request.BrandName.Trim(),
                     BrandImagePath = request.BrandImagePath.Trim(),

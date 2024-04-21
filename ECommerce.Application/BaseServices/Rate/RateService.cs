@@ -1,20 +1,17 @@
 ﻿
 using ECommerce.Application.Common;
 using ECommerce.Utilities.Constants;
-using ECommerce.Application.Repositories.Notification.Dtos;
-using ECommerce.Application.Repositories.Notification.Enums;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
-using ECommerce.Application.BaseServices.User;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.UserSchema;
 
 namespace ECommerce.Application.BaseServices.Rate
 {
@@ -299,7 +296,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 }
 
                 // Add comment content
-                var comment = new Data.Entities.Rate()
+                var comment = new Data.Entities.ProductSchema.Rate()
                 {
                     Comment = request.comment,
                     ProductId = request.productId,
@@ -319,7 +316,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 {
                     foreach (var filename in request.fileNames)
                     {
-                        var image = new Data.Entities.RatingImage()
+                        var image = new Data.Entities.ProductSchema.RatingImage()
                         {
                             RateId = comment.RateId,
                             RatingImagePath = filename,
@@ -330,14 +327,14 @@ namespace ECommerce.Application.BaseServices.Rate
                 }
 
                 // Notification
-                var notification = new Data.Entities.Notification()
+                var notification = new Notification()
                 {
                     TextContent = comment.Comment,
                     IsRead = false,
                     ReceiverId = comment.UserRepliedId,
                     SenderId = comment.UserId,
                     JsLink = $"/Product/ProductDetail?ProductId={comment.ProductId}&isScrolledTo=true&commentId={comment.RateId}",
-                    TypeId = (int?)NotificationType.Comment,
+                    TypeCode = NotificationConstant.COMMNENT,
                 };
                 await _DbContext.Notifications.AddAsync(notification);
                 await _DbContext.SaveChangesAsync();
@@ -361,7 +358,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 int rateId = 0;
                 if (currObj == null)
                 {
-                    var _obj = new Data.Entities.Interest
+                    var _obj = new Data.Entities.ProductSchema.Interest
                     {
                         RateId = request.rateId,
                         UserId = request.userId,
@@ -434,7 +431,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 if (isOwner) return new ApiFailResponse("Bạn không thể đánh giá sản phẩm của mình");
 
                 // Add comment content
-                var comment = new Data.Entities.Rate()
+                var comment = new Data.Entities.ProductSchema.Rate()
                 {
                     Comment = request.comment,
                     RateValue = request.value,
@@ -450,7 +447,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 {
                     foreach (var filename in request.fileNames)
                     {
-                        var image = new Data.Entities.RatingImage()
+                        var image = new Data.Entities.ProductSchema.RatingImage()
                         {
                             RateId = comment.RateId,
                             RatingImagePath = filename,
@@ -488,7 +485,7 @@ namespace ECommerce.Application.BaseServices.Rate
                 {
                     foreach (var filename in request.fileNames)
                     {
-                        var image = new Data.Entities.RatingImage()
+                        var image = new Data.Entities.ProductSchema.RatingImage()
                         {
                             RateId = comment.RateId,
                             RatingImagePath = filename,

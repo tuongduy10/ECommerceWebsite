@@ -1,6 +1,6 @@
 ﻿using ECommerce.Application.Services.Comment;
-using ECommerce.Application.Services.Product;
-using ECommerce.Application.Services.Product.Dtos;
+using ECommerce.Application.Services.ProductSrv;
+using ECommerce.Application.Services.ProductSrv.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

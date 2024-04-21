@@ -1,7 +1,7 @@
 ﻿using ECommerce.Application.BaseServices.FilterProduct.Dtos;
 using ECommerce.Application.Common;
 using ECommerce.Application.Services.Inventory.Dtos;
-using ECommerce.Application.Services.User.Dtos;
+using ECommerce.Application.Services.UserSrv.Dtos;
 using ECommerce.Data.Entities.Inventory;
 using System;
 using System.Collections.Generic;

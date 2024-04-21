@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using ECommerce.Data.Entities;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using ECommerce.Data.Entities.Common;
@@ -39,7 +38,6 @@ namespace ECommerce.Data.Context
         public virtual DbSet<Interest> Interests { get; set; }
         public virtual DbSet<MessageHistory> MessageHistories { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
-        public virtual DbSet<NotificationType> NotificationTypes { get; set; }
         public virtual DbSet<Option> Options { get; set; }
         public virtual DbSet<OptionValue> OptionValues { get; set; }
         public virtual DbSet<OnlineHistory> OnlineHistories { get; set; }
@@ -282,24 +280,7 @@ namespace ECommerce.Data.Context
                     .WithMany(p => p.NotificationSenders)
                     .HasForeignKey(d => d.SenderId)
                     .HasConstraintName("FK_Notification_User1");
-
-                entity.HasOne(d => d.Type)
-                    .WithMany(p => p.Notifications)
-                    .HasForeignKey(d => d.TypeId)
-                    .HasConstraintName("FK_Notification_NotificationType");
             });
-
-            modelBuilder.Entity<NotificationType>(entity =>
-            {
-                entity.ToTable("NotificationType");
-
-                entity.Property(e => e.TypeCode)
-                    .HasMaxLength(256)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.TypeName).HasMaxLength(256);
-            });
-
 
             modelBuilder.Entity<OnlineHistory>(entity =>
             {

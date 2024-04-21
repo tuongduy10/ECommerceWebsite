@@ -3,9 +3,8 @@ using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.Common.DTOs.Requests;
-using ECommerce.Application.Services.Product;
+using ECommerce.Application.Services.ProductSrv;
 using ECommerce.Dtos.Common;
-using ECommerce.WebApp.Dtos.Common;
 using ECommerce.WebApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -54,19 +53,19 @@ namespace ECommerce.WebApp.Controllers
                 string path = "";
                 switch (request.uploadType)
                 {
-                    case UploadTypeConstant.PRODUCT:
+                    case FilePathConstant.PRODUCT:
                         {
                             prefix = PRODUCT_FILE_PREFIX;
                             path = PRODUCT_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.BRAND:
+                    case FilePathConstant.BRAND:
                         {
                             prefix = BRAND_FILE_PREFIX;
                             path = BRAND_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.RATING:
+                    case FilePathConstant.RATING:
                         {
                             prefix = RATING_FILE_PREFIX;
                             path = RATING_FILE_PATH;
@@ -106,26 +105,26 @@ namespace ECommerce.WebApp.Controllers
         }
         [AllowAnonymous]
         [HttpPost("remove-files")]
-        public async Task<IActionResult> removeFiles(RemoveUploadRequest request)
+        public async Task<IActionResult> removeFiles(RemoveFilesRequest request)
         {
             try
             {
                 string path = "";
                 switch (request.uploadType)
                 {
-                    case UploadTypeConstant.PRODUCT:
+                    case FilePathConstant.PRODUCT:
                         {
                             path = PRODUCT_FILE_PATH;
                             await _productService.removeUserImages(request.fileNames);
                             await _productService.removeSystemImages(request.fileNames);
                             break;
                         }
-                    case UploadTypeConstant.BRAND:
+                    case FilePathConstant.BRAND:
                         {
                             path = BRAND_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.RATING:
+                    case FilePathConstant.RATING:
                         {
                             path = RATING_FILE_PATH;
                             break;
@@ -213,16 +212,16 @@ namespace ECommerce.WebApp.Controllers
 
         [AllowAnonymous]
         [HttpPost("encrypt-conn")]
-        public IActionResult EncryptConnString(EncryptRequest request)
+        public IActionResult EncryptConnString(HashRequest request)
         {
-            string encryptedConn = EncryptHelper.EncryptString(request.connectionString);
+            string encryptedConn = EncryptHelper.EncryptString(request.text);
             return Ok(encryptedConn);
         }
         [AllowAnonymous]
         [HttpPost("decrypt-conn")]
-        public IActionResult DecryptConnString(EncryptRequest request)
+        public IActionResult DecryptConnString(HashRequest request)
         {
-            string decryptedConn = EncryptHelper.DecryptString(request.connectionString);
+            string decryptedConn = EncryptHelper.DecryptString(request.text);
             return Ok(decryptedConn);
         }
         [AllowAnonymous]

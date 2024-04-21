@@ -8,12 +8,15 @@ namespace ECommerce.Utilities.Constants
 {
     public class FilePathConstant
     {
+        public const string PRODUCT = "products";
         public const string PRODUCT_FILEPATH = "images/products";
         public const string PRODUCT_FILEPREFIX = "product_";
 
+        public const string BRAND = "brand";
         public const string BRAND_FILEPATH = "images/brand";
         public const string BRAND_FILEPREFIX = "brand_";
 
+        public const string RATING = "rates";
         public const string RATE_FILEPATH = "images/rates";
         public const string RATE_FILEPREFIX = "rate_";
 

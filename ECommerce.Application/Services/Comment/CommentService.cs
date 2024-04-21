@@ -1,58 +1,33 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
-using ECommerce.Application.Repositories.Comment;
-using ECommerce.Application.Repositories.Interest;
-using ECommerce.Application.Repositories.Notification;
-using ECommerce.Application.Repositories.User;
 using ECommerce.Application.Services.Comment.Request;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
 using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ECommerce.Application.Repositories.Product;
 using PostCommentRequest = ECommerce.Application.Services.Comment.Request.PostCommentRequest;
+using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Data.Abstractions;
+using ECommerce.Application.Services.Notifications;
 
 namespace ECommerce.Application.Services.Comment
 {
     public class CommentService : ICommentService
     {
         private ECommerceContext _DbContext;
-        private INotificationRepository _notificationRepo;
-        private ICommentRepository _commentRepo;
-        private IRepositoryBase<RatingImage> _commentImageRepo;
-        private IUserRepository _userRepo;
-        private IInterestRepository _interestRepo;
-        private IProductRepository _productRepo;
-        public CommentService(ECommerceContext DbContext)
+        private readonly INotificationService _notificationService;
+        private readonly IUnitOfWork _uow;
+        public CommentService(ECommerceContext DbContext, IUnitOfWork uow)
         {
             _DbContext = DbContext;
-            if (_commentRepo == null)
-                _commentRepo = new CommentRepository(_DbContext);
-            if (_notificationRepo == null)
-                _notificationRepo = new NotificationRepository(_DbContext);
-            if (_commentImageRepo == null)
-                _commentImageRepo = new RepositoryBase<RatingImage>(_DbContext);
-            if (_userRepo == null)
-                _userRepo = new UserRepository(_DbContext);
-            if (_interestRepo == null)
-                _interestRepo = new InterestRepository(_DbContext);
-            if (_productRepo == null)
-                _productRepo = new ProductRepository(_DbContext);
+            _uow = uow;
         }
-        // Repositories
-        public ICommentRepository Comment { get => _commentRepo; }
-        public INotificationRepository Notification { get => _notificationRepo; }
-        public IRepositoryBase<RatingImage> CommentImage { get => _commentImageRepo; }
-        public IUserRepository User { get => _userRepo; }
-        public IInterestRepository Interest { get => _interestRepo; }
-        // Service methods
         public async Task<Response<bool>> postComment(PostCommentRequest request)
         {
             try
@@ -67,8 +42,8 @@ namespace ECommerce.Application.Services.Comment
                 //if (!hasProduct) return new ApiFailResponse("Bạn cần mua sản phẩm này để đánh giá");
 
                 // Check if user's shop is selling this product
-                var isOwner = await _productRepo
-                    .AnyAsyncWhere(i => i.ProductId == request.productId && i.Shop.UserId == request.userId);
+                var isOwner = await _uow.Repository<Data.Entities.ProductSchema.Product>()
+                    .AnyAsync(i => i.ProductId == request.productId && i.Shop.UserId == request.userId);
                 if (isOwner) 
                     return new FailResponse<bool>("Bạn không thể đánh giá sản phẩm của mình");
 
@@ -81,8 +56,8 @@ namespace ECommerce.Application.Services.Comment
                     UserId = request.userId,
                     CreateDate = DateTime.Now,
                 };
-                await _commentRepo.AddAsync(comment);
-                await _commentRepo.SaveChangesAsync();
+                await _uow.Repository<Rate>().AddAsync(comment);
+                await _uow.SaveChangesAsync();
 
                 // Add image
                 if (request.fileNames != null)
@@ -94,8 +69,8 @@ namespace ECommerce.Application.Services.Comment
                             RatingImagePath = file
                         })
                         .ToList();
-                    await _commentImageRepo.AddRangeAsync(commentImages);
-                    await _commentImageRepo.SaveChangesAsync();
+                    await _uow.Repository<RatingImage>().AddAsync(commentImages);
+                    await _uow.SaveChangesAsync();
                 }
 
                 return new SuccessResponse<bool>();
@@ -113,11 +88,11 @@ namespace ECommerce.Application.Services.Comment
             {
                 // Add comment
                 string idsToDelete = null;
-                var all = await _commentRepo.ToListAsync();
-                var replied = await _commentRepo.GetAsyncWhere(i => i.RateId == request.repliedId);
+                var all = await _uow.Repository<Rate>().GetAllAsync();
+                var replied = await _uow.Repository<Rate>().FindByAsync(i => i.RateId == request.repliedId);
                 if (replied != null)
                     idsToDelete = string.IsNullOrEmpty(replied.IdsToDelete) ? request.repliedId.ToString() : (replied.IdsToDelete + "," + replied.RateId);
-                var comment = new Data.Entities.Rate()
+                var comment = new Rate()
                 {
                     Comment = request.comment,
                     ProductId = request.productId,
@@ -129,8 +104,8 @@ namespace ECommerce.Application.Services.Comment
                     CreateDate = DateTime.Now,
                     RateValue = 0,
                 };
-                await _commentRepo.AddAsync(comment);
-                await SaveChangesAsync();
+                await _uow.Repository<Rate>().AddAsync(comment);
+                await _uow.SaveChangesAsync();
 
                 // Add Comment Image;
                 if (request.fileNames != null)
@@ -145,13 +120,13 @@ namespace ECommerce.Application.Services.Comment
                         };
                         images.Add(image);
                     }
-                    await _commentImageRepo.AddRangeAsync(images);
+                    await _uow.Repository<RatingImage>().AddAsync(images);
                 }
-                await SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 // Add Notification
-                var noti = await _notificationRepo.CreateCommentNotiAsync(comment);
-                await SaveChangesAsync();
+                var noti = await _notificationService.CreateCommentNotiAsync(comment);
+                await _uow.SaveChangesAsync();
                 return new SuccessResponse<List<string>>("Phản hồi thành công");
             }
             catch (Exception error)
@@ -166,7 +141,7 @@ namespace ECommerce.Application.Services.Comment
                 if (string.IsNullOrEmpty(request.content))
                     return new FailResponse<List<string>>("Nội dung không được để trống");
 
-                var comment = await _commentRepo.GetAsyncWhere(item => item.RateId == request.id);
+                var comment = await _uow.Repository<Rate>().FindByAsync(item => item.RateId == request.id);
                 if (comment == null)
                     return new FailResponse<List<string>>("Không tìm thấy bình luận hoặc bình luận đã bị xóa");
 
@@ -176,8 +151,8 @@ namespace ECommerce.Application.Services.Comment
                     comment.Comment = request.content;
                     comment.RateValue = request.rateValue;
                 }
-                _commentRepo.Update(comment);
-                await SaveChangesAsync();
+                _uow.Repository<Rate>().Update(comment);
+                await _uow.SaveChangesAsync();
 
                 // Add images
                 if (request.fileNames != null)
@@ -189,13 +164,13 @@ namespace ECommerce.Application.Services.Comment
                             RateId = comment.RateId,
                             RatingImagePath = filename,
                         };
-                        await _commentImageRepo.AddAsync(image);
-                        await SaveChangesAsync();
+                        await _uow.Repository<RatingImage>().AddAsync(image);
+                        await _uow.SaveChangesAsync();
                     }
                 }
 
                 // Notification
-                await _notificationRepo.CreateCommentNotiAsync(comment);
+                await _notificationService.CreateCommentNotiAsync(comment);
 
                 return new SuccessResponse<List<string>>("Cập nhật thành công");
             }
@@ -209,11 +184,38 @@ namespace ECommerce.Application.Services.Comment
             try
             {
                 // Like
-                var result = await _interestRepo.LikeComment(request);
+                var currObj = await _uow.Repository<Interest>().FindByAsync(i => i.UserId == request.userId && i.RateId == request.rateId);
+                int rateId = 0;
+                if (currObj == null)
+                {
+                    var _obj = new Interest
+                    {
+                        RateId = request.rateId,
+                        UserId = request.userId,
+                        Liked = request.liked
+                    };
+                    await _uow.Repository<Interest>().AddAsync(_obj);
+                    rateId = _obj.RateId;
+                }
+                else
+                {
+                    if (currObj.Liked == request.liked) currObj.Liked = null;
+                    else currObj.Liked = request.liked;
+
+                    rateId = currObj.RateId;
+                }
+                await _uow.SaveChangesAsync();
+                var interestObj = await _uow.Repository<Interest>().GetByAsync(item => item.RateId == rateId);
+                var result = new LikeAndDislike
+                {
+                    RateId = rateId,
+                    LikeCount = interestObj == null ? 0 : interestObj.Where(item => item.Liked == true).Count(),
+                    DislikeCount = interestObj == null ? 0 : interestObj.Where(item => item.Liked == false).Count()
+                };
 
                 // Notification
-                var comment = await _commentRepo.GetAsyncWhere(item => item.RateId == request.rateId);
-                await _notificationRepo.CreateLikeDislikeNotiAsync(comment);
+                var comment = await _uow.Repository<Rate>().FindByAsync(item => item.RateId == request.rateId);
+                await _notificationService.CreateLikeDislikeNotiAsync(comment);
 
                 return new SuccessResponse<LikeAndDislike>("Đánh giá thành công", result);
             }
@@ -345,10 +347,10 @@ namespace ECommerce.Application.Services.Comment
         {
             try
             {
-                var userNames = await _interestRepo
-                    .Query(item => item.RateId == request.id && item.Liked == request.liked)
+                var userNames = (await _uow.Repository<Interest>()
+                    .GetByAsync(item => item.RateId == request.id && item.Liked == request.liked))
                     .Select(item => item.User.UserFullName)
-                    .ToListAsync();
+                    .ToList();
                 return new SuccessResponse<List<string>>("success", userNames);
             }
             catch(Exception e)
@@ -361,24 +363,27 @@ namespace ECommerce.Application.Services.Comment
 
             try
             {
-                var comments = await _commentRepo.ToListAsyncWhere(i => i.ProductId == _productId);
+                var comments = await _uow.Repository<Rate>().GetByAsync(i => i.ProductId == _productId);
                 if (comments != null && comments.Count() > 0)
                 {
                     var commentIds = comments.Select(i => i.RateId).ToList();
-                    var deleteImages = await _commentImageRepo
-                        .Query(item => commentIds.Contains(item.RateId == null ? 0 : (int)item.RateId))
+                    var deleteImages = (await _uow.Repository<RatingImage>()
+                        .GetByAsync(item => commentIds.Contains(item.RateId == null ? 0 : (int)item.RateId)))
                         .Select(item => item.RatingImagePath)
-                        .ToListAsync();
+                        .ToList();
 
                     if (commentIds != null && commentIds.Count > 0)
-                        await _commentImageRepo.RemoveRangeAsyncWhere(i => commentIds.Contains(i.RateId == null ? 0 : (int)i.RateId));
+                    {
+                        var ents = await _uow.Repository<RatingImage>().GetByAsync(i => commentIds.Contains(i.RateId == null ? 0 : (int)i.RateId));
+                        _uow.Repository<RatingImage>().Delete(ents);
+                    }
 
-                    var interestes = await _interestRepo.ToListAsyncWhere(i => commentIds.Contains((int)i.RateId));
+                    var interestes = await _uow.Repository<Interest>().GetByAsync(i => commentIds.Contains((int)i.RateId));
                     if (interestes != null && interestes.Count() > 0)
-                        _interestRepo.RemoveRange(interestes);
-                    
-                    _commentRepo.RemoveRange(comments);
-                    await SaveChangesAsync();
+                        _uow.Repository<Interest>().Delete(interestes);
+
+                    _uow.Repository<Rate>().Delete(comments);
+                    await _uow.SaveChangesAsync();
 
                     return new SuccessResponse<List<string>>("Xóa thành công", deleteImages);
                 }
@@ -394,20 +399,21 @@ namespace ECommerce.Application.Services.Comment
         {
             try
             {
-                var comments = await _commentRepo.ToListAsyncWhere(i => i.UserId == _userId || i.UserRepliedId == _userId);
+                var comments = await _uow.Repository<Rate>().GetByAsync(i => i.UserId == _userId || i.UserRepliedId == _userId);
                 if (comments != null && comments.Count() > 0)
                 {
                     var commentIds = comments.Select(i => i.RateId).ToList();
-                    var deleteImages = await _commentImageRepo
-                        .Query(item => commentIds.Contains(item.RateId == null ? 0 : (int)item.RateId))
+                    var deleteImages = (await _uow.Repository<RatingImage>()
+                        .GetByAsync(item => commentIds.Contains(item.RateId == null ? 0 : (int)item.RateId)))
                         .Select(item => item.RatingImagePath)
-                        .ToListAsync();
-
+                        .ToList();
                     if (commentIds != null && commentIds.Count > 0)
-                        await _commentImageRepo.RemoveRangeAsyncWhere(i => commentIds.Contains(i.RateId == null ? 0 : (int)i.RateId));
-
-                    _commentRepo.RemoveRange(comments);
-                    await SaveChangesAsync();
+                    {
+                        var ents = await _uow.Repository<RatingImage>().GetByAsync(i => commentIds.Contains(i.RateId == null ? 0 : (int)i.RateId));
+                        _uow.Repository<RatingImage>().Delete(ents);
+                    }
+                    _uow.Repository<Rate>().Delete(comments);
+                    await _uow.SaveChangesAsync();
 
                     return new SuccessResponse<List<string>>("Xóa thành công", deleteImages);
                 }
@@ -419,6 +425,5 @@ namespace ECommerce.Application.Services.Comment
                 return new FailResponse<List<string>>("Xóa không thành công: \n\n" + error);
             }
         }
-        public async Task SaveChangesAsync() => await _DbContext.SaveChangesAsync();
     }
 }

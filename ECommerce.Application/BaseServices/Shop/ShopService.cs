@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Application.BaseServices.Shop
 {
@@ -37,7 +38,7 @@ namespace ECommerce.Application.BaseServices.Shop
                     if (checkMail != null) return new ApiFailResponse("Mail đã tồn tại");
                 }
 
-                Data.Entities.Shop shop = new Data.Entities.Shop();
+                Data.Entities.ProductSchema.Shop shop = new Data.Entities.ProductSchema.Shop();
                 shop.ShopName = request.name.Trim();
                 shop.ShopPhoneNumber = request.phone.Trim();
                 shop.ShopAddress = request.address.Trim();
@@ -56,7 +57,7 @@ namespace ECommerce.Application.BaseServices.Shop
                 {
                     foreach (var id in request.brandIds)
                     {
-                        Data.Entities.ShopBrand brand = new Data.Entities.ShopBrand
+                        ShopBrand brand = new Data.Entities.ProductSchema.ShopBrand
                         {
                             BrandId = id,
                             ShopId = shop.ShopId
@@ -214,7 +215,7 @@ namespace ECommerce.Application.BaseServices.Shop
             var checkUser = await _DbContext.Shops.Where(s => s.UserId == request.UserId).FirstOrDefaultAsync();
             if (checkUser != null) return new ApiFailResponse("Tài khoản này đã đăng ký bán hàng");
 
-            Data.Entities.Shop shop = new Data.Entities.Shop();
+            Data.Entities.ProductSchema.Shop shop = new Data.Entities.ProductSchema.Shop();
             shop.ShopName = request.ShopName;
             shop.ShopPhoneNumber = request.ShopPhoneNumber;
             shop.ShopAddress = request.ShopAddress;
@@ -226,7 +227,7 @@ namespace ECommerce.Application.BaseServices.Shop
             shop.UserId = request.UserId;
             shop.Status = (byte?)enumShopStatus.Pending; // waiting..
 
-            Data.Entities.ShopBank bank = new Data.Entities.ShopBank();
+            ShopBank bank = new Data.Entities.ProductSchema.ShopBank();
             bank.ShopBankName = request.ShopBankName;
             bank.ShopAccountNumber = request.ShopAccountNumber;
             bank.ShopAccountName = request.ShopAccountName;
@@ -362,7 +363,7 @@ namespace ECommerce.Application.BaseServices.Shop
                     if (!string.IsNullOrEmpty(request.shopbank.ShopAccountNumber))
                         accountNumber = request.shopbank.ShopAccountNumber.Trim();
 
-                    var newBank = new Data.Entities.ShopBank
+                    var newBank = new Data.Entities.ProductSchema.ShopBank
                     {
                         ShopAccountName = accountName,
                         ShopBankName = bankName,
@@ -402,7 +403,7 @@ namespace ECommerce.Application.BaseServices.Shop
                 {
                     foreach (var id in request.shopBrands)
                     {
-                        var brand = new Data.Entities.ShopBrand
+                        var brand = new Data.Entities.ProductSchema.ShopBrand
                         {
                             BrandId = id,
                             ShopId = shop.ShopId
