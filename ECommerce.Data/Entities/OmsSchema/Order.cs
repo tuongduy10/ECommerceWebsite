@@ -1,5 +1,7 @@
 ﻿using ECommerce.Data.Abstractions;
 using ECommerce.Data.Entities.Common;
+using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Utilities.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,11 +16,17 @@ namespace ECommerce.Data.Entities.OmsSchema
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Remark { get; set; }
+        public string PaymentMethod { get; set; }
+        public decimal TotalPice { get; set; }
+        public decimal TotalFinalPrice { get; set; }
+        public int TotalQty { get; set; }
+        public string Status { get; set; } = OmsConstant.STATUS_ORDER_PENDING;
         public string CityCode { get; set; }
         public virtual Province City { get; set; }
         public string DistrictCode { get; set; }
         public virtual District District { get; set; }
         public string WardCode { get; set; }
         public virtual Ward Ward { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

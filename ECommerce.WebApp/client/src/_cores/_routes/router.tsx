@@ -23,6 +23,7 @@ import {
   SubCategory,
   Options,
   Attributes,
+  OrderList,
 } from "src/_pages/admin/components";
 import { PrivateRoute } from "./private-route";
 import { ADMIN_ROUTE_NAME, ROUTE_NAME } from "../_enums/route-config.enum";
@@ -59,6 +60,7 @@ const Router = () => {
         { path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_DETAIL, element: <PrivateRoute><ProductDetail /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_USER, element: <PrivateRoute><UserList /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_USER_DETAIL, element: <PrivateRoute><UserDetail /></PrivateRoute> },
+        { path: ADMIN_ROUTE_NAME.MANAGE_OMS_ORDER_LIST, element: <PrivateRoute><OrderList /></PrivateRoute> },
       ],
     },
   ]);

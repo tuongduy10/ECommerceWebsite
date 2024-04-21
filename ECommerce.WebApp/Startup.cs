@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using ECommerce.WebApp.Configs.AppSettings;
 using ECommerce.WebApp.Utils;
 using ECommerce.Application.Extensions;
 using Microsoft.AspNetCore.Http;
+using ECommerce.Utilities.AppSettings;
 
 namespace ECommerce.WebApp
 {
@@ -69,7 +69,10 @@ namespace ECommerce.WebApp
                             .AllowAnyMethod();
                     });
             });
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
             services.AddHttpClient();
             //services.AddSignalR();
             services.AddHttpContextAccessor();
@@ -109,6 +112,7 @@ namespace ECommerce.WebApp
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            app.ConfigureExceptionHandler(logger);
             app.UseMiddleware<CustomAuthMiddleware>();
             app.UseAuthentication();
             app.UseRouting();

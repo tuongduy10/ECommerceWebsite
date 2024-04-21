@@ -13,15 +13,27 @@ using ECommerce.Application.Enums;
 using ECommerce.Data.Entities.UserSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Abstractions;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+using ECommerce.Utilities.AppSettings;
+using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerce.Application.Services.UserSrv
 {
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _uow;
-        public UserService(IUnitOfWork uow)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly AppSetting _appSetting;
+        public UserService(IUnitOfWork uow, 
+            IHttpContextAccessor httpContextAccessor,
+            IOptionsMonitor<AppSetting> optionsMonitor)
         {
             _uow = uow;
+            _httpContextAccessor = httpContextAccessor;
+            _appSetting = optionsMonitor.CurrentValue;
         }
         public async Task<Response<PageResult<UserGetModel>>> getUserPagingList(UserGetRequest request)
         {
@@ -399,6 +411,55 @@ namespace ECommerce.Application.Services.UserSrv
             {
                 return new FailResponse<UserShopModel>(exc.Message);
             }
+        }
+
+        public int getCurrentUserId() => Int32.Parse(getUserValue("id"));
+        public string getCurrentUserFullName() => getUserValue("fullName");
+        private string getUserValue(string key)
+        {
+            var userClaims = DecodeToken(getAccessToken()).Claims;
+            return userClaims.FirstOrDefault(claim => claim.Type == key)?.Value;
+        }
+        public string getAccessToken()
+        {
+            var authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+                return "";
+            var token = authorizationHeader.Substring("Bearer ".Length);
+            return token;
+        }
+        public string GenerateToken(UserModel user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
+            var description = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim("id", user.id.ToString()),
+                    new Claim("tokenId", Guid.NewGuid().ToString()),
+                    new Claim("fullName", user.fullName),
+                    new Claim("phone", user.phone),
+                }),
+                Expires = DateTime.UtcNow.AddHours(4),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var createToken = jwtTokenHandler.CreateToken(description);
+            var writeToken = jwtTokenHandler.WriteToken(createToken);
+
+            return writeToken;
+        }
+        public ClaimsPrincipal DecodeToken(string token)
+        {
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
+            var jwtTokenHandler = new JwtSecurityTokenHandler()
+                .ValidateToken(token, new TokenValidationParameters()
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                }, out SecurityToken secToken);
+            return jwtTokenHandler;
         }
     }
 }

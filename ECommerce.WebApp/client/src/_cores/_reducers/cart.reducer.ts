@@ -31,6 +31,11 @@ const cartSlice = createSlice({
   name: SLICE_NAME.CART,
   initialState: initialState,
   reducers: {
+    clearCart: (state) => {
+      state.totalPrice = 0;
+      state.totalQty = 0;
+      state.productsInCart = [];
+    },
     addToCart: (state, action: PayloadAction<INewProductInCart>) => {
       const _product = action.payload;
       const _uniqId = CartHelper.getUniqId(_product);
@@ -103,7 +108,7 @@ const cartSlice = createSlice({
   }
 });
 
-export const { addToCart, removeItem, changeItemQty } = cartSlice.actions;
+export const { addToCart, removeItem, changeItemQty, clearCart } = cartSlice.actions;
 
 const cartReducer = cartSlice.reducer;
 export default cartReducer;
