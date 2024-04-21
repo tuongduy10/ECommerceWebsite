@@ -24,6 +24,5 @@ namespace ECommerce.Application.Repositories
         void Update(T entity);
         // Remove
         Task RemoveRangeAsyncWhere(Expression<Func<T, bool>> expression);
-        void RemoveRange(IEnumerable<T> entities);
     }
 }

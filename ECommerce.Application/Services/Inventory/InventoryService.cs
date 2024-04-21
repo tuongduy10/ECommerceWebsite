@@ -1,5 +1,4 @@
-﻿using ECommerce.Application.BaseServices.FilterProduct.Dtos;
-using ECommerce.Application.Common;
+﻿using ECommerce.Application.Common;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Inventory.Dtos;
 using ECommerce.Application.Services.UserSrv.Dtos;
@@ -504,10 +503,10 @@ namespace ECommerce.Application.Services.Inventory
                 foreach (var value in valuesToRemove)
                 {
                     var proOptValues = value.ProductOptionValues;
-                    _productOptionValuesRepo.RemoveRange(proOptValues);
+                    _uow.Repository<ProductOptionValue>().Delete(proOptValues);
                     await _uow.SaveChangesAsync();
                 }
-                _optionValueRepo.RemoveRange(valuesToRemove);
+                _uow.Repository<OptionValue>().Delete(valuesToRemove);
                 await _uow.SaveChangesAsync();
 
                 await transaction.CommitAsync();
