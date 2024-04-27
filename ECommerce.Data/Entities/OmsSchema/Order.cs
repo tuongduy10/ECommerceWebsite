@@ -17,7 +17,7 @@ namespace ECommerce.Data.Entities.OmsSchema
         public string Email { get; set; }
         public string Remark { get; set; }
         public string PaymentMethod { get; set; }
-        public decimal TotalPice { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal TotalFinalPrice { get; set; }
         public int TotalQty { get; set; }
         public string Status { get; set; } = OmsConstant.STATUS_ORDER_PENDING;

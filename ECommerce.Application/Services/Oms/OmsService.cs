@@ -5,6 +5,8 @@ using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Dtos.Oms;
 using ECommerce.Utilities.Constants;
+using ECommerce.Utilities.Shared;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +32,21 @@ namespace ECommerce.Application.Services.Oms
         public async Task<Response<IEnumerable<OrderResponseDto>>> getOrderByStatus(string status) 
         {
             var orders = (await _uow.Repository<Order>()
-                .GetByAsync(_ => _.Status == status, null, "OrderDetails,Ward,District,City"))
+                .GetByAsync(
+                    _ => _.Status == status, 
+                    _ => _.OrderByDescending(i => i.CreatedDate), 
+                    "OrderDetails,Ward,District,City"))
                 .Select(_ => (OrderResponseDto)_);
             return new SuccessResponse<IEnumerable<OrderResponseDto>>(StatusConstant.SUCCESS, orders);
+        }
+        public async Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(PagedRequest request)
+        {
+            var pagedResult = await _uow.Repository<Order>()
+                .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex,request.PageSize,
+                    _ => _.IsDeleted == false,
+                    _ => _.OrderByDescending(i => i.CreatedDate),
+                    "OrderDetails,Ward,District,City");
+            return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
         }
         public async Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request)
         {
@@ -71,8 +85,8 @@ namespace ECommerce.Application.Services.Oms
                             price = (decimal)pro.PricePreOrder;
                             finalPrice = (decimal)pro.DiscountPreOrder;
                         }
-                        totalPrice += price;
-                        totalFinalPrice += finalPrice;
+                        totalPrice += price * product.qty;
+                        totalFinalPrice += finalPrice * product.qty;
                         var detail = new OrderDetail
                         {
                             Price = price,
@@ -84,7 +98,7 @@ namespace ECommerce.Application.Services.Oms
                         orderDetails.Add(detail);
                     }
                 }
-                entity.TotalPice = totalPrice;
+                entity.TotalPrice = totalPrice;
                 entity.TotalFinalPrice = totalFinalPrice;
                 entity.OrderDetails = orderDetails;
                 await _uow.Repository<Order>().AddAsync(entity);

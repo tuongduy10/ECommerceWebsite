@@ -9,4 +9,17 @@ export class FormatHelper {
     }
     return null;
   }
+  public static getOrderStatus(status: string) {
+    switch (status) {
+      case 'ORDER_PENDING': return "Chờ duyệt";
+      default: return status
+    }
+  }
+  public static getPaymentMethod(method: string) {
+    switch (method) {
+      case 'cash': return "Tiền mặt";
+      case 'bank': return "Chuyển khoản";
+      default: return method
+    }
+  }
 }

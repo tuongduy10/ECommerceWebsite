@@ -1,4 +1,5 @@
 ﻿using ECommerce.Data.Entities.OmsSchema;
+using ECommerce.Utilities.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace ECommerce.Dtos.Oms
         public string Email { get; set; }
         public string Remark { get; set; }
         public string PaymentMethod { get; set; }
-        public decimal TotalPice { get; set; }
+        public decimal TotalPrice { get; set; }
         public decimal TotalFinalPrice { get; set; }
         public int TotalQty { get; set; }
         public string Status { get; set; }
@@ -48,7 +49,7 @@ namespace ECommerce.Dtos.Oms
                 Remark = data.Remark,
                 Status = data.Status,
                 TotalFinalPrice = data.TotalFinalPrice,
-                TotalPice = data.TotalPice,
+                TotalPrice = data.TotalPrice,
                 UpdatedDate = data.UpdatedDate,
                 TotalQty = data.TotalQty,
                 OrderDetails = data.OrderDetails.Select(_ => (OrderDetailResponseDto)_).ToList(),

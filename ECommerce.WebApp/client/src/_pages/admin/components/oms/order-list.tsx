@@ -1,10 +1,14 @@
-import { Box, Button, Checkbox, Collapse, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Button, Checkbox, Collapse, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import OmsService from "src/_cores/_services/oms.service";
+import { DateTimeHelper } from "src/_shares/_helpers/datetime-helper";
+import { ProductHelper } from "src/_shares/_helpers/product-helper";
+import { IPagedRequest } from "src/_cores/_interfaces";
+import { FormatHelper } from "src/_shares/_helpers/format-helper";
 
 const header: ITableHeader[] = [
     { field: 'createdDate', fieldName: 'Ngày tạo', align: 'left' },
@@ -31,6 +35,7 @@ function Row(props: TableRowProps) {
     const [open, setOpen] = useState(false);
     const openDel = Boolean(delAnchorEl);
 
+    const getFormatedPrice = (price: number) => ProductHelper.getFormatedPrice(price);
 
     const updateStatus = (id: number, status: number) => {
         onUpdateStatus(id, status);
@@ -66,23 +71,16 @@ function Row(props: TableRowProps) {
                         aria-label="expand row"
                         size="small"
                         onClick={() => setOpen(!open)}
-                        sx={{ display: 'none' }}
                     >
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
-                    <IconButton
-                        size="small"
-                        onClick={() => viewDetail(rowData.id)}
-                    >
-                        <ModeEditIcon />
-                    </IconButton>
                 </TableCell>
-                <TableCell align="left">{rowData.createdDate}</TableCell>
+                <TableCell align="left">{DateTimeHelper.getDateTimeFormated(rowData.createdDate)}</TableCell>
                 <TableCell align="left">{rowData.createdBy}</TableCell>
-                <TableCell align="left">{rowData.totalPrice}</TableCell>
-                <TableCell align="left">{rowData.totalFinalPrice}</TableCell>
-                <TableCell align="left">{rowData.paymentMethod}</TableCell>
-                <TableCell align="left">{rowData.status}</TableCell>
+                <TableCell align="left">{getFormatedPrice(rowData.totalPrice)}</TableCell>
+                <TableCell align="left">{getFormatedPrice(rowData.totalFinalPrice)}</TableCell>
+                <TableCell align="left">{FormatHelper.getPaymentMethod(rowData.paymentMethod)}</TableCell>
+                <TableCell align="left">{FormatHelper.getOrderStatus(rowData.status)}</TableCell>
                 <TableCell align="center">
                     <Button
                         variant="outlined"
@@ -91,6 +89,7 @@ function Row(props: TableRowProps) {
                         aria-haspopup="true"
                         aria-expanded={openDel ? 'true' : undefined}
                         onClick={handleClickDel}
+                        sx={{ display: 'none' }}
                     >
                         Xóa
                     </Button>
@@ -102,7 +101,7 @@ function Row(props: TableRowProps) {
                             'aria-labelledby': 'basic-button',
                         }}
                     >
-                        <MenuItem onClick={() => deleteProduct(rowData.categoryId)}>Xác nhận xóa</MenuItem>
+                        <MenuItem onClick={() => deleteProduct(rowData.id)}>Xác nhận xóa</MenuItem>
                         <MenuItem onClick={handleCloseDel}>Hủy</MenuItem>
                     </Menu>
                 </TableCell>
@@ -110,7 +109,33 @@ function Row(props: TableRowProps) {
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
-
+                        <Box sx={{ margin: 1 }}>
+                            <Typography variant="h6" gutterBottom component="div">
+                                Chi tiết
+                            </Typography>
+                            <Table size="small" aria-label="purchases">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Tên</TableCell>
+                                        <TableCell>Đơn giá</TableCell>
+                                        <TableCell align="right">Giá đã giảm</TableCell>
+                                        <TableCell align="right">Số lượng</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {rowData.orderDetails?.map((item: any) => (
+                                        <TableRow key={item.productId}>
+                                            <TableCell component="th" scope="row">
+                                                {item.productName}
+                                            </TableCell>
+                                            <TableCell>{getFormatedPrice(item.price)}</TableCell>
+                                            <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
+                                            <TableCell align="right">{item.qty}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Box>
                     </Collapse>
                 </TableCell>
             </TableRow>
@@ -122,31 +147,32 @@ export default function OrderList() {
     const [open, setOpen] = useState(false);
     const [orders, setOrders] = useState<any[]>([]);
     const [selectedOrders, setSelectedOrder] = useState<number[]>([]);
-    const [formData, setFormData] = useState({
-        categoryId: -1,
-        categoryName: '',
-    });
 
     useEffect(() => {
         search();
     }, []);
 
     const search = async (_params?: any) => {
-        const response = await OmsService.getPendingOrders() as any;
+        const params: IPagedRequest = {
+            pageIndex: 1,
+            pageSize: 10,
+            searchKey: '',
+        }
+        const response = await OmsService.getOrdersPaging(params) as any;
         if (response?.isSucceed) {
-            setOrders(response.data);
+            setOrders(response.data?.items);
         }
     }
 
     const temp = async (id: number, stat = 0) => {
     }
-    
+
     return (
         <Fragment>
             <Box>
                 <Grid container spacing={2} sx={{ marginBottom: 2 }}>
                     <Grid item xs={12} sm={4}>
-                        <Button variant="contained" sx={{ marginRight: 2 }}>Thêm</Button>
+                        {/* <Button variant="contained" sx={{ marginRight: 2 }}>Thêm</Button> */}
                     </Grid>
                 </Grid>
             </Box>
