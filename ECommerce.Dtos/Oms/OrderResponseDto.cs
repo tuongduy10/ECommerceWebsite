@@ -10,6 +10,7 @@ namespace ECommerce.Dtos.Oms
     {
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
@@ -33,6 +34,7 @@ namespace ECommerce.Dtos.Oms
             {
                 Id = data.Id,
                 CreatedDate = data.CreatedDate,
+                CreatedBy = data.CreatedBy,
                 CityCode = data.CityCode,
                 CityName = data.City.Name,
                 DistrictCode = data.DistrictCode,

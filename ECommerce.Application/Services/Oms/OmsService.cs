@@ -44,7 +44,7 @@ namespace ECommerce.Application.Services.Oms
             entity.CityCode = request.deliveryInfo.cityCode;
             entity.DistrictCode = request.deliveryInfo.districtCode;
             entity.WardCode = request.deliveryInfo.wardCode;
-            entity.CreatedBy = _userService.getCurrentUserFullName();
+            entity.CreatedBy = _userService.getCurrentUserName() ?? request.deliveryInfo.fullName;
             entity.PaymentMethod = request.deliveryInfo.paymentMethod;
             entity.TotalQty = request.products.Sum(_ => _.qty);
 
@@ -100,5 +100,7 @@ namespace ECommerce.Application.Services.Oms
             var order = (OrderResponseDto)(await _uow.Repository<Order>().FindByAsync(_ => _.Id == entity.Id, "OrderDetails,Ward,District,City"));
             return new SuccessResponse<OrderResponseDto>(order);
         }
+
+
     }
 }

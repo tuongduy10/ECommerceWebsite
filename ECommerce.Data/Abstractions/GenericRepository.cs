@@ -65,8 +65,11 @@ namespace ECommerce.Data.Abstractions
         }
         public virtual void Update(IEnumerable<TEntity> entities)
         {
-            _dbSet.UpdateRange(entities);
-            _dbContext.Entry(entities).State = EntityState.Modified;
+            _dbSet.UpdateRange(entities.ToList());
+            foreach (var entity in entities)
+            {
+                _dbContext.Entry(entity).State = EntityState.Modified;
+            }
         }
         public virtual IQueryable<TEntity> QueryableAsync(
             Expression<Func<TEntity, bool>> filter = null,

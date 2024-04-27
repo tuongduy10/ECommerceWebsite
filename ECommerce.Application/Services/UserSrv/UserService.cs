@@ -262,6 +262,7 @@ namespace ECommerce.Application.Services.UserSrv
                 user.fullName = result.UserFullName;
                 user.roles = roles;
                 user.phone = result.UserPhone;
+                user.userName = result.UserName;
 
                 return new SuccessResponse<UserModel>("Đăng nhập thành công", user);
             }
@@ -415,16 +416,20 @@ namespace ECommerce.Application.Services.UserSrv
 
         public int getCurrentUserId() => Int32.Parse(getUserValue("id"));
         public string getCurrentUserFullName() => getUserValue("fullName");
+        public string getCurrentUserName() => getUserValue("userName");
         private string getUserValue(string key)
         {
-            var userClaims = DecodeToken(getAccessToken()).Claims;
+            string accessToken = getAccessToken();
+            if (string.IsNullOrEmpty(accessToken))
+                return null;
+            var userClaims = DecodeToken(accessToken).Claims;
             return userClaims.FirstOrDefault(claim => claim.Type == key)?.Value;
         }
         public string getAccessToken()
         {
             var authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString();
             if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
-                return "";
+                return null;
             var token = authorizationHeader.Substring("Bearer ".Length);
             return token;
         }
@@ -440,6 +445,7 @@ namespace ECommerce.Application.Services.UserSrv
                     new Claim("tokenId", Guid.NewGuid().ToString()),
                     new Claim("fullName", user.fullName),
                     new Claim("phone", user.phone),
+                    new Claim("userName", user.userName),
                 }),
                 Expires = DateTime.UtcNow.AddHours(4),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
@@ -460,6 +466,20 @@ namespace ECommerce.Application.Services.UserSrv
                     ValidateAudience = false,
                 }, out SecurityToken secToken);
             return jwtTokenHandler;
+        }
+    
+        private string generateUserName(string fullName, string phoneNumber)
+        {
+            string lowercaseAlphabets = string.Join("", Enumerable.Range('a', 'z' - 'a' + 1).Select(c => (char)c));
+
+            List<char> distinctConsonants = new List<char>();
+            for (int i = 0; i < fullName.Length; i++)
+            {
+                char charAtIdx = fullName[i];
+                if (lowercaseAlphabets.IndexOf(char.ToLower(charAtIdx)) >= 0)
+                    distinctConsonants.Add(charAtIdx.ToString().ToLower()[0]);
+            }
+            return string.Join("", distinctConsonants) + phoneNumber.Substring(phoneNumber.Length - 4, 4);
         }
     }
 }

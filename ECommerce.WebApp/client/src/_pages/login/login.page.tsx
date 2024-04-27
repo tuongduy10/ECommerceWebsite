@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { useAuthStore } from "src/_cores/_store/root-store";
 import { useDispatch } from "react-redux";
-import { setAccessToken } from "src/_cores/_reducers/auth.reducer";
+import { setAccessToken, setUser } from "src/_cores/_reducers/auth.reducer";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -34,6 +34,8 @@ const LoginPage = () => {
     const response = await UserService.login(param) as any;
     if (response.isSucceed) {
       dispatch(setAccessToken(response.data));
+      const user = await UserService.getUserInfo() as any;
+      dispatch(setUser(user));
       navigate(ROUTE_NAME.HOME)
     }
   }
