@@ -30,4 +30,6 @@ export const ADMIN_ROUTE_NAME = {
     MANAGE_ORDERS_PENDING: ADMIN_ROUTE_PREFIX + '/manage-orders/pending',
     MANAGE_USERS: ADMIN_ROUTE_PREFIX + '/manage-users',
     MANAGE_STATISTICAL: ADMIN_ROUTE_PREFIX + '/manage-statistical',
+
+    MANAGE_OMS_ORDER_LIST: ADMIN_ROUTE_PREFIX + '/manage-oms/order-list'
 }

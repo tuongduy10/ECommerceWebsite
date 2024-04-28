@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ECommerce.Data.Context;
+using ECommerce.Utilities.Shared;
 
 namespace ECommerce.Data.Abstractions
 {
@@ -65,8 +66,11 @@ namespace ECommerce.Data.Abstractions
         }
         public virtual void Update(IEnumerable<TEntity> entities)
         {
-            _dbSet.UpdateRange(entities);
-            _dbContext.Entry(entities).State = EntityState.Modified;
+            _dbSet.UpdateRange(entities.ToList());
+            foreach (var entity in entities)
+            {
+                _dbContext.Entry(entity).State = EntityState.Modified;
+            }
         }
         public virtual IQueryable<TEntity> QueryableAsync(
             Expression<Func<TEntity, bool>> filter = null,
@@ -96,19 +100,7 @@ namespace ECommerce.Data.Abstractions
             Expression<Func<TEntity, bool>> filter = null,
             string includeProperties = "")
         {
-            IQueryable<TEntity> query = _dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
+            var query = QueryableAsync(filter, null, includeProperties);
             return await query.FirstOrDefaultAsync();
         }
         public virtual async Task<TEntity> FindLastAsync()
@@ -120,24 +112,40 @@ namespace ECommerce.Data.Abstractions
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "")
         {
-            IQueryable<TEntity> query = _dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
-            if (orderBy != null)
-            {
-                return await orderBy(query).ToListAsync();
-            }
+            var query = QueryableAsync(filter, orderBy, includeProperties);
             return await query.ToListAsync();
+        }
+        public virtual async Task<PagedResult<TEntity>> GetPagedResultByAsync(
+            int pageIndex,
+            int pageSize,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "")
+        {
+            var query = QueryableAsync(filter, orderBy, includeProperties);
+            return await PagedResult<TEntity>.CreateAsync(query, pageIndex, pageSize);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TResult">
+        /// Your custom clas response must has "explicit operator static" function to map from Entity class to Custom class
+        /// </typeparam>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="filter"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="includeProperties"></param>
+        /// <returns></returns>
+        public virtual async Task<PagedResult<TResult>> GetPagedMappingByAsync<TResult>(
+            int pageIndex,
+            int pageSize,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "")
+        {
+            var pagedResult = await GetPagedResultByAsync(pageIndex, pageSize, filter, orderBy, includeProperties);
+            return PagedResult<TEntity, TResult>.CreateMapping(pagedResult);
         }
     }
 }

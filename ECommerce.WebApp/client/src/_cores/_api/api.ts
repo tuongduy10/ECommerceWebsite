@@ -30,11 +30,6 @@ const setupAxiosInterceptors = (dispatch: any) => {
     (response) => response.data,
     async (error) => {
       if (error.response) {
-        if (error.response.status === 401) {
-          if (window.location.pathname.includes("admin")) {
-            window.location.replace(ADMIN_ROUTE_NAME.LOGIN);
-          }
-        }
         // The request was made, but the server responded with a status code
         console.error(
           "Response Error:",

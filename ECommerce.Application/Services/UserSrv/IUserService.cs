@@ -23,5 +23,12 @@ namespace ECommerce.Application.Services.UserSrv
         Task<Response<List<ShopModel>>> GetShops();
         Task<Response<UserShopModel>> UpdateUser(UserShopModel request);
         Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request);
+
+        string getAccessToken();
+        int getCurrentUserId();
+        string getCurrentUserName();
+        string getCurrentUserFullName();
+        string GenerateToken(UserModel user);
+        ClaimsPrincipal DecodeToken(string token);
     }
 }

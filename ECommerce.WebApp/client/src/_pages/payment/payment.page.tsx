@@ -5,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces";
 import { showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
+import { clearCart } from "src/_cores/_reducers/cart.reducer";
 import CommonService from "src/_cores/_services/common.service";
+import OmsService from "src/_cores/_services/oms.service";
 import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { MuiIcon, WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
@@ -25,7 +27,7 @@ const PaymentPage = () => {
         getCities();
     }, []);
 
-    const handleProcessOrder = () => {
+    const handleProcessOrder = async () => {
         if (!dataDetail['phoneNumber'] || !dataDetail['cityCode'] || !dataDetail['districtCode'] || !dataDetail['wardCode'] || !dataDetail['address']) {
             dispatch(showError('Vui lòng nhập đầy đủ thông tin'));
             return;
@@ -40,10 +42,15 @@ const PaymentPage = () => {
             products: cartStore.productsInCart
         }
         console.log(param);
-        if (dataDetail['paymentMethod'] === 'bank') {            
-            setOpen(true);
+        const response = await OmsService.createOrder(param) as any;
+        if (response?.isSucceed) {
+            if (dataDetail['paymentMethod'] === 'bank') {            
+                setOpen(true);
+            }
+            dispatch(showSuccess(`Đặt hàng thành công`));
+            dispatch(clearCart());
+            window.location.reload();
         }
-        dispatch(showSuccess(`Đặt hàng thành công`));
     };
 
     const handleClose = () => {

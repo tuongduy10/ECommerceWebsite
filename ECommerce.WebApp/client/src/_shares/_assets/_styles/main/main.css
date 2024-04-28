@@ -2276,7 +2276,7 @@ hr {
 
 .control-list .active,
 .control-list .active svg,
-.control-list li:hover a,
+.control-list li:hover span,
 .control-list li:hover span svg {
   color: var(--blue-dior);
   stroke: var(--blue-dior);

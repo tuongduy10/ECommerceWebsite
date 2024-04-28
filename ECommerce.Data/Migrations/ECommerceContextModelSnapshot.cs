@@ -516,6 +516,14 @@ namespace ECommerce.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentMethod")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -523,6 +531,18 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<string>("Remark")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalFinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TotalQty")
+                        .HasColumnType("int");
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -542,6 +562,51 @@ namespace ECommerce.Data.Migrations
                     b.HasIndex("WardCode");
 
                     b.ToTable("Orders","oms");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.OrderDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceOnSell")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderDetails","oms");
                 });
 
             modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Brand", b =>
@@ -1254,6 +1319,9 @@ namespace ECommerce.Data.Migrations
                         .HasMaxLength(50)
                         .IsUnicode(false);
 
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserPhone")
                         .HasColumnType("varchar(50)")
                         .HasMaxLength(50)
@@ -1353,6 +1421,21 @@ namespace ECommerce.Data.Migrations
                     b.HasOne("ECommerce.Data.Entities.Common.Ward", "Ward")
                         .WithMany()
                         .HasForeignKey("WardCode");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.OrderDetail", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.OmsSchema.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Brand", b =>

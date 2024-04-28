@@ -31,6 +31,9 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import SessionService from 'src/_cores/_services/session.service';
 import { ADMIN_ROUTE_NAME } from 'src/_cores/_enums/route-config.enum';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { useAuthStore } from 'src/_cores/_store/root-store';
+import { useDispatch } from 'react-redux';
+import { logout } from 'src/_cores/_reducers/auth.reducer';
 
 const mainListItems = [
     { name: "dashboard", icon: <HomeRoundedIcon />, label: "Trang chủ", path: "/" },
@@ -107,7 +110,7 @@ const mainListItems = [
             {
                 name: 'pending',
                 label: 'Chờ xác nhận',
-                path: '',
+                path: ADMIN_ROUTE_NAME.MANAGE_OMS_ORDER_LIST,
             },
         ]
     },
@@ -196,6 +199,8 @@ export default function AdminLayout() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [open, setOpen] = React.useState(true);
     const [selectedItem, setSelectedItem] = React.useState('');
+    const authStore = useAuthStore();
+    const dispatch = useDispatch();
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -297,7 +302,7 @@ export default function AdminLayout() {
                             <MenuItem onClick={() => setAnchorEl(null)}>Hồ sơ</MenuItem>
                             <MenuItem onClick={() => {
                                 setAnchorEl(null);
-                                SessionService.deleteAccessToken();
+                                dispatch(logout());
                                 window.location.href = ADMIN_ROUTE_NAME.LOGIN;
                             }}>Đăng xuất</MenuItem>
                         </Menu>

@@ -9,6 +9,9 @@ using ECommerce.Data.Entities.Cms;
 using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Entities.OmsSchema;
+using ECommerce.Data.Configurations;
+using ECommerce.Data.Configurations.UserSchema;
+using ECommerce.Data.Configurations.OmsSchema;
 
 #nullable disable
 
@@ -65,6 +68,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<Ward> Wards { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<OrderDetail> OrderDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -689,45 +693,7 @@ namespace ECommerce.Data.Context
                     .HasConstraintName("FK_SubCategoryOption_SubCategory");
             });
 
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.ToTable("User");
-
-                entity.Property(e => e.IsSystemAccount).HasColumnName("isSystemAccount");
-
-                entity.Property(e => e.Password)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserAddress).HasMaxLength(100);
-
-                entity.Property(e => e.UserCityCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserDistrictCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserFullName).HasMaxLength(100);
-
-                entity.Property(e => e.UserJoinDate).HasColumnType("datetime");
-
-                entity.Property(e => e.LastOnline).HasColumnType("datetime");
-
-                entity.Property(e => e.UserMail)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserPhone)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserWardCode)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
 
             modelBuilder.Entity<UserRole>(entity =>
             {
@@ -778,6 +744,10 @@ namespace ECommerce.Data.Context
 
                 entity.Property(e => e.CreateDate).HasColumnType("datetime");
             });
+
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderDetailConfiguration());
+
 
             OnModelCreatingPartial(modelBuilder);
         }

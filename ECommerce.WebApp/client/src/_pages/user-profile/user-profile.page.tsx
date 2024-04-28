@@ -1,49 +1,69 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces";
+import { logout } from "src/_cores/_reducers/auth.reducer";
 import CommonService from "src/_cores/_services/common.service";
 import UserService from "src/_cores/_services/user.service";
-import { useUserStore } from "src/_cores/_store/root-store";
+import { useAuthStore, useUserStore } from "src/_cores/_store/root-store";
 import { MuiIcon, WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 
-const PROFILE_MENU_ITEMS = [
-    {
-        code: 'notifications',
-        name: 'Thông báo',
-        icon: ICON_NAME.FEATHER.BELL
-    },
-    {
-        code: 'userInfo',
-        name: 'Thông tin cá nhân',
-        icon: ICON_NAME.FEATHER.INFO
-    },
-    {
-        code: 'orderHistory',
-        name: 'Lịch sử đơn hàng',
-        icon: ICON_NAME.FEATHER.LIST
-    },
-    {
-        code: 'changePassword',
-        name: 'Đổi mật khẩu',
-        icon: ICON_NAME.FEATHER.EDIT_3
-    },
-    {
-        code: 'logout',
-        name: 'Đăng xuất',
-        icon: ICON_NAME.FEATHER.LOG_OUT
-    },
-]
-
 const UserProfilePage = () => {
+    const navigate = useNavigate();
     const [selectedMenu, setSelectedMenu] = useState('userInfo');
     const [cities, setCitites] = useState<ICity[]>([]);
     const [districts, setDistricts] = useState<IDistrict[]>([]);
     const [wards, setWards] = useState<IWard[]>([]);
     const [dataDetail, setDataDetail] = useState<{ [key: string]: any }>({});
     const userStore = useUserStore();
+    const authStore = useAuthStore();
     const dispatch = useDispatch();
+
+    const PROFILE_MENU_ITEMS = [
+        {
+            code: 'notifications',
+            name: 'Thông báo',
+            icon: ICON_NAME.FEATHER.BELL,
+            command: () => {
+    
+            }
+        },
+        {
+            code: 'userInfo',
+            name: 'Thông tin cá nhân',
+            icon: ICON_NAME.FEATHER.INFO,
+            command: () => {
+                
+            }
+        },
+        {
+            code: 'orderHistory',
+            name: 'Lịch sử đơn hàng',
+            icon: ICON_NAME.FEATHER.LIST,
+            command: () => {
+                
+            }
+        },
+        {
+            code: 'changePassword',
+            name: 'Đổi mật khẩu',
+            icon: ICON_NAME.FEATHER.EDIT_3,
+            command: () => {
+                
+            }
+        },
+        {
+            code: 'logout',
+            name: 'Đăng xuất',
+            icon: ICON_NAME.FEATHER.LOG_OUT,
+            command: () => {
+                dispatch(logout());
+                navigate(ROUTE_NAME.LOGIN);
+            }
+        },
+    ]
 
     useEffect(() => {
         getCities();
@@ -150,16 +170,17 @@ const UserProfilePage = () => {
                                 <ul className="control-list">
                                     {PROFILE_MENU_ITEMS.map(_ => (
                                         <li key={_.code} className="mb-2">
-                                            <a className={`flex items-center ${_.code === selectedMenu && 'active'}`} href="/"
-                                                style={{ whiteSpace: 'nowrap' }}>
+                                            <span className={`flex items-center cursor-pointer ${_.code === selectedMenu && 'active'}`}
+                                                style={{ whiteSpace: 'nowrap' }}
+                                                onClick={() => _.command()}>
                                                 <span className="mr-2 relative" style={{ height: '24px' }}>
                                                     <MuiIcon name={_.icon} />
                                                     {_.code === 'notifications' && (
-                                                        <span className="point-red-quantity" style={{ top: '12px', left: '20px' }}>1</span>
+                                                        <div className="point-red-quantity" style={{ top: '12px', left: '20px' }}>1</div>
                                                     )}
                                                 </span>
-                                                {_.name}
-                                            </a>
+                                                <span>{_.name}</span>
+                                            </span>
                                         </li>
                                     ))}
                                     <hr />

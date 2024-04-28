@@ -10,6 +10,7 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
     {
         public int id { get; set; }
         public string mail { get; set; }
+        public string userName { get; set; }
         public string fullName { get; set; }
         public DateTime joinDate { get; set; }
         public string address { get; set; }

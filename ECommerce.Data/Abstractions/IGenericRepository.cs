@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Shared;
 
 namespace ECommerce.Data.Abstractions
 {
@@ -18,15 +19,27 @@ namespace ECommerce.Data.Abstractions
         void Delete(TEntity entity);
         void Delete(IEnumerable<TEntity> entities);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter);
-        IQueryable<TEntity> QueryableAsync(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            string includeProperties = "");
+        Task<TEntity> FindLastAsync();
         Task<TEntity> FindByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             string includeProperties = "");
-        Task<TEntity> FindLastAsync();
         Task<IEnumerable<TEntity>> GetByAsync(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "");
+        Task<PagedResult<TEntity>> GetPagedResultByAsync(
+            int pageIndex,
+            int pageSize,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "");
+        Task<PagedResult<TResult>> GetPagedMappingByAsync<TResult>(
+            int pageIndex,
+            int pageSize,
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "");
+        IQueryable<TEntity> QueryableAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "");

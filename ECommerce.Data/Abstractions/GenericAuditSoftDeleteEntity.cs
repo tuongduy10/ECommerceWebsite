@@ -5,6 +5,7 @@ namespace ECommerce.Data.Abstractions
 {
     public abstract class GenericAuditSoftDeleteEntity<T> : GenericEntity<T>, IGenericAuditSoftDeleteEntity<T>
     {
+        public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedDate { get; set; } = null;
         public string? DeletedBy { get; set; } = null;
     }
