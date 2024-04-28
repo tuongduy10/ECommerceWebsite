@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ECommerce.Utilities.Shared.Responses;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Diagnostics;
+using ECommerce.Utilities.Constants;
 
 namespace ECommerce.Infrastructure.Middlewares
 {
@@ -23,16 +27,23 @@ namespace ECommerce.Infrastructure.Middlewares
         public async Task InvokeAsync(HttpContext context)
         {
             await _next(context);
-
-            if (context.Response.StatusCode == 401)
+            
+            int[] statusCodes = new int[] { 401, 403 };
+            if (statusCodes.Contains(context.Response.StatusCode))
             {
+                string message = "";
+                if (context.Response.StatusCode == 401)
+                    message = MessageConstant.UNAUTHORIZED;
+                if (context.Response.StatusCode == 403)
+                    message = MessageConstant.UNAUTHORIZED;
+                var failResponse = new FailResponse<bool>(message);
+
+                var serializerSettings = new JsonSerializerSettings();
+                serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                var jsonReponse = JsonConvert.SerializeObject(failResponse, serializerSettings);
+
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 401;
-
-                // Customize the response format
-                var response = new FailResponse<bool>();
-
-                await context.Response.WriteAsync("{\"status\": \"fail\", \"message\": \"Unauthorized\", \"data\": null }");
+                await context.Response.WriteAsync(jsonReponse);
             }
         }
     }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ECommerce.Infrastructure.Middlewares
 {
@@ -25,7 +26,7 @@ namespace ECommerce.Infrastructure.Middlewares
 
                     // Write the error details to a text file
                     var logDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "logs");
-                    var logFileName = $"error_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                    var logFileName = $"error_{DateTime.Now:yyyyMMMMdd_HHmmss}.txt";
                     var logFilePath = Path.Combine(logDirectory, logFileName);
                     Directory.CreateDirectory(logDirectory); // Ensure the directory exists
                     using (var writer = new StreamWriter(logFilePath))
@@ -40,7 +41,11 @@ namespace ECommerce.Infrastructure.Middlewares
                     context.Response.StatusCode = 500;
                     context.Response.ContentType = "application/json";
                     var failResponse = new FailResponse<string>(exception.Message);
-                    var jsonReponse = JsonConvert.SerializeObject(failResponse);
+
+                    var serializerSettings = new JsonSerializerSettings();
+                    serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    var jsonReponse = JsonConvert.SerializeObject(failResponse, serializerSettings);
+
                     await context.Response.WriteAsync(jsonReponse);
                 });
             });

@@ -7,7 +7,7 @@ using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.Data.Entities.UserSchema
 {
-    [Table("User", Schema = "ums")]
+    //[Table("User", Schema = "ums")]
     public partial class User
     {
         public User()

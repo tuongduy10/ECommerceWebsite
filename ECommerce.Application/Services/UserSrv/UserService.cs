@@ -40,6 +40,7 @@ namespace ECommerce.Application.Services.UserSrv
         {
             try
             {
+                string userName = getCurrentUserName();
                 var query = _uow.Repository<User>()
                     .QueryableAsync(x => request.userId == -1 || x.UserId == request.userId)
                     .Select(i => (UserGetModel)i);
@@ -226,43 +227,37 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<UserGetModel>(error.ToString());
             }
         }
-        public async Task<Response<UserModel>> ValidateUser(SignInRequest request)
+        public async Task<Response<string>> ValidateUser(SignInRequest request)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(request.UserPhone) || string.IsNullOrEmpty(request.Password)) 
-                    return new FailResponse<UserModel>("Thông tin không được để trống");
+            if (string.IsNullOrEmpty(request.UserPhone) || string.IsNullOrEmpty(request.Password))
+                return new FailResponse<string>("Thông tin không được để trống");
 
-                var phonenumber = request.UserPhone;
-                if (phonenumber.Contains("+84"))
+            var phonenumber = request.UserPhone;
+            if (phonenumber.Contains("+84"))
+            {
+                phonenumber = phonenumber.Replace("+84", "");
+                if (!phonenumber.StartsWith("0"))
                 {
-                    phonenumber = phonenumber.Replace("+84", "");
-                    if (!phonenumber.StartsWith("0"))
-                    {
-                        phonenumber = "0" + phonenumber;
-                    }
+                    phonenumber = "0" + phonenumber;
                 }
-
-                var result = await _uow.Repository<User>()
-                    .FindByAsync(i => i.UserPhone == phonenumber && i.Password == request.Password);
-
-                if (result == null) 
-                    return new FailResponse<UserModel>("Mật khẩu hoặc tài khoản không đúng");
-                if (result.Status == false) 
-                    return new FailResponse<UserModel>("Tài khoản đã bị khóa");
-
-                var user = new UserModel();
-                user.id = result.UserId;
-                user.fullName = result.UserFullName;
-                user.phone = result.UserPhone;
-                user.userName = result.UserName;
-
-                return new SuccessResponse<UserModel>("Đăng nhập thành công", user);
             }
-            catch(Exception error)
-            {
-                return new FailResponse<UserModel>("Đang xảy ra lỗi, vui lòng thử lại sau");
-            }
+
+            var result = await _uow.Repository<User>()
+                .FindByAsync(i => i.UserPhone == phonenumber && i.Password == request.Password);
+
+            if (result == null)
+                return new FailResponse<string>("Mật khẩu hoặc tài khoản không đúng");
+            if (result.Status == false)
+                return new FailResponse<string>("Tài khoản đã bị khóa");
+
+            var user = new UserModel();
+            user.id = result.UserId;
+            user.fullName = result.UserFullName;
+            user.phone = result.UserPhone;
+            user.userName = result.UserName;
+            string token = GenerateToken(user);
+
+            return new SuccessResponse<string>("Đăng nhập thành công", token);
         }
         public async Task<Response<List<ShopModel>>> GetShops()
         {
@@ -430,16 +425,23 @@ namespace ECommerce.Application.Services.UserSrv
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
+
+            var claims = new List<Claim>
+            {
+                new Claim("id", user.id.ToString()),
+                new Claim("tokenId", Guid.NewGuid().ToString()),
+                new Claim("fullName", user.fullName),
+                new Claim("phone", user.phone),
+                new Claim("userName", user.userName),
+            };
+            var permissions = new string[] { "COMMON_READ", "COMMON_WRITE" };
+            foreach (var item in permissions)
+            {
+                claims.Add(new Claim("permission", item));
+            }
             var description = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("id", user.id.ToString()),
-                    new Claim("tokenId", Guid.NewGuid().ToString()),
-                    new Claim("fullName", user.fullName),
-                    new Claim("phone", user.phone),
-                    new Claim("userName", user.userName),
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(4),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
             };

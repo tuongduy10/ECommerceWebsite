@@ -50,20 +50,14 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [HttpPost("login")]
         [AllowAnonymous]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(SignInRequest request)
         {
             var result = await _userService.ValidateUser(request);
             if (!result.isSucceed)
                 return BadRequest(result);
-            return Ok(new SuccessResponse<string>
-            {
-                Status = "success",
-                isSucceed = result.isSucceed,
-                Message = result.Message,
-                Data = _userService.GenerateToken(result.Data)
-            });
+            return Ok(result);
         }
         [HttpPost("info")]
         public async Task<IActionResult> UserInfo()
