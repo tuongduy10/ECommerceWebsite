@@ -19,6 +19,7 @@ using ECommerce.Application.Services.UserSrv.Dtos;
 using UserUpdateRequest = ECommerce.Application.Services.UserSrv.Dtos.UserUpdateRequest;
 using ECommerce.Utilities.Helpers;
 using ECommerce.Utilities.AppSettings;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.WebApp.Controllers
 {

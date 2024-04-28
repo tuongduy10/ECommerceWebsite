@@ -1,7 +1,7 @@
-﻿using ECommerce.Application.Common;
-using ECommerce.Application.Services.Common.DTOs;
+﻿using ECommerce.Application.Services.Common.DTOs;
 using ECommerce.Application.Services.Common.DTOs.Requests;
 using ECommerce.Dtos.Common;
+using ECommerce.Utilities.Shared.Responses;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;

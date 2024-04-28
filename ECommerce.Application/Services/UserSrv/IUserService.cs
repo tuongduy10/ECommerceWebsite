@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using ECommerce.Data.Entities.UserSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.UserSrv
 {

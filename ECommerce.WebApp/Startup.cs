@@ -6,8 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using ECommerce.WebApp.Middlewares;
-using ECommerce.WebApp.Configs.Middlewares;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using System.Text;
@@ -17,6 +15,8 @@ using ECommerce.WebApp.Utils;
 using ECommerce.Application.Extensions;
 using Microsoft.AspNetCore.Http;
 using ECommerce.Utilities.AppSettings;
+using ECommerce.Infrastructure.Middlewares;
+using ECommerce.Utilities.Helpers;
 
 namespace ECommerce.WebApp
 {
@@ -32,15 +32,13 @@ namespace ECommerce.WebApp
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        { 
-            string secretKey = Configuration["AppSettings:SecretKey"];
-            byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-
-            string connStr = EncryptHelper.DecryptString(Configuration.GetConnectionString("ECommerceDB"));
-
+        {             
+            string connStr = HashHelper.Decrypt(Configuration.GetConnectionString("ECommerceDB"));
             services.AddDbContext<ECommerceContext>(options => options.UseSqlServer(connStr));
             services.AddControllersWithViews();
 
+            string secretKey = Configuration["AppSettings:SecretKey"];
+            byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
             services
                 .AddAuthentication(option =>
                 {
@@ -121,7 +119,6 @@ namespace ECommerce.WebApp
 
             app.UseCookiePolicy();
 
-            app.UseMiddleware<NoCacheMiddleware>();
             app.UseCors(myCorsPolicy); ;
 
             //app.UseEndpoints(routes =>

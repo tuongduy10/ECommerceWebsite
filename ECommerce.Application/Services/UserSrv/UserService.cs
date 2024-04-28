@@ -19,6 +19,7 @@ using ECommerce.Utilities.AppSettings;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -250,17 +251,9 @@ namespace ECommerce.Application.Services.UserSrv
                 if (result.Status == false) 
                     return new FailResponse<UserModel>("Tài khoản đã bị khóa");
 
-                var roles = (
-                    from role in _uow.Repository<Role>().QueryableAsync()
-                    join userrole in _uow.Repository<UserRole>().QueryableAsync(_ => _.UserId == result.UserId)
-                        on role.RoleId equals userrole.RoleId
-                    select role.RoleName
-                ).Distinct().ToList();
-
                 var user = new UserModel();
                 user.id = result.UserId;
                 user.fullName = result.UserFullName;
-                user.roles = roles;
                 user.phone = result.UserPhone;
                 user.userName = result.UserName;
 

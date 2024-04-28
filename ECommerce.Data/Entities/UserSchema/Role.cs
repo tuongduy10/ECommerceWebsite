@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
 namespace ECommerce.Data.Entities.UserSchema
 {
+    [Table("Role", Schema = "ums")]
     public partial class Role
     {
         public Role()

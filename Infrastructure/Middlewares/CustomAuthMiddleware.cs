@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using ECommerce.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ECommerce.Application.BaseServices.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ECommerce.Application.Common;
+using ECommerce.Utilities.Shared.Responses;
 
-namespace ECommerce.WebApp.Middlewares
+namespace ECommerce.Infrastructure.Middlewares
 {
     public class CustomAuthMiddleware
     {

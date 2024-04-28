@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
-using ECommerce.Application.Common;
+using ECommerce.Utilities.Shared.Responses;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace ECommerce.WebApp.Configs.Middlewares
+namespace ECommerce.Infrastructure.Middlewares
 {
     public static class HandleExceptionMiddleware
     {

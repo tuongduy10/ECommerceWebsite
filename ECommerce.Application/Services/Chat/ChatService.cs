@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ECommerce.Data.Abstractions;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.Chat
 {
