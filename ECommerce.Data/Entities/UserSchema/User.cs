@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using ECommerce.Data.Entities.ProductSchema;
 
 #nullable disable
 
 namespace ECommerce.Data.Entities.UserSchema
 {
+    //[Table("User", Schema = "ums")]
     public partial class User
     {
         public User()

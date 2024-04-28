@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerce.Application.Common
+namespace ECommerce.Utilities.Shared.Responses
 {
     public class SuccessResponse<T> : Response<T>
     {

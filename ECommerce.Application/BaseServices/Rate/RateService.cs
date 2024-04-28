@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ECommerce.Data.Entities.UserSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.BaseServices.Rate
 {

@@ -5,6 +5,7 @@ using ECommerce.Application.BaseServices.Product.Response;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.BaseServices.Product
 {

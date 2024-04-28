@@ -12,6 +12,7 @@ using ECommerce.Data.Entities.UserSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Utilities.Constants;
 using ECommerce.Dtos.UserSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.Notifications
 {

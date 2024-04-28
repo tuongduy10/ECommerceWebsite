@@ -159,10 +159,11 @@ namespace ECommerce.Application.BaseServices.User
                 await _DbContext.Users.AddAsync(user);
                 await _DbContext.SaveChangesAsync();
 
-                UserRole role = new Data.Entities.UserSchema.UserRole();
-                role.RoleId = request.RoleId != 0 ? request.RoleId : (int)enumRole.Buyer;
-                role.UserId = user.UserId;
-                await _DbContext.UserRoles.AddAsync(role);
+                // UserRole
+                //UserRole role = new Data.Entities.UserSchema.UserRole();
+                //role.RoleId = request.RoleId != 0 ? request.RoleId : (int)enumRole.Buyer;
+                //role.UserId = user.UserId;
+                //await _DbContext.UserRoles.AddAsync(role);
                 await _DbContext.SaveChangesAsync();
 
                 return new ApiSuccessResponse("Tạo tài khoản thành công");
@@ -223,11 +224,11 @@ namespace ECommerce.Application.BaseServices.User
                 await _DbContext.Users.AddAsync(user);
                 await _DbContext.SaveChangesAsync();
 
-                // Role
-                UserRole role = new Data.Entities.UserSchema.UserRole();
-                role.RoleId = (int)enumRole.Seller;
-                role.UserId = user.UserId;
-                await _DbContext.UserRoles.AddAsync(role);
+                // UserRole
+                //UserRole role = new Data.Entities.UserSchema.UserRole();
+                //role.RoleId = (int)enumRole.Seller;
+                //role.UserId = user.UserId;
+                //await _DbContext.UserRoles.AddAsync(role);
                 await _DbContext.SaveChangesAsync();
 
                 // Shop

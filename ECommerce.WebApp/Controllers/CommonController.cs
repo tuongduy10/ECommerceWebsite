@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Shared.Responses;
+using Infrastructure.Authentications;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -182,7 +184,7 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(new FailResponse<string>(error.Message));
             }
         }
-        [AllowAnonymous]
+        [HasPermission(PermissionConstant.Common.COMMON_READ)]
         [HttpGet("provinces")]
         public async Task<IActionResult> getProvinces()
         {
@@ -208,21 +210,6 @@ namespace ECommerce.WebApp.Controllers
             if (!result.isSucceed)
                 return BadRequest(result);
             return Ok(result);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("encrypt-conn")]
-        public IActionResult EncryptConnString(HashRequest request)
-        {
-            string encryptedConn = EncryptHelper.EncryptString(request.text);
-            return Ok(encryptedConn);
-        }
-        [AllowAnonymous]
-        [HttpPost("decrypt-conn")]
-        public IActionResult DecryptConnString(HashRequest request)
-        {
-            string decryptedConn = EncryptHelper.DecryptString(request.text);
-            return Ok(decryptedConn);
         }
         [AllowAnonymous]
         [HttpPost("encrypt")]

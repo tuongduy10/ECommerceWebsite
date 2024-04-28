@@ -22,6 +22,7 @@ using ECommerce.Data.Entities.Inventory;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Abstractions;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.ProductSrv
 {

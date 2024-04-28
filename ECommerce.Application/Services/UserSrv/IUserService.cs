@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using ECommerce.Data.Entities.UserSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -19,7 +20,7 @@ namespace ECommerce.Application.Services.UserSrv
         Task<ApiResponse> SetOnline(int userId = 0, bool isOnline = true);
         Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline);
         Task<Response<UserGetModel>> UpdateOnlineHistory(int _userId);
-        Task<Response<UserModel>> ValidateUser(SignInRequest request);
+        Task<Response<string>> ValidateUser(SignInRequest request);
         Task<Response<List<ShopModel>>> GetShops();
         Task<Response<UserShopModel>> UpdateUser(UserShopModel request);
         Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request);
