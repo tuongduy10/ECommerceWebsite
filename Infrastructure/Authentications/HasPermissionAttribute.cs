@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure.Authentications
+namespace ECommerce.Infrastructure.Authentications
 {
     public class HasPermissionAttribute : AuthorizeAttribute
     {

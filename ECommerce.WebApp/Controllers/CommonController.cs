@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ECommerce.Utilities.Shared.Responses;
-using Infrastructure.Authentications;
+using ECommerce.Infrastructure.Authentications;
 
 namespace ECommerce.WebApp.Controllers
 {

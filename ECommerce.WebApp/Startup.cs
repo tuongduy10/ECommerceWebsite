@@ -15,11 +15,11 @@ using ECommerce.WebApp.Utils;
 using ECommerce.Application.Extensions;
 using Microsoft.AspNetCore.Http;
 using ECommerce.Utilities.AppSettings;
-using ECommerce.Infrastructure.Middlewares;
+using ECommerce.ECommerce.Infrastructure.Middlewares;
 using ECommerce.Utilities.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using Infrastructure.Authentications;
-using Infrastructure.Extensions;
+using ECommerce.Infrastructure.Authentications;
+using ECommerce.Infrastructure.Extensions;
 
 namespace ECommerce.WebApp
 {
