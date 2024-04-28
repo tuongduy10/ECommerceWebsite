@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ECommerce.Infrastructure.Middlewares
+namespace ECommerce.ECommerce.Infrastructure.Middlewares
 {
     public static class HandleExceptionMiddleware
     {

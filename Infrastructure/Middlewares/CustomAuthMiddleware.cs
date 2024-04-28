@@ -13,7 +13,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics;
 using ECommerce.Utilities.Constants;
 
-namespace ECommerce.Infrastructure.Middlewares
+namespace ECommerce.ECommerce.Infrastructure.Middlewares
 {
     public class CustomAuthMiddleware
     {

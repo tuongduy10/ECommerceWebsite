@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Authentications
+namespace ECommerce.Infrastructure.Authentications
 {
     public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
     {

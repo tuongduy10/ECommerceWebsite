@@ -1,4 +1,4 @@
-﻿using Infrastructure.Authentications;
+﻿using ECommerce.Infrastructure.Authentications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure.Extensions
+namespace ECommerce.Infrastructure.Extensions
 {
     public static class AuthCollectionExtensions
     {
