@@ -195,34 +195,7 @@ namespace ECommerce.WebApp.Controllers
             var result = await _commonService.getProvinces();
             if (!result.isSucceed)
                 return BadRequest(result);
-
-            var permissions = new List<Permission>();
-            var currentFields = typeof(PermissionConstant).GetFields();
-            foreach (var field in currentFields)
-            {
-                permissions.Add(new Permission
-                {
-                    Name = field.Name,
-                    Value = field.GetValue(null).ToString()
-                });
-            }
-
-            var nestedClasses = typeof(PermissionConstant).GetNestedTypes();
-            foreach (var nestedClass in nestedClasses)
-            {
-                var fields = nestedClass.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
-                foreach (var field in fields)
-                {
-                    string name = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
-                    permissions.Add(new Permission
-                    {
-                        Name = name,
-                        Value = field.GetValue(null).ToString(),
-                        Module = nestedClass.Name.ToUpper(),
-                    });
-                }
-            }
-            return Ok(permissions);
+            return Ok(result);
         }
         [AllowAnonymous]
         [HttpPost("districts")]

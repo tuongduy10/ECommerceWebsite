@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Data.Entities.UserSchema
 {
-    [Table("Role", Schema = "ums")]
+    [Table("Role")]
     public partial class Role
     {
         public Role()

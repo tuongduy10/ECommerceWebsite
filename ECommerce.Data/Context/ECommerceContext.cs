@@ -64,6 +64,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<SubCategoryOption> SubCategoryOptions { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<Ward> Wards { get; set; }
@@ -747,6 +748,7 @@ namespace ECommerce.Data.Context
 
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new OrderDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new PermissionConfiguration());
 
 
             OnModelCreatingPartial(modelBuilder);
