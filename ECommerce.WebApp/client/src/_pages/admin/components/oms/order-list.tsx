@@ -122,6 +122,8 @@ function Row(props: TableRowProps) {
                                                 <TableCell>Đơn giá</TableCell>
                                                 <TableCell align="right">Giá đã giảm</TableCell>
                                                 <TableCell align="right">Số lượng</TableCell>
+                                                <TableCell align="right">Tạm tính</TableCell>
+                                                <TableCell align="right">Thành tiền</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -133,6 +135,8 @@ function Row(props: TableRowProps) {
                                                     <TableCell>{getFormatedPrice(item.price)}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
                                                     <TableCell align="right">{item.qty}</TableCell>
+                                                    <TableCell align="right">{getFormatedPrice(item.totalPrice)}</TableCell>
+                                                    <TableCell align="right">{getFormatedPrice(item.totalFinalPrice)}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>

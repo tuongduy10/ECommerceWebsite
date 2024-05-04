@@ -103,6 +103,8 @@ namespace ECommerce.Application.Services.Oms
                         {
                             Price = price,
                             PriceOnSell = finalPrice >= price ? 0 : finalPrice,
+                            TotalPrice = price * product.qty,
+                            TotalFinalPrice = finalPrice * product.qty,
                             Qty = product.qty,
                             ProductName = pro.ProductName,
                             ProductId = pro.ProductId,

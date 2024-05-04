@@ -64,6 +64,8 @@ namespace ECommerce.Dtos.Oms
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public decimal PriceOnSell { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal TotalFinalPrice { get; set; }
         public int Qty { get; set; }
         public int ProductId { get; set; }
         public static explicit operator OrderDetailResponseDto(OrderDetail data)
@@ -72,6 +74,8 @@ namespace ECommerce.Dtos.Oms
             {
                 Price = data.Price,
                 PriceOnSell = data.PriceOnSell,
+                TotalPrice = data.TotalPrice,
+                TotalFinalPrice = data.TotalFinalPrice,
                 ProductId = data.ProductId,
                 ProductName = data.ProductName,
                 Qty = data.Qty,

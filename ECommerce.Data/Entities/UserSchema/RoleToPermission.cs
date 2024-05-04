@@ -9,11 +9,9 @@ namespace ECommerce.Data.Entities.UserSchema
     [Table("RoleToPermissions")]
     public class RoleToPermission : GenericAuditEntity<Guid>
     {
-        public string RoleKey { get; set; }
-        public string PermissionKey { get; set; }
-        public bool Read { get; set; }
-        public bool Write { get; set; }
-        public bool Update { get; set; }
-        public bool Delete { get; set; }
+        public int RoleId { get; set; }
+        public string PermissionId { get; set; }
+        public virtual Permission Permission { get; set; }
+        public virtual Role Role { get; set; }
     }
 }
