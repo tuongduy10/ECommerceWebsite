@@ -78,13 +78,17 @@ namespace ECommerce.Application.Services.Oms
                         decimal finalPrice = 0;
                         if (product.priceType.Equals(ProductConstant.PRICE_AVAILABLE))
                         {
-                            price = (decimal)pro.PriceAvailable;
-                            finalPrice = (decimal)pro.DiscountAvailable;
+                            if (pro.PriceAvailable != null)
+                                price = (decimal)pro.PriceAvailable;
+                            if (pro.DiscountAvailable != null)
+                                finalPrice = (decimal)pro.DiscountAvailable;
                         }
                         if (product.priceType.Equals(ProductConstant.PRICE_PRE_ORDER))
                         {
-                            price = (decimal)pro.PricePreOrder;
-                            finalPrice = (decimal)pro.DiscountPreOrder;
+                            if (pro.PricePreOrder != null)
+                                price = (decimal)pro.PricePreOrder;
+                            if (pro.DiscountPreOrder != null)
+                                finalPrice = (decimal)pro.DiscountPreOrder;
                         }
                         totalPrice += price * product.qty;
                         totalFinalPrice += finalPrice * product.qty;

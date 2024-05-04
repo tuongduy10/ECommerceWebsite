@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerce.Data.Entities.UserSchema
 {
-    //[Table("UserRole", Schema = "ums")]
     public partial class UserRole
     {
         public int UserId { get; set; }

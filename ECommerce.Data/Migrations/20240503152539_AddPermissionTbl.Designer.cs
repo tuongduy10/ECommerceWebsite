@@ -4,14 +4,16 @@ using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ECommerceContext))]
-    partial class ECommerceContextModelSnapshot : ModelSnapshot
+    [Migration("20240503152539_AddPermissionTbl")]
+    partial class AddPermissionTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1261,7 +1263,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Permissions");
+                    b.ToTable("Permissions","ums");
 
                     b.HasData(
                         new
@@ -1364,6 +1366,12 @@ namespace ECommerce.Data.Migrations
                             Id = "ORDER_DELETE",
                             Module = "ORDER",
                             Name = "ORDER_DELETE"
+                        },
+                        new
+                        {
+                            Id = "ORDER_TEST",
+                            Module = "ORDER",
+                            Name = "ORDER_TEST"
                         });
                 });
 
@@ -1382,7 +1390,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("RoleId");
 
-                    b.ToTable("Role");
+                    b.ToTable("Role","ums");
                 });
 
             modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.User", b =>
@@ -1461,7 +1469,7 @@ namespace ECommerce.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User","ums");
                 });
 
             modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.UserRole", b =>

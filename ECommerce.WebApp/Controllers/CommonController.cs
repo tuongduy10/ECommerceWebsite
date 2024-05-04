@@ -16,6 +16,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ECommerce.Utilities.Shared.Responses;
 using ECommerce.Infrastructure.Authentications;
+using ECommerce.Data.Entities.UserSchema;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -184,7 +187,8 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(new FailResponse<string>(error.Message));
             }
         }
-        [HasPermission(PermissionConstant.Common.COMMON_READ)]
+        //[HasPermission(PermissionConstant.Common.COMMON_READ)]
+        [AllowAnonymous]
         [HttpGet("provinces")]
         public async Task<IActionResult> getProvinces()
         {

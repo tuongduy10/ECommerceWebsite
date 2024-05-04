@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ECommerce.Data.Entities.UserSchema
 {
-    [Table("RoleToPermissions", Schema = "ums")]
+    [Table("RoleToPermissions")]
     public class RoleToPermission : GenericAuditEntity<Guid>
     {
         public string RoleKey { get; set; }
