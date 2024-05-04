@@ -21,6 +21,7 @@ namespace ECommerce.Data.Entities.OmsSchema
         public decimal TotalFinalPrice { get; set; }
         public int TotalQty { get; set; }
         public string Status { get; set; } = OmsConstant.STATUS_ORDER_PENDING;
+        public string Address { get; set; }
         public string CityCode { get; set; }
         public virtual Province City { get; set; }
         public string DistrictCode { get; set; }

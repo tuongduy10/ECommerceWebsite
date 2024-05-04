@@ -30,6 +30,6 @@ namespace ECommerce.Application.Services.UserSrv
         string getCurrentUserName();
         string getCurrentUserFullName();
         string GenerateToken(UserModel user);
-        ClaimsPrincipal DecodeToken(string token);
+        IEnumerable<Claim> TokenPrincipal(string token);
     }
 }

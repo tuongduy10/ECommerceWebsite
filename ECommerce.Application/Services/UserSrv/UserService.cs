@@ -410,8 +410,8 @@ namespace ECommerce.Application.Services.UserSrv
             string accessToken = getAccessToken();
             if (string.IsNullOrEmpty(accessToken))
                 return null;
-            var userClaims = DecodeToken(accessToken).Claims;
-            return userClaims.FirstOrDefault(claim => claim.Type == key)?.Value;
+            var userClaims = TokenPrincipal(accessToken);
+            return userClaims?.FirstOrDefault(claim => claim.Type == key)?.Value;
         }
         public string getAccessToken()
         {
@@ -450,17 +450,32 @@ namespace ECommerce.Application.Services.UserSrv
 
             return writeToken;
         }
-        public ClaimsPrincipal DecodeToken(string token)
+        public IEnumerable<Claim> TokenPrincipal(string token)
         {
             var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
-            var jwtTokenHandler = new JwtSecurityTokenHandler()
-                .ValidateToken(token, new TokenValidationParameters()
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                }, out SecurityToken secToken);
-            return jwtTokenHandler;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            // Define token validation parameters
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ValidateIssuer = false, // You may want to set this to true if issuer validation is required
+                ValidateAudience = false, // You may want to set this to true if audience validation is required
+                RequireExpirationTime = true,
+                ValidateLifetime = true
+            };
+            // Decode and validate the token
+            try
+            {
+                // This will throw an exception if the token is not valid
+                SecurityToken validatedToken;
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+                return principal.Claims;
+            }
+            catch (SecurityTokenException)
+            {
+                return null;
+            }
         }
     
         private string generateUserName(string fullName, string phoneNumber)

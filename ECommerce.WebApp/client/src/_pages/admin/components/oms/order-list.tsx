@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Collapse, Grid, IconButton, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Collapse, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -110,31 +110,66 @@ function Row(props: TableRowProps) {
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
-                            <Typography variant="h6" gutterBottom component="div">
-                                Chi tiết
-                            </Typography>
-                            <Table size="small" aria-label="purchases">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Tên</TableCell>
-                                        <TableCell>Đơn giá</TableCell>
-                                        <TableCell align="right">Giá đã giảm</TableCell>
-                                        <TableCell align="right">Số lượng</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {rowData.orderDetails?.map((item: any) => (
-                                        <TableRow key={item.productId}>
-                                            <TableCell component="th" scope="row">
-                                                {item.productName}
-                                            </TableCell>
-                                            <TableCell>{getFormatedPrice(item.price)}</TableCell>
-                                            <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
-                                            <TableCell align="right">{item.qty}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Chi tiết
+                                    </Typography>
+                                    <Table size="small">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Tên</TableCell>
+                                                <TableCell>Đơn giá</TableCell>
+                                                <TableCell align="right">Giá đã giảm</TableCell>
+                                                <TableCell align="right">Số lượng</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {rowData.orderDetails?.map((item: any) => (
+                                                <TableRow key={item.productId}>
+                                                    <TableCell component="th" scope="row">
+                                                        {item.productName}
+                                                    </TableCell>
+                                                    <TableCell>{getFormatedPrice(item.price)}</TableCell>
+                                                    <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
+                                                    <TableCell align="right">{item.qty}</TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Thông tin giao hàng
+                                    </Typography>
+                                    <Table size="small">
+                                        <TableBody>
+                                            <TableRow>
+                                                <TableCell component="th" scope="row">Người nhận:</TableCell>
+                                                <TableCell component="th" scope="row">{rowData.fullName || ''}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell component="th" scope="row">Số điện thoại:</TableCell>
+                                                <TableCell component="th" scope="row">{rowData.phoneNumber || ''}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell component="th" scope="row">Địa chỉ:</TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    {rowData.address + ', phường ' + rowData.wardName + ', quận ' + rowData.districtName + ', ' + rowData.cityName}.
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell component="th" scope="row">Email:</TableCell>
+                                                <TableCell component="th" scope="row">{rowData.email || ''}</TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell component="th" scope="row">Ghi chú:</TableCell>
+                                                <TableCell component="th" scope="row">{rowData.remark || ''}</TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </Grid>
+                            </Grid>
                         </Box>
                     </Collapse>
                 </TableCell>

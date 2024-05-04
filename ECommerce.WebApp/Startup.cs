@@ -20,6 +20,8 @@ using ECommerce.Utilities.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using ECommerce.Infrastructure.Authentications;
 using ECommerce.Infrastructure.Extensions;
+using System.Threading.Tasks;
+using ECommerce.Utilities.Constants;
 
 namespace ECommerce.WebApp
 {
@@ -38,44 +40,18 @@ namespace ECommerce.WebApp
         {             
             string connStr = HashHelper.Decrypt(Configuration.GetConnectionString("ECommerceDB"));
             services.AddDbContext<ECommerceContext>(options => options.UseSqlServer(connStr));
+            // Configure jwt
+            services.AddJwtConfiguration(Configuration);
+            // Configure cor policy
+            services.AddPolicyConfiguration(Configuration);
+            // Controller
             services.AddControllersWithViews();
-
-            string secretKey = Configuration["AppSettings:SecretKey"];
-            byte[] secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
-            services
-                .AddAuthentication(option =>
-                {
-                    option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(option => 
-                {
-                    option.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                        ClockSkew = TimeSpan.Zero
-                    };
-                });
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(myCorsPolicy,
-                    builder =>
-                    {
-                        builder.WithOrigins("https://localhost:44330", "http://localhost:3000", "https://hihichi.com", "http://192.168.1.10:3000")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-                );
-            services.AddHttpClient();
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             //services.AddSignalR();
+            services.AddHttpClient();
             services.AddHttpContextAccessor();
 
             services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
@@ -87,10 +63,7 @@ namespace ECommerce.WebApp
             services.AddScopedServices();
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "client/build";
-            });
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "client/build");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -110,20 +83,27 @@ namespace ECommerce.WebApp
                 app.UseHsts();
             }
 
+            // Serve default files and static files
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.ConfigureExceptionHandler(logger);
-            app.UseMiddleware<CustomAuthMiddleware>();
+            // Configure cookie policy and CORS
+            app.UseCookiePolicy();
+            app.UseCors(ConfigConstant.CORS_POLICY);
+
+            // Authentication and routing
             app.UseAuthentication();
             app.UseRouting();
 
+            // Custom authentication middleware
+            app.UseMiddleware<AuthMiddleware>();
+
+            // Configure exception handling
+            app.ConfigureExceptionHandler(logger);
+
+            // Authorization
             app.UseAuthorization();
-
-            app.UseCookiePolicy();
-
-            app.UseCors(myCorsPolicy); ;
 
             //app.UseEndpoints(routes =>
             //{
@@ -132,12 +112,15 @@ namespace ECommerce.WebApp
             //    routes.MapHub<CommonHub>("/common-hub");
             //});
 
+            // Map controllers
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
             });
+
+            // Configure Single Page Application (SPA)
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "client";

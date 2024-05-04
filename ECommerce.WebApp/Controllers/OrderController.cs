@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.BaseServices.User.Dtos;
 using ECommerce.Application.Services.Oms;
 using ECommerce.Dtos.Oms;
+using ECommerce.Infrastructure.Authentications;
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Shared;
 using Microsoft.AspNetCore.Authorization;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace ECommerce.WebApp.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
-    [AllowAnonymous]
+    [Route("api/order")]
     public class OrderController : ControllerBase
     {
         private readonly IOmsService _omsService;
@@ -20,6 +21,7 @@ namespace ECommerce.WebApp.Controllers
         {
             _omsService = omsService;
         }
+        [AllowAnonymous]
         [HttpPost("create-order")]
         public async Task<IActionResult> CreateOrder(OrderCreateRequest request)
         {

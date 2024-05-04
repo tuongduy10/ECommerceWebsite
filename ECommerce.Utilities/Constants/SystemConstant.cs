@@ -8,6 +8,7 @@ namespace ECommerce.Utilities.Constants
     {
         public class AppSettings
         {
+            public const string SecretKey = "AppSettings:SecretKey";
             public const string ConnectionString = "ConnectionStrings";
             public const string AssetsServerAddress = "AssetsServerAddress";
         }

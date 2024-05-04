@@ -22,6 +22,7 @@ namespace ECommerce.Dtos.Oms
         public decimal TotalFinalPrice { get; set; }
         public int TotalQty { get; set; }
         public string Status { get; set; }
+        public string Address { get; set; }
         public string CityCode { get; set; }
         public string CityName { get; set; }
         public string DistrictCode { get; set; }
@@ -42,6 +43,7 @@ namespace ECommerce.Dtos.Oms
                 DistrictName = data.District.Name,
                 WardCode = data.WardCode,
                 WardName = data.Ward.Name,
+                Address = data.Address,
                 Email = data.Email,
                 FullName = data.FullName,
                 PaymentMethod = data.PaymentMethod,

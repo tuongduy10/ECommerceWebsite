@@ -6,6 +6,7 @@ namespace ECommerce.Utilities.Constants
 {
     public class ConfigConstant
     {
+        public const string CORS_POLICY = "_myCorsPolicy";
         public const string DATE_FORMAT = "HH:mm:ss, dd/MM/yyyy";
 
         // tinymce init config

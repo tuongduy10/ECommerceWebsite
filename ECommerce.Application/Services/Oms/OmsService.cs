@@ -56,6 +56,7 @@ namespace ECommerce.Application.Services.Oms
             entity.PhoneNumber = request.deliveryInfo.phoneNumber;
             entity.Email = request.deliveryInfo.email;
             entity.Remark = request.deliveryInfo.remark;
+            entity.Address = request.deliveryInfo.address;
             entity.CityCode = request.deliveryInfo.cityCode;
             entity.DistrictCode = request.deliveryInfo.districtCode;
             entity.WardCode = request.deliveryInfo.wardCode;
@@ -78,15 +79,21 @@ namespace ECommerce.Application.Services.Oms
                         decimal finalPrice = 0;
                         if (product.priceType.Equals(ProductConstant.PRICE_AVAILABLE))
                         {
+                            // Price
                             if (pro.PriceAvailable != null)
                                 price = (decimal)pro.PriceAvailable;
+                            // Final price
+                            finalPrice = price;
                             if (pro.DiscountAvailable != null)
                                 finalPrice = (decimal)pro.DiscountAvailable;
                         }
                         if (product.priceType.Equals(ProductConstant.PRICE_PRE_ORDER))
                         {
+                            // Price
                             if (pro.PricePreOrder != null)
                                 price = (decimal)pro.PricePreOrder;
+                            // Final price
+                            finalPrice = price;
                             if (pro.DiscountPreOrder != null)
                                 finalPrice = (decimal)pro.DiscountPreOrder;
                         }
@@ -95,7 +102,7 @@ namespace ECommerce.Application.Services.Oms
                         var detail = new OrderDetail
                         {
                             Price = price,
-                            PriceOnSell = finalPrice,
+                            PriceOnSell = finalPrice >= price ? 0 : finalPrice,
                             Qty = product.qty,
                             ProductName = pro.ProductName,
                             ProductId = pro.ProductId,
@@ -113,7 +120,7 @@ namespace ECommerce.Application.Services.Oms
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return new FailResponse<OrderResponseDto>(ex.Message);
+                throw;
             }
 
             var order = (OrderResponseDto)(await _uow.Repository<Order>().FindByAsync(_ => _.Id == entity.Id, "OrderDetails,Ward,District,City"));

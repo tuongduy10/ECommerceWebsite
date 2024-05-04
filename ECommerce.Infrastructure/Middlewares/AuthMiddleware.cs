@@ -12,17 +12,16 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Diagnostics;
 using ECommerce.Utilities.Constants;
+using System.Net;
 
 namespace ECommerce.ECommerce.Infrastructure.Middlewares
 {
-    public class CustomAuthMiddleware
+    public class AuthMiddleware
     {
         public readonly RequestDelegate _next;
-        private readonly ILogger<CustomAuthMiddleware> _logger;
-        public CustomAuthMiddleware(RequestDelegate next, ILogger<CustomAuthMiddleware> logger)
+        public AuthMiddleware(RequestDelegate next)
         {
             _next = next;
-            _logger = logger;
         }
         public async Task InvokeAsync(HttpContext context)
         {
