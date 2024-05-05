@@ -1,6 +1,6 @@
 ﻿using ECommerce.Application.BaseServices.User.Dtos;
 using ECommerce.Application.Services.Oms;
-using ECommerce.Dtos.Oms;
+using ECommerce.Dtos.Oms.Request;
 using ECommerce.Infrastructure.Authentications;
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Shared;
@@ -39,7 +39,7 @@ namespace ECommerce.WebApp.Controllers
             return Ok(result);
         }
         [HttpPost("orders-paging")]
-        public async Task<IActionResult> getOrdersPaging(PagedRequest request)
+        public async Task<IActionResult> getOrdersPaging(OrderPagingRequest request)
         {
             var result = await _omsService.getOrdersPaging(request);
             if (!result.isSucceed)

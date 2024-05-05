@@ -4,6 +4,7 @@ using ECommerce.Data.Abstractions;
 using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Dtos.Oms;
+using ECommerce.Dtos.Oms.Request;
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Shared;
 using ECommerce.Utilities.Shared.Responses;
@@ -40,12 +41,20 @@ namespace ECommerce.Application.Services.Oms
                 .Select(_ => (OrderResponseDto)_);
             return new SuccessResponse<IEnumerable<OrderResponseDto>>(StatusConstant.SUCCESS, orders);
         }
-        public async Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(PagedRequest request)
+        public async Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(OrderPagingRequest request)
         {
+            string searchKey = string.IsNullOrEmpty(request.SearchKey) ? string.Empty : request.SearchKey.Trim().ToLower();
             var pagedResult = await _uow.Repository<Order>()
                 .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex,request.PageSize,
-                    _ => _.IsDeleted == false,
-                    _ => _.OrderByDescending(i => i.CreatedDate),
+                    _ => _.IsDeleted == false
+                        && (string.IsNullOrEmpty(request.status) || request.status == _.Status)
+                        && (string.IsNullOrEmpty(searchKey) 
+                            || searchKey.Contains(_.Remark.ToLower().Trim())
+                            || searchKey.Contains(_.FullName.ToLower().Trim()))
+                            || searchKey.Contains(_.Email.ToLower().Trim())
+                            || searchKey.Contains(_.PhoneNumber.ToLower().Trim()),
+                    _ => _.OrderByDescending(i => i.UpdatedDate)
+                        .ThenByDescending(i => i.CreatedDate),
                     "OrderDetails,Ward,District,City");
             return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
         }

@@ -1,3 +1,8 @@
+export interface ICodeName {
+  code: string;
+  name: string;
+}
+
 export interface ICity {
   code: string; // 1
   name: string; // "Thành phố Hà Nội"

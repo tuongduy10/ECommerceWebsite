@@ -1,14 +1,16 @@
-import { Box, Button, Checkbox, Collapse, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, Checkbox, Chip, CircularProgress, Collapse, Grid, IconButton, Menu, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import OmsService from "src/_cores/_services/oms.service";
 import { DateTimeHelper } from "src/_shares/_helpers/datetime-helper";
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
-import { IPagedRequest } from "src/_cores/_interfaces";
+import { ICodeName, IPagedRequest } from "src/_cores/_interfaces";
 import { FormatHelper } from "src/_shares/_helpers/format-helper";
+import { ORDER_STATUSES } from "src/_cores/_constants/order-constants";
+import { IOrderPagedRequest } from "../../interfaces/oms-interface";
+import { StatusDisplay } from "src/_shares/_components";
 
 const header: ITableHeader[] = [
     { field: 'createdDate', fieldName: 'Ngày tạo', align: 'left' },
@@ -80,7 +82,9 @@ function Row(props: TableRowProps) {
                 <TableCell align="left">{getFormatedPrice(rowData.totalPrice)}</TableCell>
                 <TableCell align="left">{getFormatedPrice(rowData.totalFinalPrice)}</TableCell>
                 <TableCell align="left">{FormatHelper.getPaymentMethod(rowData.paymentMethod)}</TableCell>
-                <TableCell align="left">{FormatHelper.getOrderStatus(rowData.status)}</TableCell>
+                <TableCell align="left">
+                    <StatusDisplay statusCode={rowData.status} />
+                </TableCell>
                 <TableCell align="center">
                     <Button
                         variant="outlined"
@@ -111,7 +115,7 @@ function Row(props: TableRowProps) {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
                             <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} sm={7}>
                                     <Typography variant="h6" gutterBottom component="div">
                                         Chi tiết
                                     </Typography>
@@ -121,7 +125,7 @@ function Row(props: TableRowProps) {
                                                 <TableCell>Tên</TableCell>
                                                 <TableCell>Đơn giá</TableCell>
                                                 <TableCell align="right">Giá đã giảm</TableCell>
-                                                <TableCell align="right">Số lượng</TableCell>
+                                                <TableCell align="center">Số lượng</TableCell>
                                                 <TableCell align="right">Tạm tính</TableCell>
                                                 <TableCell align="right">Thành tiền</TableCell>
                                             </TableRow>
@@ -134,7 +138,7 @@ function Row(props: TableRowProps) {
                                                     </TableCell>
                                                     <TableCell>{getFormatedPrice(item.price)}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
-                                                    <TableCell align="right">{item.qty}</TableCell>
+                                                    <TableCell align="center">{item.qty}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.totalPrice)}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.totalFinalPrice)}</TableCell>
                                                 </TableRow>
@@ -142,7 +146,7 @@ function Row(props: TableRowProps) {
                                         </TableBody>
                                     </Table>
                                 </Grid>
-                                <Grid item xs={12} sm={6}>
+                                <Grid item xs={12} sm={5}>
                                     <Typography variant="h6" gutterBottom component="div">
                                         Thông tin giao hàng
                                     </Typography>
@@ -168,7 +172,9 @@ function Row(props: TableRowProps) {
                                             </TableRow>
                                             <TableRow>
                                                 <TableCell component="th" scope="row">Ghi chú:</TableCell>
-                                                <TableCell component="th" scope="row">{rowData.remark || ''}</TableCell>
+                                                <TableCell component="th" scope="row" sx={{ whiteSpace: 'normal' }}>
+                                                    {rowData.remark || ''}
+                                                </TableCell>
                                             </TableRow>
                                         </TableBody>
                                     </Table>
@@ -184,23 +190,41 @@ function Row(props: TableRowProps) {
 
 export default function OrderList() {
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [orders, setOrders] = useState<any[]>([]);
     const [selectedOrders, setSelectedOrder] = useState<number[]>([]);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [params, setParams] = useState<IOrderPagedRequest>({
+        pageIndex: 1,
+        pageSize: 10,
+        searchKey: '',
+        status: ''
+    });
 
     useEffect(() => {
-        search();
+        search(params);
     }, []);
 
-    const search = async (_params?: any) => {
-        const params: IPagedRequest = {
-            pageIndex: 1,
-            pageSize: 10,
-            searchKey: '',
-        }
-        const response = await OmsService.getOrdersPaging(params) as any;
+    const search = async (_params: IOrderPagedRequest) => {
+        setLoading(true);
+        const response = await OmsService.getOrdersPaging(_params) as any;
         if (response?.isSucceed) {
             setOrders(response.data?.items);
+            setTotalPages(response.data?.totalPages);
+            setLoading(false);
         }
+    }
+
+    const onChangeStatus = async (status?: string) => {
+        const _params = { ...params, status: status || '' };
+        setParams(_params);
+        search(_params);
+    }
+
+    const pageChange = (event: any, pageIndex: number) => {
+        const _params = { ...params, pageIndex: pageIndex || 1 };
+        setParams(_params);
+        search(_params);
     }
 
     const temp = async (id: number, stat = 0) => {
@@ -211,7 +235,13 @@ export default function OrderList() {
             <Box>
                 <Grid container spacing={2} sx={{ marginBottom: 2 }}>
                     <Grid item xs={12} sm={4}>
-                        {/* <Button variant="contained" sx={{ marginRight: 2 }}>Thêm</Button> */}
+                        <Autocomplete
+                            size="small"
+                            disablePortal
+                            options={ORDER_STATUSES.map((item: ICodeName) => ({ ...item, label: item.name }))}
+                            renderInput={(params) => <TextField {...params} name="status" label="Trạng thái đơn hàng" />}
+                            onChange={(event, value) => onChangeStatus(value?.code)}
+                        />
                     </Grid>
                 </Grid>
             </Box>
@@ -229,21 +259,30 @@ export default function OrderList() {
                             ))}
                         </TableRow>
                     </TableHead>
-                    <TableBody>
-                        {orders.length > 0 && orders.map((item, idx) => (
-                            <Row
-                                key={`row-${item.id}`}
-                                rowData={item}
-                                isSelected={selectedOrders.includes(item.id)}
-                                onUpdateStatus={(id, status) => temp(id, status)}
-                                onDelete={(id) => temp(id)}
-                                onSelected={(id) => temp(id)}
-                                onViewDetail={(id) => temp(id)}
-                            />
-                        ))}
-                    </TableBody>
+                    {loading
+                        ? <CircularProgress />
+                        : <TableBody>
+                            {orders.length > 0 && orders.map((item, idx) => (
+                                <Row
+                                    key={`row-${item.id}`}
+                                    rowData={item}
+                                    isSelected={selectedOrders.includes(item.id)}
+                                    onUpdateStatus={(id, status) => temp(id, status)}
+                                    onDelete={(id) => temp(id)}
+                                    onSelected={(id) => temp(id)}
+                                    onViewDetail={(id) => temp(id)}
+                                />
+                            ))}
+                        </TableBody>}
                 </Table>
             </TableContainer>
+            <Pagination
+                variant="outlined"
+                shape="rounded"
+                page={params.pageIndex}
+                count={totalPages}
+                onChange={pageChange}
+            />
         </Fragment>
     )
 }

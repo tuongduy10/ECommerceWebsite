@@ -6,3 +6,4 @@ export { default as TextEditor} from './input/text-editor';
 export { default as MiniCart } from './mini-cart/mini-cart';
 export { default as MyAlert } from './my-alert/my-alert';
 export { default as Each } from './each/each';
+export { default as StatusDisplay } from './status-display/status-display';

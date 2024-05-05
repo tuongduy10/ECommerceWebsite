@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ECommerce.Dtos.Oms
+namespace ECommerce.Dtos.Oms.Request
 {
     public class OrderCreateRequest
     {
