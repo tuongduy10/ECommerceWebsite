@@ -8,6 +8,7 @@ import {
   ExamplePage,
   ProductListPage,
   PaymentPage,
+  UserProfileOrderList,
 } from "src/_pages";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import DefaultLayout from "src/_shares/_layouts/default-layout/default-layout.component";
@@ -28,6 +29,7 @@ import {
 import { PrivateRoute } from "./private-route";
 import { ADMIN_ROUTE_NAME, ROUTE_NAME } from "../_enums/route-config.enum";
 import { NotFoundLayout } from "src/_shares/_layouts/error-layout/notfound-layout";
+import UserProfileLayout from "src/_shares/_layouts/user-profile-layout/user-profile-layout";
 const Router = () => {
   const browserRoutes = createBrowserRouter([
     {
@@ -37,7 +39,17 @@ const Router = () => {
         { path: ROUTE_NAME.HOME, element: <HomePage /> },
         { path: ROUTE_NAME.EXAMPLE, element: <ExamplePage /> },
         { path: ROUTE_NAME.LOGIN, element: <LoginPage /> },
-        { path: ROUTE_NAME.USER_PROFILE, element: <PrivateRoute><UserProfilePage /></PrivateRoute> },
+        {
+          path: ROUTE_NAME.USER_PROFILE,
+          element:
+            <PrivateRoute>
+              <UserProfileLayout />
+            </PrivateRoute>,
+          children: [
+            { path: ROUTE_NAME.USER_PROFILE_INFO, element: <UserProfilePage /> },
+            { path: ROUTE_NAME.USER_PROFILE_ORDER_LIST, element: <UserProfileOrderList /> }
+          ]
+        },
         { path: ROUTE_NAME.CART, element: <CartPage /> },
         { path: ROUTE_NAME.PAYMENT, element: <PaymentPage /> },
         { path: ROUTE_NAME.BLOG, element: <BlogPage /> },

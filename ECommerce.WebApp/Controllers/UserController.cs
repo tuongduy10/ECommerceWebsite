@@ -111,5 +111,11 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [HttpPost("update-username")]
+        public async Task<IActionResult> updateUserName()
+        {
+            await _userService.updateUserName();
+            return Ok();
+        }
     }
 }

@@ -26,10 +26,10 @@ namespace ECommerce.Application.Services.Oms
             _uow = uow;
             _userService = userService;
         }
-        public async Task<Response<Order>> getById(int id)
+        public async Task<Response<OrderResponseDto>> getById(Guid id)
         {
-            var ent = await _uow.Repository<Order>().GetByIdAsync(new Guid("18C4F8C8-67F2-4CCE-B482-5788DECE69B0"));
-            return new SuccessResponse<Order>(ent);
+            var ent = (OrderResponseDto)(await _uow.Repository<Order>().GetByIdAsync(id));
+            return new SuccessResponse<OrderResponseDto>(ent);
         }
         public async Task<Response<IEnumerable<OrderResponseDto>>> getOrderByStatus(string status) 
         {
@@ -58,6 +58,27 @@ namespace ECommerce.Application.Services.Oms
                     "OrderDetails,Ward,District,City");
             return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
         }
+        public async Task<Response<PagedResult<OrderResponseDto>>> getUserOrdersPaging(OrderPagingRequest request)
+        {
+            var logedInUser = await _userService.getCurrentUser();
+            string searchKey = string.IsNullOrEmpty(request.SearchKey) ? string.Empty : request.SearchKey.Trim().ToLower();
+            var pagedResult = await _uow.Repository<Order>()
+                .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex, request.PageSize,
+                    _ => _.IsDeleted == false
+                        && logedInUser.isSucceed
+                        && (_.CreatedBy == logedInUser.Data.UserPhone 
+                            || _.CreatedBy == logedInUser.Data.UserName)
+                        && (string.IsNullOrEmpty(request.status) || request.status == _.Status)
+                        && (string.IsNullOrEmpty(searchKey)
+                            || searchKey.Contains(_.Remark.ToLower().Trim())
+                            || searchKey.Contains(_.FullName.ToLower().Trim()))
+                            || searchKey.Contains(_.Email.ToLower().Trim())
+                            || searchKey.Contains(_.PhoneNumber.ToLower().Trim()),
+                    _ => _.OrderByDescending(i => i.UpdatedDate)
+                        .ThenByDescending(i => i.CreatedDate),
+                    "OrderDetails,Ward,District,City");
+            return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
+        }
         public async Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request)
         {
             var entity = new Order();
@@ -69,7 +90,7 @@ namespace ECommerce.Application.Services.Oms
             entity.CityCode = request.deliveryInfo.cityCode;
             entity.DistrictCode = request.deliveryInfo.districtCode;
             entity.WardCode = request.deliveryInfo.wardCode;
-            entity.CreatedBy = _userService.getCurrentUserName() ?? request.deliveryInfo.fullName;
+            entity.CreatedBy = _userService.getCurrentUserName() ?? request.deliveryInfo.phoneNumber;
             entity.PaymentMethod = request.deliveryInfo.paymentMethod;
             entity.TotalQty = request.products.Sum(_ => _.qty);
 

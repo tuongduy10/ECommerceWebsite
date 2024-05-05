@@ -7,6 +7,7 @@ using ECommerce.Utilities.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace ECommerce.WebApp.Controllers
@@ -21,9 +22,17 @@ namespace ECommerce.WebApp.Controllers
         {
             _omsService = omsService;
         }
+        [HttpGet("order-detail/{id}")]
+        public async Task<IActionResult> getOrderDetail(Guid id)
+        {
+            var result = await _omsService.getById(id);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
         [AllowAnonymous]
         [HttpPost("create-order")]
-        public async Task<IActionResult> CreateOrder(OrderCreateRequest request)
+        public async Task<IActionResult> createOrder(OrderCreateRequest request)
         {
             var result = await _omsService.createOrder(request);
             if (!result.isSucceed)
@@ -42,6 +51,14 @@ namespace ECommerce.WebApp.Controllers
         public async Task<IActionResult> getOrdersPaging(OrderPagingRequest request)
         {
             var result = await _omsService.getOrdersPaging(request);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("user-orders-paging")]
+        public async Task<IActionResult> getUserOrdersPaging(OrderPagingRequest request)
+        {
+            var result = await _omsService.getUserOrdersPaging(request);
             if (!result.isSucceed)
                 return BadRequest(result);
             return Ok(result);

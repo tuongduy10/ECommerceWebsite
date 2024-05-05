@@ -14,9 +14,10 @@ namespace ECommerce.Application.Services.Oms
 {
     public interface IOmsService
     {
-        Task<Response<Order>> getById(int id);
+        Task<Response<OrderResponseDto>> getById(Guid id);
         Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request);
         Task<Response<IEnumerable<OrderResponseDto>>> getOrderByStatus(string status);
         Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(OrderPagingRequest request);
+        Task<Response<PagedResult<OrderResponseDto>>> getUserOrdersPaging(OrderPagingRequest request);
     }
 }

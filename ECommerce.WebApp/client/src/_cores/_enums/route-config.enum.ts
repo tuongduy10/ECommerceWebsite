@@ -5,7 +5,11 @@ export const ROUTE_NAME = {
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
     PRODUCT_DETAIL: ROUTE_PREFIX + '/product-detail',
     EXAMPLE: ROUTE_PREFIX + '/example',
+    
     USER_PROFILE: ROUTE_PREFIX + '/user-profile',
+    USER_PROFILE_INFO: ROUTE_PREFIX + '/user-profile/info',
+    USER_PROFILE_ORDER_LIST: ROUTE_PREFIX + '/user-profile/order-list',
+
     CART: ROUTE_PREFIX + '/cart',
     PAYMENT: ROUTE_PREFIX + '/payment',
     BLOG: ROUTE_PREFIX + '/blog',

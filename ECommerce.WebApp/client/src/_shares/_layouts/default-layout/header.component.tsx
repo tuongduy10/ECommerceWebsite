@@ -29,7 +29,7 @@ const Header = () => {
         // if (!authStore.user) {
         //     getUserInfo();
         // }
-    }, [authStore.accessToken]);
+    }, []);
 
 
     useEffect(() => {
@@ -38,12 +38,12 @@ const Header = () => {
             '/payment',
         ];
         setHideCart(hiddenPath.includes(location.pathname));
-    }, [location.pathname]);
+    }, [location.pathname, authStore.user?.fullName]);
 
     const leftHeader = [
         { path: '', field: 'findOrder', text: 'Tra cứu đơn hàng', icon: ICON_NAME.FEATHER.HELP_CIRCLE },
         { path: 'tel:0906035526', field: '', text: '0906035526', icon: ICON_NAME.FEATHER.SMARTPHONE },
-        { path: ROUTE_NAME.USER_PROFILE, field: 'profile', text: authStore.user?.fullName ? `Hi, ${authStore.user?.fullName}` : 'Tài khoản của tôi', icon: ICON_NAME.FEATHER.USER },
+        { path: ROUTE_NAME.USER_PROFILE_INFO, field: 'profile', text: authStore.user?.fullName ? `Hi, ${authStore.user?.fullName}` : 'Tài khoản của tôi', icon: ICON_NAME.FEATHER.USER },
     ];
 
     return (

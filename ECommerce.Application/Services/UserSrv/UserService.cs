@@ -323,7 +323,7 @@ namespace ECommerce.Application.Services.UserSrv
 
                 var seller = await _uow.Repository<User>().FindByAsync(_ => _.UserId == request.id);
                 if (seller == null)
-                    seller = new Data.Entities.UserSchema.User();
+                    seller = new User();
 
                 seller.UserMail = request.email.Trim();
                 seller.UserCityCode = request.cityCode;
@@ -338,11 +338,15 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.IsOnline = false;
                 seller.LastOnline = DateTime.Now;
                 seller.IsSystemAccount = true;
+
                 if (!string.IsNullOrEmpty(request.password) && !string.IsNullOrEmpty(request.rePassword))
                     seller.Password = request.password.Trim();
 
                 if (request.id == -1) // Add
+                {
+                    seller.UserName = generateUserName(request.fullName.Trim(), phonenumber);
                     _uow.Repository<User>().AddAsync(seller).Wait();
+                }
                 if (request.id > -1) // Update
                     _uow.Repository<User>().Update(seller);
                 _uow.SaveChangesAsync().Wait();
@@ -401,8 +405,27 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<UserShopModel>(exc.Message);
             }
         }
-
-        public int getCurrentUserId() => Int32.Parse(getUserValue("id"));
+        public async Task<Response<User>> getCurrentUser()
+        {
+            int id = getCurrentUserId();
+            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id);
+            return new SuccessResponse<User>(user);
+        }
+        public async Task updateUserName()
+        {
+            var users = await _uow.Repository<User>().GetByAsync(_ => _.UserName == null);
+            foreach (var user in users)
+            {
+                user.UserName = generateUserName(user.UserFullName, user.UserPhone);
+            }
+            _uow.Repository<User>().Update(users);
+            await _uow.SaveChangesAsync();
+        }
+        public int getCurrentUserId() 
+        {
+            if (getUserValue("id") == null) return -1;
+            return Int32.Parse(getUserValue("id"));
+        }
         public string getCurrentUserFullName() => getUserValue("fullName");
         public string getCurrentUserName() => getUserValue("userName");
         private string getUserValue(string key)
