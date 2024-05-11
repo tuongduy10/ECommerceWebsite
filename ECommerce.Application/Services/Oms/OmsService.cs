@@ -82,7 +82,8 @@ namespace ECommerce.Application.Services.Oms
         public async Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request)
         {
             var entity = new Order();
-            entity.FullName = request.deliveryInfo.fullName;
+            entity.OrderCode = generateNewOrderCode();
+            entity.FullName = request.deliveryInfo.fullName;    
             entity.PhoneNumber = request.deliveryInfo.phoneNumber;
             entity.Email = request.deliveryInfo.email;
             entity.Remark = request.deliveryInfo.remark;
@@ -129,6 +130,11 @@ namespace ECommerce.Application.Services.Oms
                         }
                         totalPrice += price * product.qty;
                         totalFinalPrice += finalPrice * product.qty;
+
+                        string opts = string.Empty;
+                        if (product.options.Count() > 0)
+                            opts = string.Join(", ", product.options.Select(_ => _.valueName));
+                        
                         var detail = new OrderDetail
                         {
                             Price = price,
@@ -136,6 +142,7 @@ namespace ECommerce.Application.Services.Oms
                             TotalPrice = price * product.qty,
                             TotalFinalPrice = finalPrice * product.qty,
                             Qty = product.qty,
+                            Options = opts,
                             ProductName = pro.ProductName,
                             ProductId = pro.ProductId,
                         };
@@ -158,7 +165,11 @@ namespace ECommerce.Application.Services.Oms
             var order = (OrderResponseDto)(await _uow.Repository<Order>().FindByAsync(_ => _.Id == entity.Id, "OrderDetails,Ward,District,City"));
             return new SuccessResponse<OrderResponseDto>(order);
         }
-
+        public string generateNewOrderCode()
+        {
+            var dateStr = DateTime.Now.ToString("yyMMdd");
+            return dateStr + Guid.NewGuid().ToString("N").Substring(0, 8);
+        }
 
     }
 }

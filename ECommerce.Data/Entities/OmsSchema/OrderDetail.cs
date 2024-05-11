@@ -11,6 +11,7 @@ namespace ECommerce.Data.Entities.OmsSchema
     public class OrderDetail : GenericAuditUpdateEntity<Guid>
     {
         public string ProductName { get; set; }
+        public string Options { get; set; }
         public decimal Price { get; set; }
         public decimal PriceOnSell { get; set; }
         public int Qty { get; set; }

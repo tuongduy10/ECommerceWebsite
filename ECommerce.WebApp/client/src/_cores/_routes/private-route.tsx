@@ -5,6 +5,7 @@ import SessionService from "../_services/session.service";
 export const PrivateRoute = ({ children, ...rest }: any) => {
     const isAuthorized = SessionService.getAccessToken();
     if (!isAuthorized) {
+        SessionService.deleteAccessToken();
         let navigateTo = ROUTE_NAME.LOGIN;
         if (window.location.pathname.includes(ADMIN_ROUTE_PREFIX)) {
             navigateTo = ADMIN_ROUTE_NAME.LOGIN;   

@@ -7,10 +7,11 @@ const StatusDisplay = (props: any) => {
     return (
         <Chip
             label={statusObj?.name}
-            style={{ 
+            sx={{
+                '& > span': { fontSize: '12px' },
                 backgroundColor: statusObj?.backgroud,
                 color: statusObj?.color || '',
-                border: 'unset'
+                border: 'unset',
             }}
             variant="outlined"
         />

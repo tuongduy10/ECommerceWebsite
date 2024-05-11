@@ -51,11 +51,11 @@ const UserProfileOrderList = () => {
                             {orders.length > 0 && orders.map((item, idx) => (
                                 <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
                                     <TableCell>{DateTimeHelper.getDateTimeFormated(item.createdDate)}</TableCell>
-                                    <TableCell></TableCell>
+                                    <TableCell>#{item.orderCode}</TableCell>
                                     <TableCell>{getFormatedPrice(item.totalPrice)}</TableCell>
-                                    <TableCell>{getFormatedPrice(item.totalPrice)}</TableCell>
+                                    <TableCell>{getFormatedPrice(item.totalFinalPrice)}</TableCell>
                                     <TableCell>
-                                        <StatusDisplay statusCode={item.status} />
+                                        <StatusDisplay className="text-base" statusCode={item.status} />
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -27,7 +27,14 @@ namespace ECommerce.Dtos.Oms.Request
     {
         public int id { get; set; }
         public string priceType { get; set; }
-        public object options { get; set; }
+        public IEnumerable<ProductOptionInCart> options { get; set; }
         public int qty { get; set; }
+    }
+
+    public class ProductOptionInCart
+    {
+        public int id { get;set; }
+        public int value { get; set; }
+        public string valueName { get; set; }
     }
 }

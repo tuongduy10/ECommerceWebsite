@@ -134,7 +134,7 @@ function Row(props: TableRowProps) {
                                             {rowData.orderDetails?.map((item: any) => (
                                                 <TableRow key={item.productId}>
                                                     <TableCell component="th" scope="row">
-                                                        {item.productName}
+                                                        {item.productName} {item.options ? `(${item.options})`: ''}
                                                     </TableCell>
                                                     <TableCell>{getFormatedPrice(item.price)}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>

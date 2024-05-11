@@ -12,6 +12,7 @@ namespace ECommerce.Data.Entities.OmsSchema
     [Table("Orders", Schema = "oms")]
     public class Order : GenericAuditEntity<Guid>
     {
+        public string OrderCode { get; set; }
         public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
