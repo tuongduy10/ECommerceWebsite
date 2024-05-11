@@ -25,6 +25,7 @@ import {
   Options,
   Attributes,
   OrderList,
+  PaymentMethod,
 } from "src/_pages/admin/components";
 import { PrivateRoute } from "./private-route";
 import { ADMIN_ROUTE_NAME, ROUTE_NAME } from "../_enums/route-config.enum";
@@ -68,6 +69,7 @@ const Router = () => {
         { path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_SUB_CATEGORY, element: <PrivateRoute><SubCategory /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_OPTIONS, element: <PrivateRoute><Options /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_ATTRIBUTES, element: <PrivateRoute><Attributes /></PrivateRoute> },
+        { path: ADMIN_ROUTE_NAME.MANAGE_SALES_PAYMENT_METHODS, element: <PrivateRoute><PaymentMethod /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_ADD, element: <PrivateRoute><ProductDetail /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_DETAIL, element: <PrivateRoute><ProductDetail /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_USER, element: <PrivateRoute><UserList /></PrivateRoute> },

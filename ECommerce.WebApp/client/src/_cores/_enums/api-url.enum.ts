@@ -46,3 +46,9 @@ export const INVENTORY_API_URL = {
     ADD_SUB_CATEGORY: '/inventory/add-sub-category',
     SUB_CATEGORIES: '/inventory/sub-categories',
 }
+
+export const SALES_API_URL = {
+    PAYMENT_METHODS: '/sales/payment-methods',
+    SAVE_PAYMENT_METHODS: '/sales/save-payment-method',
+    DELETE_PAYMENT_METHODS: '/sales/delete-payment-method',
+}

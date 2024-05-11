@@ -8,6 +8,7 @@ import { showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
 import { clearCart } from "src/_cores/_reducers/cart.reducer";
 import CommonService from "src/_cores/_services/common.service";
 import OmsService from "src/_cores/_services/oms.service";
+import SalesService from "src/_cores/_services/sales.service";
 import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { MuiIcon, WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
@@ -21,7 +22,9 @@ const PaymentPage = () => {
     const [cities, setCitites] = useState<ICity[]>([]);
     const [districts, setDistricts] = useState<IDistrict[]>([]);
     const [wards, setWards] = useState<IWard[]>([]);
+    const [orderResponse, setOrderResponses] = useState<any>(undefined);
     const [dataDetail, setDataDetail] = useState<{ [key: string]: any }>({});
+    const [banks, setBanks] = useState<any>([]);
 
     useEffect(() => {
         getCities();
@@ -44,12 +47,18 @@ const PaymentPage = () => {
 
         const response = await OmsService.createOrder(param) as any;
         if (response?.isSucceed) {
+            setOrderResponses(response.data);
             dispatch(showSuccess(`Đặt hàng thành công`));
             dispatch(clearCart());
             if (dataDetail['paymentMethod'] === 'bank') {
-                setOpen(true);
+                const resBanks = await SalesService.getPaymentMethods() as any;
+                if (resBanks?.isSucceed) {
+                    setBanks(resBanks.data);
+                    setOpen(true);
+                }
                 return;
             }
+            setOrderResponses(undefined);
             window.location.reload();
         }
     };
@@ -305,6 +314,8 @@ const PaymentPage = () => {
             </div>
             <PaymentDialog
                 open={open}
+                banks={banks}
+                order={orderResponse}
                 onClose={handleClose}
             />
         </div>
@@ -313,11 +324,13 @@ const PaymentPage = () => {
 
 interface DialogProps {
     open: boolean;
+    banks: any[];
+    order: any;
     onClose: () => void;
 }
 
 const PaymentDialog = (props: DialogProps) => {
-    const { onClose, open } = props;
+    const { onClose, open, banks, order } = props;
 
     const handleClose = () => {
         onClose();
@@ -341,77 +354,49 @@ const PaymentDialog = (props: DialogProps) => {
                 <MuiIcon name={ICON_NAME.FEATHER.X} />
             </IconButton>
             <DialogContent>
-                <div className="payment-expand">
-                    <div><strong>Mã đơn hàng: 11111</strong></div>
-                    <div className="mb-4">
-                        Cảm ơn quý khách đã mua hàng.
-                        Quý khách vui lòng chuyển khoản để thanh toán đơn hàng với thông tin:
+                {order && (
+                    <div className="payment-expand">
+                        <div><strong>Mã đơn hàng: {order.orderCode}</strong></div>
+                        <div className="mb-4">
+                            Cảm ơn quý khách đã mua hàng.
+                            Quý khách vui lòng chuyển khoản để thanh toán đơn hàng với thông tin:
+                        </div>
+                        <hr className="mb-4" />
+                        <ul className="bank-list">
+                            {banks.map((_: any) => (
+                                <li key={_.bankId} className="bank">
+                                    <div className="flex">
+                                        {/* <div className="bank-image">
+                                        <img className="max-w-full max-h-full" src="assets/images/logo/bidv.png" alt="" />
+                                    </div> */}
+                                        <div className="bank-info flex items-center">
+                                            <div className="">
+                                                <div className="bank-name mb-2">{_.bankName}</div>
+                                                <div className="bank-accnumber flex mb-2">
+                                                    <span className="mr-2">STK: <strong className="stk">{_.bankAccountNumber}</strong></span>
+                                                    <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
+                                                        <span className="--tooltip-text">Sao chép</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                                            height="22" viewBox="0 0 24 24" fill="none"
+                                                            stroke="#333" strokeWidth="1"
+                                                            strokeLinecap="round" strokeLinejoin="round"
+                                                            className="feather feather-copy">
+                                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <div className="bank-username">Tên: <strong>{_.bankAccountName}</strong></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                        <hr className="mb-4" />
+                        <div>Nội dung chuyển khoản: <strong>Thanh toan cho ma don hang: {order.orderCode}</strong></div>
                     </div>
-                    <hr className="mb-4" />
-                    <ul className="bank-list">
-                        <li className="bank">
-                            <div className="flex">
-                                <div className="bank-image">
-                                    <img className="max-w-full max-h-full" src="assets/images/logo/bidv.png" alt="" />
-                                </div>
-                                <div className="bank-info flex items-center">
-                                    <div className="">
-                                        <div className="bank-name mb-2">Ngân hàng Thương mại cổ phần Đầu tư và
-                                            Phát
-                                            triển Việt Nam</div>
-                                        <div className="bank-accnumber flex mb-2">
-                                            <span className="mr-2">STK: <strong className="stk">987654321000</strong></span>
-                                            <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
-                                                <span className="--tooltip-text">Sao chép</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                                    height="22" viewBox="0 0 24 24" fill="none"
-                                                    stroke="#333" strokeWidth="1"
-                                                    strokeLinecap="round" strokeLinejoin="round"
-                                                    className="feather feather-copy">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div className="bank-username">Tên: <strong>NGUYEN VAN A</strong></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li className="bank">
-                            <div className="flex">
-                                <div className="bank-image">
-                                    <img className="max-w-full max-h-full" src="assets/images/logo/sacombank.png"
-                                        alt="" />
-                                </div>
-                                <div className="bank-info flex items-center">
-                                    <div className="">
-                                        <div className="bank-name mb-2">Ngân hàng thương mại cổ phần Sài Gòn Thương Tín</div>
-                                        <div className="bank-accnumber mb-2 flex items-center">
-                                            <span className="mr-2">
-                                                STK: <strong className="stk">000123456789</strong>
-                                            </span>
-                                            <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
-                                                <span className="--tooltip-text">Sao chép</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                                    height="22" viewBox="0 0 24 24" fill="none"
-                                                    stroke="#333" strokeWidth="1"
-                                                    strokeLinecap="round" strokeLinejoin="round"
-                                                    className="feather feather-copy">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div className="bank-username">Tên: <strong>NGUYEN VAN A</strong></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <hr className="mb-4" />
-                    <div>Nội dung chuyển khoản: <strong>Thanh toan cho ma don hang: 11111</strong></div>
-                </div>
+                )}
             </DialogContent>
         </Dialog>
     )

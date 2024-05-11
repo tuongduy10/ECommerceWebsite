@@ -19,6 +19,7 @@ using ECommerce.Application.Services.Inventory;
 using ECommerce.Application.Services.Notifications;
 using ECommerce.Application.Services.Oms;
 using ECommerce.Application.Services.ProductSrv;
+using ECommerce.Application.Services.SalesSrv;
 using ECommerce.Application.Services.UserSrv;
 using ECommerce.Data.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,7 @@ namespace ECommerce.Application.Extensions
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IShopService, ShopService>();
             services.AddTransient<IOmsService, OmsService>();
+            services.AddTransient<ISalesService, SalesService>();
         }
         public static void AddScopedServices(this IServiceCollection services)
         {
