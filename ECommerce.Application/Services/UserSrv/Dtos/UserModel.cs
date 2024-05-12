@@ -19,6 +19,7 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
         public string cityCode { get; set; }
         public string phone { get; set; }
         public List<string> roles { get; set; }
+        public List<string> permissions { get; set; }
         public bool status { get; set; }
         public bool isSystemAccount { get; set; }
         public bool isOnline { get; set; }

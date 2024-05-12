@@ -37,6 +37,7 @@ export const INVENTORY_API_URL = {
     ATTRIBUTES: '/inventory/attributes',
     SAVE_ATTRIBUTES: '/inventory/save-attributes',
     SAVE_OPTIONS: '/inventory/save-options',
+    DELETE_OPTION: '/inventory/delete-option',
     GET_BRAND: '/inventory/get-brand',
     CATEGORIES: '/inventory/get-categories',
     CATEGORY: '/inventory/get-category',

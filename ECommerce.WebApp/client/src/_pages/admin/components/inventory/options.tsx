@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Popper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, Chip, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Popper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { FormEvent, Fragment, useEffect, useState } from "react";
 import { ICategory } from "src/_cores/_interfaces/inventory.interface";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
@@ -10,6 +10,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
 import { Each } from "src/_shares/_components";
 import { GlobalConfig } from "src/_configs/global.config";
+import { useDispatch } from "react-redux";
+import { showSuccess } from "src/_cores/_reducers/alert.reducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -132,6 +134,7 @@ export default function Options() {
         name: '',
         values: [] as any[]
     });
+    const dispatch = useDispatch();
 
     useEffect(() => {
         search();
@@ -238,6 +241,14 @@ export default function Options() {
         }
     }
 
+    const deleteOption = async (id: number) => {
+        const res = await InventoryService.deleteOption(id) as any;
+        if (res?.isSucceed) {
+            dispatch(showSuccess("Xóa thành công"));
+            await search();
+        }
+    }
+
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const returnToList = async () => {
@@ -301,7 +312,7 @@ export default function Options() {
                                 rowData={item}
                                 isSelected={selectedItems.includes(item.id)}
                                 onUpdateStatus={(id, status) => updateStatus(id, status)}
-                                onDelete={(id) => { }}
+                                onDelete={(id) => deleteOption(id)}
                                 onSelected={(id) => selectCategory(id)}
                                 onViewDetail={(id) => viewDetail(id)}
                             />

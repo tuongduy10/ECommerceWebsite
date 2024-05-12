@@ -8,7 +8,7 @@ import { DateTimeHelper } from "src/_shares/_helpers/datetime-helper";
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
 import { ICodeName, IPagedRequest } from "src/_cores/_interfaces";
 import { FormatHelper } from "src/_shares/_helpers/format-helper";
-import { ORDER_STATUSES } from "src/_cores/_constants/order-constants";
+import { ORDER_STATUSES, ORDER_STATUS_CODE } from "src/_cores/_constants/order-constants";
 import { IOrderPagedRequest } from "../../interfaces/oms-interface";
 import { StatusDisplay } from "src/_shares/_components";
 
@@ -198,7 +198,7 @@ export default function OrderList() {
         pageIndex: 1,
         pageSize: 10,
         searchKey: '',
-        status: ''
+        status: ORDER_STATUS_CODE.ORDER_PENDING
     });
 
     useEffect(() => {
@@ -238,8 +238,10 @@ export default function OrderList() {
                         <Autocomplete
                             size="small"
                             disablePortal
-                            options={ORDER_STATUSES.map((item: ICodeName) => ({ ...item, label: item.name }))}
+                            value={ORDER_STATUSES.find(_ => _.code === params.status) ?? null}
+                            options={ORDER_STATUSES}
                             renderInput={(params) => <TextField {...params} name="status" label="Trạng thái đơn hàng" />}
+                            getOptionLabel={(option: any) => option.name}
                             onChange={(event, value) => onChangeStatus(value?.code)}
                         />
                     </Grid>

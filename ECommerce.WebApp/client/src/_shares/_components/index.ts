@@ -7,3 +7,4 @@ export { default as MiniCart } from './mini-cart/mini-cart';
 export { default as MyAlert } from './my-alert/my-alert';
 export { default as Each } from './each/each';
 export { default as StatusDisplay } from './status-display/status-display';
+export { default as ScrollToTop } from './scroll-top-top/scroll-to-top';
