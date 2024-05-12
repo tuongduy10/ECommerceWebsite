@@ -1,3 +1,5 @@
+import { ENV } from "src/_configs/enviroment.config";
+
 export class ProductHelper {
   public static getProductListFormated(productList: any) {
     const formattedList = [];
@@ -42,5 +44,8 @@ export class ProductHelper {
       default:
         return { label: "", color: "" };
     }
+  }
+  public static getImagePath(type: 'product' | 'brand' | 'rates', name: string) {
+    return `${ENV.IMAGE_URL}/${type}/${name}`;
   }
 }
