@@ -4,6 +4,7 @@ using ECommerce.Data.Abstractions;
 using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Dtos.Oms;
+using ECommerce.Dtos.Oms.Request;
 using ECommerce.Utilities.Constants;
 using ECommerce.Utilities.Shared;
 using ECommerce.Utilities.Shared.Responses;
@@ -25,10 +26,10 @@ namespace ECommerce.Application.Services.Oms
             _uow = uow;
             _userService = userService;
         }
-        public async Task<Response<Order>> getById(int id)
+        public async Task<Response<OrderResponseDto>> getById(Guid id)
         {
-            var ent = await _uow.Repository<Order>().GetByIdAsync(new Guid("18C4F8C8-67F2-4CCE-B482-5788DECE69B0"));
-            return new SuccessResponse<Order>(ent);
+            var ent = (OrderResponseDto)(await _uow.Repository<Order>().GetByIdAsync(id));
+            return new SuccessResponse<OrderResponseDto>(ent);
         }
         public async Task<Response<IEnumerable<OrderResponseDto>>> getOrderByStatus(string status) 
         {
@@ -40,26 +41,57 @@ namespace ECommerce.Application.Services.Oms
                 .Select(_ => (OrderResponseDto)_);
             return new SuccessResponse<IEnumerable<OrderResponseDto>>(StatusConstant.SUCCESS, orders);
         }
-        public async Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(PagedRequest request)
+        public async Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(OrderPagingRequest request)
         {
+            string searchKey = string.IsNullOrEmpty(request.SearchKey) ? string.Empty : request.SearchKey.Trim().ToLower();
             var pagedResult = await _uow.Repository<Order>()
                 .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex,request.PageSize,
-                    _ => _.IsDeleted == false,
-                    _ => _.OrderByDescending(i => i.CreatedDate),
+                    _ => _.IsDeleted == false
+                        && (string.IsNullOrEmpty(request.status) || request.status == _.Status)
+                        && (string.IsNullOrEmpty(searchKey) 
+                            || searchKey.Contains(_.Remark.ToLower().Trim())
+                            || searchKey.Contains(_.FullName.ToLower().Trim()))
+                            || searchKey.Contains(_.Email.ToLower().Trim())
+                            || searchKey.Contains(_.PhoneNumber.ToLower().Trim()),
+                    _ => _.OrderByDescending(i => i.UpdatedDate)
+                        .ThenByDescending(i => i.CreatedDate),
+                    "OrderDetails,Ward,District,City");
+            return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
+        }
+        public async Task<Response<PagedResult<OrderResponseDto>>> getUserOrdersPaging(OrderPagingRequest request)
+        {
+            var logedInUser = await _userService.getCurrentUser();
+            string searchKey = string.IsNullOrEmpty(request.SearchKey) ? string.Empty : request.SearchKey.Trim().ToLower();
+            var pagedResult = await _uow.Repository<Order>()
+                .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex, request.PageSize,
+                    _ => _.IsDeleted == false
+                        && logedInUser.isSucceed
+                        && (_.CreatedBy == logedInUser.Data.UserPhone 
+                            || _.CreatedBy == logedInUser.Data.UserName)
+                        && (string.IsNullOrEmpty(request.status) || request.status == _.Status)
+                        && (string.IsNullOrEmpty(searchKey)
+                            || searchKey.Contains(_.Remark.ToLower().Trim())
+                            || searchKey.Contains(_.FullName.ToLower().Trim()))
+                            || searchKey.Contains(_.Email.ToLower().Trim())
+                            || searchKey.Contains(_.PhoneNumber.ToLower().Trim()),
+                    _ => _.OrderByDescending(i => i.UpdatedDate)
+                        .ThenByDescending(i => i.CreatedDate),
                     "OrderDetails,Ward,District,City");
             return new SuccessResponse<PagedResult<OrderResponseDto>>(StatusConstant.SUCCESS, pagedResult);
         }
         public async Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request)
         {
             var entity = new Order();
-            entity.FullName = request.deliveryInfo.fullName;
+            entity.OrderCode = generateNewOrderCode();
+            entity.FullName = request.deliveryInfo.fullName;    
             entity.PhoneNumber = request.deliveryInfo.phoneNumber;
             entity.Email = request.deliveryInfo.email;
             entity.Remark = request.deliveryInfo.remark;
+            entity.Address = request.deliveryInfo.address;
             entity.CityCode = request.deliveryInfo.cityCode;
             entity.DistrictCode = request.deliveryInfo.districtCode;
             entity.WardCode = request.deliveryInfo.wardCode;
-            entity.CreatedBy = _userService.getCurrentUserName() ?? request.deliveryInfo.fullName;
+            entity.CreatedBy = _userService.getCurrentUserName() ?? request.deliveryInfo.phoneNumber;
             entity.PaymentMethod = request.deliveryInfo.paymentMethod;
             entity.TotalQty = request.products.Sum(_ => _.qty);
 
@@ -78,25 +110,39 @@ namespace ECommerce.Application.Services.Oms
                         decimal finalPrice = 0;
                         if (product.priceType.Equals(ProductConstant.PRICE_AVAILABLE))
                         {
+                            // Price
                             if (pro.PriceAvailable != null)
                                 price = (decimal)pro.PriceAvailable;
+                            // Final price
+                            finalPrice = price;
                             if (pro.DiscountAvailable != null)
                                 finalPrice = (decimal)pro.DiscountAvailable;
                         }
                         if (product.priceType.Equals(ProductConstant.PRICE_PRE_ORDER))
                         {
+                            // Price
                             if (pro.PricePreOrder != null)
                                 price = (decimal)pro.PricePreOrder;
+                            // Final price
+                            finalPrice = price;
                             if (pro.DiscountPreOrder != null)
                                 finalPrice = (decimal)pro.DiscountPreOrder;
                         }
                         totalPrice += price * product.qty;
                         totalFinalPrice += finalPrice * product.qty;
+
+                        string opts = string.Empty;
+                        if (product.options.Count() > 0)
+                            opts = string.Join(", ", product.options.Select(_ => _.valueName));
+                        
                         var detail = new OrderDetail
                         {
                             Price = price,
-                            PriceOnSell = finalPrice,
+                            PriceOnSell = finalPrice >= price ? 0 : finalPrice,
+                            TotalPrice = price * product.qty,
+                            TotalFinalPrice = finalPrice * product.qty,
                             Qty = product.qty,
+                            Options = opts,
                             ProductName = pro.ProductName,
                             ProductId = pro.ProductId,
                         };
@@ -113,13 +159,17 @@ namespace ECommerce.Application.Services.Oms
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return new FailResponse<OrderResponseDto>(ex.Message);
+                throw;
             }
 
             var order = (OrderResponseDto)(await _uow.Repository<Order>().FindByAsync(_ => _.Id == entity.Id, "OrderDetails,Ward,District,City"));
             return new SuccessResponse<OrderResponseDto>(order);
         }
-
+        public string generateNewOrderCode()
+        {
+            var dateStr = DateTime.Now.ToString("yyMMdd");
+            return dateStr + Guid.NewGuid().ToString("N").Substring(0, 8);
+        }
 
     }
 }

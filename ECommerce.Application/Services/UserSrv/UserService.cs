@@ -323,7 +323,7 @@ namespace ECommerce.Application.Services.UserSrv
 
                 var seller = await _uow.Repository<User>().FindByAsync(_ => _.UserId == request.id);
                 if (seller == null)
-                    seller = new Data.Entities.UserSchema.User();
+                    seller = new User();
 
                 seller.UserMail = request.email.Trim();
                 seller.UserCityCode = request.cityCode;
@@ -338,11 +338,15 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.IsOnline = false;
                 seller.LastOnline = DateTime.Now;
                 seller.IsSystemAccount = true;
+
                 if (!string.IsNullOrEmpty(request.password) && !string.IsNullOrEmpty(request.rePassword))
                     seller.Password = request.password.Trim();
 
                 if (request.id == -1) // Add
+                {
+                    seller.UserName = generateUserName(request.fullName.Trim(), phonenumber);
                     _uow.Repository<User>().AddAsync(seller).Wait();
+                }
                 if (request.id > -1) // Update
                     _uow.Repository<User>().Update(seller);
                 _uow.SaveChangesAsync().Wait();
@@ -401,8 +405,27 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<UserShopModel>(exc.Message);
             }
         }
-
-        public int getCurrentUserId() => Int32.Parse(getUserValue("id"));
+        public async Task<Response<User>> getCurrentUser()
+        {
+            int id = getCurrentUserId();
+            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id);
+            return new SuccessResponse<User>(user);
+        }
+        public async Task updateUserName()
+        {
+            var users = await _uow.Repository<User>().GetByAsync(_ => _.UserName == null);
+            foreach (var user in users)
+            {
+                user.UserName = generateUserName(user.UserFullName, user.UserPhone);
+            }
+            _uow.Repository<User>().Update(users);
+            await _uow.SaveChangesAsync();
+        }
+        public int getCurrentUserId() 
+        {
+            if (getUserValue("id") == null) return -1;
+            return Int32.Parse(getUserValue("id"));
+        }
         public string getCurrentUserFullName() => getUserValue("fullName");
         public string getCurrentUserName() => getUserValue("userName");
         private string getUserValue(string key)
@@ -410,8 +433,8 @@ namespace ECommerce.Application.Services.UserSrv
             string accessToken = getAccessToken();
             if (string.IsNullOrEmpty(accessToken))
                 return null;
-            var userClaims = DecodeToken(accessToken).Claims;
-            return userClaims.FirstOrDefault(claim => claim.Type == key)?.Value;
+            var userClaims = TokenPrincipal(accessToken);
+            return userClaims?.FirstOrDefault(claim => claim.Type == key)?.Value;
         }
         public string getAccessToken()
         {
@@ -450,17 +473,32 @@ namespace ECommerce.Application.Services.UserSrv
 
             return writeToken;
         }
-        public ClaimsPrincipal DecodeToken(string token)
+        public IEnumerable<Claim> TokenPrincipal(string token)
         {
             var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
-            var jwtTokenHandler = new JwtSecurityTokenHandler()
-                .ValidateToken(token, new TokenValidationParameters()
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                }, out SecurityToken secToken);
-            return jwtTokenHandler;
+            var tokenHandler = new JwtSecurityTokenHandler();
+            // Define token validation parameters
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ValidateIssuer = false, // You may want to set this to true if issuer validation is required
+                ValidateAudience = false, // You may want to set this to true if audience validation is required
+                RequireExpirationTime = true,
+                ValidateLifetime = true
+            };
+            // Decode and validate the token
+            try
+            {
+                // This will throw an exception if the token is not valid
+                SecurityToken validatedToken;
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+                return principal.Claims;
+            }
+            catch (SecurityTokenException)
+            {
+                return null;
+            }
         }
     
         private string generateUserName(string fullName, string phoneNumber)

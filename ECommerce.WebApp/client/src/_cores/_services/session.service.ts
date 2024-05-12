@@ -4,6 +4,7 @@ export default class SessionService {
   private static accessTokenKey = "access_token";
 
   public static setAccessToken(token: string) {
+    this.deleteAccessToken();
     const _key = this.accessTokenKey;
     const _value = token;
     CookieHelper.setCookie(_key, _value);

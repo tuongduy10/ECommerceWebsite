@@ -12,6 +12,7 @@ using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Configurations;
 using ECommerce.Data.Configurations.UserSchema;
 using ECommerce.Data.Configurations.OmsSchema;
+using ECommerce.Data.Entities;
 
 #nullable disable
 
@@ -64,6 +65,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<SubCategoryOption> SubCategoryOptions { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<RoleToPermission> RoleToPermissions { get; set; }
         public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<District> Districts { get; set; }
@@ -695,6 +697,7 @@ namespace ECommerce.Data.Context
             });
 
             modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleToPermissionConfiguration());
 
             modelBuilder.Entity<UserRole>(entity =>
             {

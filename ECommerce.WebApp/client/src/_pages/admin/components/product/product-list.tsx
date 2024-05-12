@@ -187,8 +187,8 @@ function Row(props: TableRowProps) {
                                         <TableCell>{getFormatedPrice(rowData.discountAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.priceImport)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.priceForSeller)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.profitAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.profitPreOrder)}</TableCell>
+                                        <TableCell>{getFormatedPrice(rowData.profitAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.profitForSeller)}</TableCell>
                                     </TableRow>
                                 </TableBody>

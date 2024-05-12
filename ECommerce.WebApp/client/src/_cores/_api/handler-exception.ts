@@ -1,4 +1,5 @@
 import { ERROR_MESSAGE } from '../_enums/message.enum';
+import SessionService from '../_services/session.service';
 const handleError = (error: any) => {
   if (error.response) {
     // The request was made and the server responded with a status code
@@ -8,6 +9,7 @@ const handleError = (error: any) => {
         alert("lỗi")
         return;
       case 401: 
+        SessionService.deleteAccessToken();
         window.location.href = '/login';
         return;
       case 403: 

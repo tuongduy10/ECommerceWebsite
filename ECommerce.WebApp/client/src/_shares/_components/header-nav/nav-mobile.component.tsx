@@ -131,7 +131,7 @@ const HeaderNavMobile = () => {
             />
           </button>
 
-          <Link to={ROUTE_NAME.USER_PROFILE} className="profile-mobile">
+          <Link to={ROUTE_NAME.USER_PROFILE_INFO} className="profile-mobile">
             {/* <span className="quantity"></span> */}
             <MuiIcon name={ICON_NAME.FEATHER.USER} />
           </Link>

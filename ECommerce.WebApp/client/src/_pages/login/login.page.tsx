@@ -34,11 +34,13 @@ const LoginPage = () => {
       password: passwordRef.current.value,
     }
     const response = await UserService.login(param) as any;
-    if (response.isSucceed) {
+    if (response?.isSucceed) {
       dispatch(setAccessToken(response.data));
       const user = await UserService.getUserInfo() as any;
-      dispatch(setUser(user));
-      navigate(ROUTE_NAME.HOME)
+      if (user) {
+        dispatch(setUser(user));
+        navigate(ROUTE_NAME.HOME)
+      }
     }
   }
 

@@ -10,6 +10,7 @@ namespace ECommerce.Dtos.Oms
     public class OrderResponseDto
     {
         public Guid Id { get; set; }
+        public string orderCode { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
@@ -22,6 +23,7 @@ namespace ECommerce.Dtos.Oms
         public decimal TotalFinalPrice { get; set; }
         public int TotalQty { get; set; }
         public string Status { get; set; }
+        public string Address { get; set; }
         public string CityCode { get; set; }
         public string CityName { get; set; }
         public string DistrictCode { get; set; }
@@ -34,6 +36,7 @@ namespace ECommerce.Dtos.Oms
             return new OrderResponseDto
             {
                 Id = data.Id,
+                orderCode = data.OrderCode,
                 CreatedDate = data.CreatedDate,
                 CreatedBy = data.CreatedBy,
                 CityCode = data.CityCode,
@@ -42,6 +45,7 @@ namespace ECommerce.Dtos.Oms
                 DistrictName = data.District.Name,
                 WardCode = data.WardCode,
                 WardName = data.Ward.Name,
+                Address = data.Address,
                 Email = data.Email,
                 FullName = data.FullName,
                 PaymentMethod = data.PaymentMethod,
@@ -62,7 +66,10 @@ namespace ECommerce.Dtos.Oms
         public string ProductName { get; set; }
         public decimal Price { get; set; }
         public decimal PriceOnSell { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal TotalFinalPrice { get; set; }
         public int Qty { get; set; }
+        public string options { get; set; }
         public int ProductId { get; set; }
         public static explicit operator OrderDetailResponseDto(OrderDetail data)
         {
@@ -70,9 +77,12 @@ namespace ECommerce.Dtos.Oms
             {
                 Price = data.Price,
                 PriceOnSell = data.PriceOnSell,
+                TotalPrice = data.TotalPrice,
+                TotalFinalPrice = data.TotalFinalPrice,
                 ProductId = data.ProductId,
                 ProductName = data.ProductName,
                 Qty = data.Qty,
+                options = data.Options
             };
         }
     }
