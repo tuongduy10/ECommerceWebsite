@@ -94,7 +94,14 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(res);
             return Ok(res);
         }
-
+        [HttpPost("delete-sub-category")]
+        public async Task<IActionResult> deleteSubCategory([FromBody] int id)
+        {
+            var res = await _inventoryService.deleteSubCategory(id);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
         [HttpGet("get-brand/{id}")]
         public async Task<IActionResult> getBrand(int id)
         {
@@ -122,6 +129,12 @@ namespace ECommerce.WebApp.Controllers
 
             if (!res.isSucceed)
                 return BadRequest(res.Message);
+            return Ok(res);
+        }
+        [HttpPost("delete-option")]
+        public async Task<IActionResult> deleteOptions([FromBody] int id)
+        {
+            var res = await _inventoryService.deleteOption(id);
             return Ok(res);
         }
         [HttpPost("product-options")]

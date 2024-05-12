@@ -59,6 +59,7 @@ export default function PaymentMethod() {
             await getData();
         }
         handleClose();
+        setDelAnchorEl(null);
     }
 
     const handleSubmit = async (e: any) => {

@@ -377,19 +377,16 @@ namespace ECommerce.Application.Services.Inventory
                 return new FailResponse<SubCategory>(error.Message);
             }
         }
-        public async Task<Response<bool>> deleteSubCategories(List<int> ids)
+        public async Task<Response<bool>> deleteSubCategory(int id)
         {
             try
             {
-                if (ids.Count > 0)
-                {
-                    
-                }
+                
                 return new SuccessResponse<bool>();
             }
-            catch (Exception error)
+            catch
             {
-                return new FailResponse<bool>();
+                throw;
             }
         }
         public async Task<Response<List<OptionModel>>> getOptions(InventoryRequest request)
@@ -516,6 +513,37 @@ namespace ECommerce.Application.Services.Inventory
             {
                 await transaction.RollbackAsync();
                 return new FailResponse<bool>(ex.Message);
+            }
+        }
+        public async Task<Response<bool>> deleteOption(int id)
+        {
+            var transaction = await _uow.BeginTransactionAsync();
+            try
+            {
+                var productOptionValues = await _uow.Repository<ProductOptionValue>().GetByAsync(_ => _.OptionValue.OptionId == id, null, "OptionValue");
+                if (productOptionValues.Count() > 0)
+                    _uow.Repository<ProductOptionValue>().Delete(productOptionValues);
+
+                var subCategoryOptions = await _uow.Repository<SubCategoryOption>().GetByAsync(_ => _.OptionId == id);
+                if (subCategoryOptions.Count() > 0)
+                    _uow.Repository<SubCategoryOption>().Update(subCategoryOptions);
+
+                var optionValues = await _uow.Repository<OptionValue>().GetByAsync(_ => _.OptionId == id);
+                if (optionValues.Count() > 0)
+                    _uow.Repository<OptionValue>().Delete(optionValues);
+
+                var options = await _uow.Repository<Option>().GetByAsync(_ => _.OptionId == id);
+                if (options.Count() > 0)
+                    _uow.Repository<Option>().Delete(options);
+
+                await _uow.SaveChangesAsync();
+                await _uow.CommitTransactionAsync(transaction);
+                return new SuccessResponse<bool>();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
         public async Task<Response<List<OptionModel>>> getProductOptions(InventoryRequest request)

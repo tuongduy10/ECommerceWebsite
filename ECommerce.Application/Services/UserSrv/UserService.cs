@@ -243,18 +243,22 @@ namespace ECommerce.Application.Services.UserSrv
             }
 
             var result = await _uow.Repository<User>()
-                .FindByAsync(i => i.UserPhone == phonenumber && i.Password == request.Password);
+                .FindByAsync(i => i.UserPhone == phonenumber && i.Password == request.Password, "UserRoles.Role");
 
             if (result == null)
                 return new FailResponse<string>("Mật khẩu hoặc tài khoản không đúng");
             if (result.Status == false)
                 return new FailResponse<string>("Tài khoản đã bị khóa");
 
+            var permissions = await _uow.Repository<RoleToPermission>().GetByAsync(_ => result.UserRoles.Select(r => r.Role.RoleId).Contains(_.RoleId), null, "Permission");
+
             var user = new UserModel();
             user.id = result.UserId;
             user.fullName = result.UserFullName;
             user.phone = result.UserPhone;
             user.userName = result.UserName;
+            user.roles = result.UserRoles.Select(_ => _.Role.RoleName).ToList();
+            user.permissions = permissions.Select(_ => _.Permission.Name).ToList();
             string token = GenerateToken(user);
 
             return new SuccessResponse<string>("Đăng nhập thành công", token);
@@ -457,10 +461,13 @@ namespace ECommerce.Application.Services.UserSrv
                 new Claim("phone", user.phone),
                 new Claim("userName", user.userName),
             };
-            var permissions = new string[] { "COMMON_READ", "COMMON_WRITE" };
-            foreach (var item in permissions)
+            foreach (var item in user.roles)
             {
-                claims.Add(new Claim("permission", item));
+                claims.Add(new Claim("roles", item));
+            }
+            foreach (var item in user.permissions)
+            {
+                claims.Add(new Claim("permissions", item));
             }
             var description = new SecurityTokenDescriptor
             {

@@ -251,14 +251,16 @@ namespace ECommerce.Application.Services.ProductSrv
                 if (orderBy == "desc")
                     orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
 
-                var extQuery = _uow.Repository<Product>().QueryableAsync(_ =>
-                    (ids.Count == 0 || ids.Contains(_.ProductId)) &&
-                    (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
-                    (brandId == -1 || _.BrandId == brandId) &&
-                    (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
-                    (orderBy == "newest" ? _.New == true : _.New != null) &&
-                    (orderBy == "discount" ? _.DiscountPercent != null : (_.DiscountPercent > (byte)0 || _.DiscountPercent == null)), 
-                    orderByReq, "Brand");
+                var extQuery = _uow.Repository<Product>().QueryableAsync(
+                    _ => _.Status == (byte)ProductStatusEnum.Available &&
+                        (ids.Count == 0 || ids.Contains(_.ProductId)) &&
+                        (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
+                        (brandId == -1 || _.BrandId == brandId) &&
+                        (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
+                        (orderBy != "newest" || _.New == true) &&
+                        (orderBy != "discount" || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
+                    orderByReq, 
+                    "Brand");
 
                 var list = extQuery.Select(i => new ProductModel()
                 {
@@ -459,7 +461,6 @@ namespace ECommerce.Application.Services.ProductSrv
                 product.SizeGuide = request.sizeGuide ?? null;
                 product.Note = string.IsNullOrEmpty(request.note) ? "" : request.note.Trim();
                 product.Link = string.IsNullOrEmpty(request.link) ? "" : request.link.Trim();
-                product.DiscountPercent = request.discountPercent ?? null;
                 product.New = request.isNew;
                 product.Legit = request.isLegit;
                 product.Highlights = request.isHighlight;
@@ -473,6 +474,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 product.ProductAddedDate = DateTime.Now; // default
                 product.Status = isAdmin ? (byte?)ProductStatusEnum.Available : (byte?)ProductStatusEnum.Pending;
                 //Price
+                product.DiscountPercent = request.discountPercent ?? null;
                 product.PriceAvailable = request.priceAvailable ?? null;
                 product.PricePreOrder = request.pricePreOrder ?? null;
                 product.PriceForSeller = request.priceForSeller ?? null;
