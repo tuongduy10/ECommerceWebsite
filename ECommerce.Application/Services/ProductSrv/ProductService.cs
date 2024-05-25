@@ -453,10 +453,9 @@ namespace ECommerce.Application.Services.ProductSrv
                  */
                 var product = await _uow.Repository<Product>().FindByAsync(_ => _.ProductId == request.id);
                 if (product == null)
-                    product = new Data.Entities.ProductSchema.Product();
+                    product = new Product();
                 product.ProductCode = request.code.Trim();
                 product.ProductName = request.name.Trim(); // required
-                product.Ppc = await getNewPPC();
                 product.ProductDescription = request.description ?? null;
                 product.SizeGuide = request.sizeGuide ?? null;
                 product.Note = string.IsNullOrEmpty(request.note) ? "" : request.note.Trim();
@@ -502,6 +501,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 } 
                 else
                 {
+                    product.Ppc = await getNewPPC();
                     await _uow.Repository<Product>().AddAsync(product);
                 }
                 await _uow.SaveChangesAsync();
@@ -842,7 +842,8 @@ namespace ECommerce.Application.Services.ProductSrv
         private async Task<string> getNewPPC()
         {
             var newestId = (await _uow.Repository<Product>()
-                .FindLastAsync()).ProductId;
+                .GetByAsync(null, _ => _.OrderByDescending(p => p.ProductId)))
+                .FirstOrDefault()?.ProductId;
 
             byte[] buffer = Guid.NewGuid().ToByteArray();
             string guid = BitConverter.ToUInt32(buffer, 8).ToString();

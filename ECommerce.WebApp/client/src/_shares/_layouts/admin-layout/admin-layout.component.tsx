@@ -14,6 +14,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import ArticleIcon from '@mui/icons-material/Article';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Accordion, AccordionDetails, AccordionSummary, Collapse, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
@@ -125,6 +126,7 @@ const mainListItems = [
             }
         ]
     },
+    { name: 'blogs', icon: <ArticleIcon />, label: 'Nội dung', path: ADMIN_ROUTE_NAME.MANAGE_BLOGS },
     { name: "statistical", icon: <BarChartIcon />, label: "Thống kê", path: "" },
 ];
 

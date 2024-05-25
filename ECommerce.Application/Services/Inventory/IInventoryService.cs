@@ -32,5 +32,6 @@ namespace ECommerce.Application.Services.Inventory
         Task<Response<bool>> saveAttributes(InventoryRequest request);
         Task<Response<List<AttributeModel>>> getProductAttributes(InventoryRequest request);
         Task<Response<List<SizeGuideModel>>> getProductSizeGuides();
+        Task<Response<bool>> saveSizeGuide(SizeGuideModel request);
     }
 }

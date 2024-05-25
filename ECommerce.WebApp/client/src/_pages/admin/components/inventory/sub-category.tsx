@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Button, Checkbox, Collapse, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, ListItemText, Menu, MenuItem, OutlinedInput, Paper, Popper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { FormEvent, Fragment, useEffect, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import { ICategory, ISubCategory } from "src/_cores/_interfaces/inventory.interface";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -8,6 +8,8 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
+import { Editor } from "@tinymce/tinymce-react";
+import { GlobalConfig } from "src/_configs/global.config";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -15,6 +17,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const header: ITableHeader[] = [
     { field: 'name', fieldName: 'Tên loại sản phẩm', align: 'left' },
     { field: 'category', fieldName: 'Danh mục', align: 'left' },
+    { field: 'sizeGuide', fieldName: 'Hướng dẫn chọn size', align: 'left' },
     { field: 'action', fieldName: '', align: 'center' }
 ];
 
@@ -25,14 +28,14 @@ type TableRowProps = {
     onDelete: (id: number) => void,
     onSelected: (id: number) => void,
     onViewDetail: (id: number) => void,
+    onOpenSizeGuide: (sizeGuide: any, subId: number) => void,
 }
 
 function Row(props: TableRowProps) {
-    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected, onViewDetail } = props;
+    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected, onViewDetail, onOpenSizeGuide } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
     const openDel = Boolean(delAnchorEl);
-
 
     const updateStatus = (id: number, status: number) => {
         onUpdateStatus(id, status);
@@ -53,6 +56,10 @@ function Row(props: TableRowProps) {
 
     const viewDetail = (id: number) => {
         onViewDetail(id)
+    }
+
+    const openSizeGuide = (sizeGuide: any, subId: number) => {
+        onOpenSizeGuide(sizeGuide, subId);
     }
 
     return (
@@ -81,6 +88,14 @@ function Row(props: TableRowProps) {
                 </TableCell>
                 <TableCell align="left">{rowData.name}</TableCell>
                 <TableCell align="left">{rowData.category?.categoryName ?? ''}</TableCell>
+                <TableCell align="left">
+                    <Button
+                        size="small"
+                        onClick={() => openSizeGuide(rowData.sizeGuide, rowData.id)}
+                    >
+                        {rowData.sizeGuide === null ? 'Tạo' : 'Xem'}
+                    </Button>
+                </TableCell>
                 <TableCell align="center">
                     <Button
                         variant="outlined"
@@ -118,17 +133,25 @@ function Row(props: TableRowProps) {
 
 export default function SubCategory() {
     const [open, setOpen] = useState(false);
+    const [openSizeGuide, setOpenSizeGuide] = useState(false);
+
     const [subCategories, setSubCategories] = useState<any[]>([]);
     const [categories, setCategories] = useState<ICategory[]>([]);
     const [attributes, setAttributes] = useState<any[]>([]);
     const [options, setOptions] = useState<any[]>([]);
     const [selectedSubCategories, setSelectedSubCategories] = useState<number[]>([]);
+
+    const sizeGuideRef = useRef<any>(null);
+    const [sizeGuide, setSizeGuide] = useState<any>(undefined);
+    const [sizeGuideSubId, setSizeGuideSubId] = useState(-1);
+    
     const [formData, setFormData] = useState({
         id: -1,
         name: '',
         categoryId: -1,
         attributeIds: [] as any,
-        optionIds: [] as any
+        optionIds: [] as any,
+        sizeGuideId: -1
     });
 
     useEffect(() => {
@@ -160,6 +183,12 @@ export default function SubCategory() {
             attributeIds: [],
             optionIds: []
         });
+    };
+
+    const handleCloseSizeGuide = () => {
+        setOpenSizeGuide(false);
+        setSizeGuide(undefined);
+        setSizeGuideSubId(-1);
     };
 
     const search = async (_params?: any) => {
@@ -239,6 +268,14 @@ export default function SubCategory() {
         }
     }
 
+    const onOpenSizeGuide = (sizeGuide: any, subId: number) => {
+        if (sizeGuide != null) {
+            setSizeGuide(sizeGuide);
+        }
+        setOpenSizeGuide(true);
+        setSizeGuideSubId(subId);
+    }
+
     const onChangeCategory = (value: ICategory) => {
         setFormData({
             ...formData,
@@ -268,8 +305,8 @@ export default function SubCategory() {
         }
         const _params = {
             ...formData,
-            attributes: formData.attributeIds.map((_: any) => ({ id: _})),
-            optionList: formData.optionIds.map((_: any) => ({ id: _})),
+            attributes: formData.attributeIds.map((_: any) => ({ id: _ })),
+            optionList: formData.optionIds.map((_: any) => ({ id: _ })),
         }
         if (formData.id > -1) {
             const reqUpdate = await InventoryService.updateSubCategory(_params) as any;
@@ -283,6 +320,21 @@ export default function SubCategory() {
             }
         }
     };
+
+    const handleSubmitSizeGuide = async (e: any) => {
+        e.preventDefault();
+        const params = {
+            ...sizeGuide,
+            content: sizeGuideRef.current.getContent(),
+            subCategoryId: sizeGuideSubId
+        }
+        console.log(params);
+        const res = await InventoryService.saveSizeGuide(params) as any;
+        if (res?.isSucceed) {
+            handleCloseSizeGuide();
+            search();
+        }
+    }
 
     return (
         <Fragment>
@@ -320,6 +372,7 @@ export default function SubCategory() {
                                 onDelete={(id) => deleteSubCategory(id)}
                                 onSelected={(id) => selectSubCategory(id)}
                                 onViewDetail={(id) => viewDetail(id)}
+                                onOpenSizeGuide={(sizeGuide: any, subId: number) => onOpenSizeGuide(sizeGuide, subId)}
                             />
                         ))}
                     </TableBody>
@@ -330,9 +383,7 @@ export default function SubCategory() {
                 fullWidth={true}
                 open={open}
                 onClose={handleClose}
-                PaperProps={{
-                    style: { height: '80vh' },
-                }}
+                PaperProps={{ style: { height: '80vh' } }}
             >
                 <Box component={'form'} onSubmit={handleSubmit}>
                     <DialogTitle>Loại sản phẩm</DialogTitle>
@@ -410,6 +461,32 @@ export default function SubCategory() {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose}>Đóng</Button>
+                        <Button type="submit">Xác nhận</Button>
+                    </DialogActions>
+                </Box>
+            </Dialog>
+
+            <Dialog
+                fullScreen
+                open={openSizeGuide}
+                onClose={handleCloseSizeGuide}
+            >
+                <Box component={'form'} onSubmit={handleSubmitSizeGuide}>
+                    <DialogTitle>Hướng dẫn chọn size</DialogTitle>
+                    <DialogContent>
+                        <Editor
+                            initialValue={sizeGuide ? sizeGuide.content : ''}
+                            onInit={(evt, editor) => sizeGuideRef.current = editor}
+                            apiKey={GlobalConfig.TINY_KEY}
+                            init={{
+                                height: 500,
+                                plugins: GlobalConfig.TINY_PLUGINS,
+                                toolbar: GlobalConfig.TINY_TOOLBAR,
+                            }}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseSizeGuide}>Đóng</Button>
                         <Button type="submit">Xác nhận</Button>
                     </DialogActions>
                 </Box>

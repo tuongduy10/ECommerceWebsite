@@ -12,6 +12,7 @@ using ECommerce.Application.BaseServices.SubCategory;
 using ECommerce.Application.BaseServices.User;
 using ECommerce.Application.Repositories;
 using ECommerce.Application.Services.Chat;
+using ECommerce.Application.Services.Cms;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.HttpClient;
@@ -51,6 +52,7 @@ namespace ECommerce.Application.Extensions
             services.AddTransient<IShopService, ShopService>();
             services.AddTransient<IOmsService, OmsService>();
             services.AddTransient<ISalesService, SalesService>();
+            services.AddTransient<ICmsService, CmsService>();
         }
         public static void AddScopedServices(this IServiceCollection services)
         {
