@@ -3,6 +3,8 @@ export const ROUTE_NAME = {
     HOME: ROUTE_PREFIX + '/',
     LOGIN: ROUTE_PREFIX + '/login',
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
+    HOT_SALE: ROUTE_PREFIX + '/hot-sale',
+    NEW_PRODUCTS: ROUTE_PREFIX + '/new-products',
     PRODUCT_DETAIL: ROUTE_PREFIX + '/product-detail',
     EXAMPLE: ROUTE_PREFIX + '/example',
     

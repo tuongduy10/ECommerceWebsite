@@ -234,6 +234,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pageindex = request.PageIndex;
                 int pagesize = request.PageSize;
                 string orderBy = request.orderBy;
+                string filterBy = request.filterBy;
                 if (request.id > -1)
                     request.ids.Add(request.id);
                 List<int> ids = request.ids;
@@ -247,8 +248,10 @@ namespace ECommerce.Application.Services.ProductSrv
 
                 Func<IQueryable<Product>, IOrderedQueryable<Product>> orderByReq = _ => _.OrderByDescending(i => i.ProductAddedDate);
                 if (orderBy == "asc")
+                    orderByReq = _ => _.OrderBy(i => i.ProductAddedDate);
+                if (orderBy == "asc" && filterBy == "price")
                     orderByReq = _ => _.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
-                if (orderBy == "desc")
+                if (orderBy == "desc" && filterBy == "price")
                     orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
 
                 var extQuery = _uow.Repository<Product>().QueryableAsync(
@@ -257,8 +260,8 @@ namespace ECommerce.Application.Services.ProductSrv
                         (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
                         (brandId == -1 || _.BrandId == brandId) &&
                         (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
-                        (orderBy != "newest" || _.New == true) &&
-                        (orderBy != "discount" || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
+                        (request.isNew == false || _.New == true) &&
+                        (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
                     orderByReq, 
                     "Brand");
 

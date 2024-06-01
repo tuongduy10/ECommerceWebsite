@@ -56,6 +56,8 @@ const Router = () => {
         { path: ROUTE_NAME.PAYMENT, element: <PaymentPage /> },
         { path: ROUTE_NAME.BLOG, element: <BlogPage /> },
         { path: ROUTE_NAME.PRODUCT_LIST, element: <ProductListPage /> },
+        { path: ROUTE_NAME.HOT_SALE, element: <ProductListPage /> },
+        { path: ROUTE_NAME.NEW_PRODUCTS, element: <ProductListPage /> },
         { path: ROUTE_NAME.PRODUCT_DETAIL, element: <ProductDetailPage /> },
       ],
     },
@@ -79,6 +81,7 @@ const Router = () => {
         { path: ADMIN_ROUTE_NAME.MANAGE_BLOGS, element: <PrivateRoute><Blog /></PrivateRoute> },
       ],
     },
+    { path: '*', element: <NotFoundLayout /> }
   ]);
 
   return <RouterProvider router={browserRoutes} />;
