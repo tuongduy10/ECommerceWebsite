@@ -19,5 +19,7 @@ namespace ECommerce.Data.Entities.Cms
         public string FacebookUrl { get; set; }
         public string Address { get; set; }
         public string AddressUrl { get; set; }
+        public string InstagramUrl { get; set; }
+        public string YoutubeUrl { get; set; }
     }
 }

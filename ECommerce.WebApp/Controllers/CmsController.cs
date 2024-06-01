@@ -42,6 +42,7 @@ namespace ECommerce.WebApp.Controllers
             return Ok(res);
         }
         [HttpGet("config")]
+        [AllowAnonymous]
         public async Task<IActionResult> getConfig()
         {
             var res = await _uow.Repository<Configuration>().FindByAsync(null);
@@ -58,6 +59,10 @@ namespace ECommerce.WebApp.Controllers
                 ent.Address = dto.Address;
                 ent.AddressUrl = dto.AddressUrl;
                 ent.Mail = dto.Mail;
+                ent.YoutubeUrl = dto.YoutubeUrl;
+                ent.InstagramUrl = dto.InstagramUrl;
+                ent.StartTime = dto.StartTime;
+                ent.EndTime = dto.EndTime;
                 _uow.Repository<Configuration>().Update(ent);
                 await _uow.SaveChangesAsync();
             }

@@ -1,5 +1,6 @@
 import { Box, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import { Editor } from "@tinymce/tinymce-react";
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { GlobalConfig } from "src/_configs/global.config";
@@ -7,6 +8,9 @@ import { showSuccess } from "src/_cores/_reducers/alert.reducer";
 import CmsService from "src/_cores/_services/cms.service";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import CheckIcon from '@mui/icons-material/Check';
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const Blog = () => {
     const [checked, setChecked] = useState(false);
@@ -17,6 +21,8 @@ const Blog = () => {
     const [blogs, setBlogs] = useState<any[]>([]);
     const editorRef = useRef<any>(null);
     const dispatch = useDispatch();
+    const [fromTime, setFromTime] = useState<Dayjs | null>(dayjs('2022-04-17T15:30'));
+    const [toTime, setToTime] = useState<Dayjs | null>(dayjs('2022-04-17T15:30'));
 
     useEffect(() => {
         getBlogs();
@@ -28,6 +34,8 @@ const Blog = () => {
         const res = await CmsService.getConfig() as any;
         if (res?.isSucceed) {
             setConfig(res?.data);
+            setFromTime(dayjs('2022-04-17T' + res?.data?.startTime));
+            setToTime(dayjs('2022-04-17T' + res?.data?.endTime));
             setLoading(false);
         }
     }
@@ -80,7 +88,12 @@ const Blog = () => {
     };
 
     const handleSaveConfig = async () => {
-        const res = await CmsService.saveConfig(config) as any;
+        const params = {
+            ...config,
+            startTime: `${fromTime?.toDate().getHours()}:${fromTime?.toDate().getMinutes()}:${fromTime?.toDate().getSeconds()}`,
+            endTime: `${toTime?.toDate().getHours()}:${toTime?.toDate().getMinutes()}:${toTime?.toDate().getSeconds()}`
+        }
+        const res = await CmsService.saveConfig(params) as any;
         if (res?.isSucceed) {
             dispatch(showSuccess("Thành công"));
         }
@@ -114,7 +127,6 @@ const Blog = () => {
                             <TableCell>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="phoneNumber"
                                     label="Số điện thoại"
@@ -129,7 +141,6 @@ const Blog = () => {
                             <TableCell>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="mail"
                                     label="Email"
@@ -144,10 +155,9 @@ const Blog = () => {
                             <TableCell>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="facebookUrl"
-                                    label="facebook"
+                                    label="Facebook"
                                     type="text"
                                     fullWidth
                                     variant="standard"
@@ -159,7 +169,6 @@ const Blog = () => {
                             <TableCell>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="address"
                                     label="Địa chỉ"
@@ -174,7 +183,6 @@ const Blog = () => {
                             <TableCell>
                                 <TextField
                                     autoFocus
-                                    required
                                     margin="dense"
                                     name="addressUrl"
                                     label="Google address url"
@@ -185,6 +193,50 @@ const Blog = () => {
                                     value={config?.addressUrl || ''}
                                     onChange={handleChangeConfig}
                                 />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                            <TableCell>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    name="instagramUrl"
+                                    label="Instagram"
+                                    type="text"
+                                    fullWidth
+                                    variant="standard"
+                                    sx={{ marginBottom: 2 }}
+                                    value={config?.instagramUrl || ''}
+                                    onChange={handleChangeConfig}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    name="youtubeUrl"
+                                    label="Youtube"
+                                    type="text"
+                                    fullWidth
+                                    variant="standard"
+                                    sx={{ marginBottom: 2 }}
+                                    value={config?.youtubeUrl || ''}
+                                    onChange={handleChangeConfig}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                        label="From"
+                                        value={fromTime}
+                                        onChange={(newValue) => setFromTime(newValue)}
+                                    />
+                                    <TimePicker
+                                        label="To"
+                                        value={toTime}
+                                        onChange={(newValue) => setToTime(newValue)}
+                                    />
+                                </LocalizationProvider>
                             </TableCell>
                             <TableCell>
                                 <IconButton

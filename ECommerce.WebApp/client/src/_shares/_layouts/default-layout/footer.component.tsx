@@ -70,17 +70,17 @@ const Footer = () => {
                                             </a>
                                         </li>
                                         <li className="footer__info-link pb-2">
-                                            <a href={`/${config.facebookUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
+                                            <a href={`${config.youtubeUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
                                                 <MuiIcon name={ICON_NAME.YOUTUBE} className='mr-3' fontSize="small" /> Youtube
                                             </a>
                                         </li>
                                         <li className="footer__info-link pb-2">
-                                            <a href={`/${config.facebookUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
+                                            <a href={`${config.instagramUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
                                                 <MuiIcon name={ICON_NAME.INSTAGRAM} className='mr-3' fontSize="small" /> Instagram
                                             </a>
                                         </li>
                                         <li className="footer__info-link pb-2">
-                                            <a href={`/${config.facebookUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
+                                            <a href={`${config.facebookUrl}`} className="flex items-center" target="_blank" rel="noopener noreferrer">
                                                 <MuiIcon name={ICON_NAME.MESSENGER} className='mr-3' fontSize="small" /> Messenger
                                             </a>
                                         </li>
@@ -94,7 +94,7 @@ const Footer = () => {
                                 <ul className="footer__info-list">
                                     {config ? (<>
                                         <li className="footer__info-link pb-2">
-                                            <a href={``} target="_blank" rel="noopener noreferrer">
+                                            <a href={`tel: ${config.phoneNumber}`} target="_blank" rel="noopener noreferrer">
                                                 <MuiIcon name={ICON_NAME.PHONE_ANDROID} className='mr-2' fontSize="small" /> {config.phoneNumber}
                                             </a>
                                         </li>
@@ -110,7 +110,7 @@ const Footer = () => {
                                         </li>
                                         <li className="footer__info-link pb-2">
                                             <a target="_blank" rel="noopener noreferrer">
-                                                <MuiIcon name={ICON_NAME.OUTLINED.ACCESS_TIME} className='mr-2' fontSize="small" /> 08:30 - 17:30
+                                                <MuiIcon name={ICON_NAME.OUTLINED.ACCESS_TIME} className='mr-2' fontSize="small" /> {config.startTime.split(":")[0]}:{config.startTime.split(":")[1]} - {config.endTime.split(":")[0]}:{config.endTime.split(":")[1]}
                                             </a>
                                         </li>
                                     </>) : null}
