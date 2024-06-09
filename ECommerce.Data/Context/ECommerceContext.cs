@@ -45,6 +45,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<Option> Options { get; set; }
         public virtual DbSet<OptionValue> OptionValues { get; set; }
         public virtual DbSet<OnlineHistory> OnlineHistories { get; set; }
+        public virtual DbSet<ProductSetting> ProductSettings { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductAttribute> ProductAttributes { get; set; }
         public virtual DbSet<ProductImage> ProductImages { get; set; }

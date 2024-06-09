@@ -23,7 +23,8 @@ namespace ECommerce.Data.Entities.ProductSchema
         public string ProductCode { get; set; }
         public string ProductName { get; set; }
         public byte? DiscountPercent { get; set; }
-        public DateTime? ProductAddedDate { get; set; }
+        public DateTime? ProductAddedDate { get; set; } = DateTime.Now;
+        public DateTime NewUpdatedDate { get; set; } = DateTime.Now;
         public string ProductDescription { get; set; }
         public string ProductDescriptionMobile { get; set; }
         public int? ProductStock { get; set; }
@@ -42,6 +43,7 @@ namespace ECommerce.Data.Entities.ProductSchema
         public string Note { get; set; }
         public string SizeGuide { get; set; }
         public string Link { get; set; }
+        
 
         // Price
         public decimal? PriceAvailable { get; set; }

@@ -42,20 +42,17 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
         private readonly IRepositoryBase<Rate> _rateRepo;
         private readonly IRepositoryBase<Discount> _discountRepo;
-        private readonly IInventoryService _inventoryService;
         private readonly IRateService _rateService;
         private readonly ICommonService _commonService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _uow;
         public ProductService(ECommerceContext DbContext,
-            IInventoryService inventoryService,
             IRateService rateService,
             ICommonService commonService,
             IWebHostEnvironment webHostEnvironment,
             IUnitOfWork uow)
         {
             _DbContext = DbContext;
-            _inventoryService = inventoryService;
             _rateService = rateService;
             _commonService = commonService;
             _webHostEnvironment = webHostEnvironment;
@@ -500,6 +497,8 @@ namespace ECommerce.Application.Services.ProductSrv
                         : (request.pricePreOrder - request.priceImport);
                 if (request.id > -1)
                 {
+                    if (request.isNew == true)
+                        product.NewUpdatedDate = DateTime.Now;
                     _uow.Repository<Product>().Update(product);
                 } 
                 else
@@ -825,6 +824,22 @@ namespace ECommerce.Application.Services.ProductSrv
                 return new FailResponse<List<string>>(error.Message);
             }
         }
+        public async Task processUpdateNewProduct()
+        {
+            int dayCheck = (await _uow.Repository<ProductSetting>().FindByAsync()).NewPeriod;
+            var products = await _uow.Repository<Product>()
+                .GetByAsync(_ => _.New == true && _.NewUpdatedDate.AddDays(dayCheck) <= DateTime.Now);
+            if (products.Count() == 0)
+                return;
+
+            foreach (var product in products)
+            {
+                product.New = false;
+            }
+            _uow.Repository<Product>().Update(products);
+            await _uow.SaveChangesAsync();
+        }
+
         // private functions
         private async Task addProductOptionValueByProductId(int productId, List<int> optValIds)
         {

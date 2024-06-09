@@ -22,5 +22,6 @@ namespace ECommerce.Application.Services.ProductSrv
         Task<Response<List<string>>> removeUserImages(List<string> fileNames);
         Task<Response<List<string>>> removeSystemImages(List<int?> ids);
         Task<Response<List<string>>> removeSystemImages(List<string> fileNames);
+        Task processUpdateNewProduct();
     }
 }

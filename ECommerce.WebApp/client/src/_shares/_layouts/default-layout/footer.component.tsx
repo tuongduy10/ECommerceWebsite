@@ -48,7 +48,7 @@ const Footer = () => {
                             </div>
                             <div className="footer__info">
                                 <span className="footer__info-title">
-                                    <p>Công ty</p>
+                                    <p>Chính sách</p>
                                 </span>
                                 <ul className="footer__info-list">
                                     {blogs.length > 0 && blogs.filter(_ => _.blogPosition === 2).map((item: any) => (
@@ -89,7 +89,7 @@ const Footer = () => {
                             </div>
                             <div className="footer__info">
                                 <span className="footer__info-title">
-                                    <p>Công ty</p>
+                                    <p>Liên hệ</p>
                                 </span>
                                 <ul className="footer__info-list">
                                     {config ? (<>

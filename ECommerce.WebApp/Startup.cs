@@ -60,6 +60,7 @@ namespace ECommerce.WebApp
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAuthServices();
             services.AddTransientServices();
+            services.AddJobServices();
             services.AddScopedServices();
 
             // In production, the React files will be served from this directory
