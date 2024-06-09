@@ -169,5 +169,11 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [HttpPost("save-size")]
+        public async Task<IActionResult> updateSizeGuide(SizeGuideModel req)
+        {
+            var result = await _inventoryService.saveSizeGuide(req);
+            return Ok(result);
+        }
     }
 }

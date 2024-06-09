@@ -26,6 +26,7 @@ import {
   Attributes,
   OrderList,
   PaymentMethod,
+  Blog,
 } from "src/_pages/admin/components";
 import { PrivateRoute } from "./private-route";
 import { ADMIN_ROUTE_NAME, ROUTE_NAME } from "../_enums/route-config.enum";
@@ -55,6 +56,8 @@ const Router = () => {
         { path: ROUTE_NAME.PAYMENT, element: <PaymentPage /> },
         { path: ROUTE_NAME.BLOG, element: <BlogPage /> },
         { path: ROUTE_NAME.PRODUCT_LIST, element: <ProductListPage /> },
+        { path: ROUTE_NAME.HOT_SALE, element: <ProductListPage /> },
+        { path: ROUTE_NAME.NEW_PRODUCTS, element: <ProductListPage /> },
         { path: ROUTE_NAME.PRODUCT_DETAIL, element: <ProductDetailPage /> },
       ],
     },
@@ -75,8 +78,10 @@ const Router = () => {
         { path: ADMIN_ROUTE_NAME.MANAGE_USER, element: <PrivateRoute><UserList /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_USER_DETAIL, element: <PrivateRoute><UserDetail /></PrivateRoute> },
         { path: ADMIN_ROUTE_NAME.MANAGE_OMS_ORDER_LIST, element: <PrivateRoute><OrderList /></PrivateRoute> },
+        { path: ADMIN_ROUTE_NAME.MANAGE_BLOGS, element: <PrivateRoute><Blog /></PrivateRoute> },
       ],
     },
+    { path: '*', element: <NotFoundLayout /> }
   ]);
 
   return <RouterProvider router={browserRoutes} />;

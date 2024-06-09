@@ -1,23 +1,24 @@
 import { useEffect, useState } from "react";
+import CmsService from "src/_cores/_services/cms.service";
 import CommonService from "src/_cores/_services/common.service";
 import { WebDirectional } from "src/_shares/_components";
 
 const BlogPage = () => {
+  const searchParams = new URLSearchParams(window.location.search);
   const [blogInfo, setBlogInfo] = useState<any>(null);
 
   useEffect(() => {
     getBlog();
   }, []);
 
-  const getBlog = () => {
-    const param = { id: 1, type: 'BLOG' };
-    CommonService.getBlog(param).then(res => {
-      if (res.data) {
-        setBlogInfo(res.data);
+  const getBlog = async () => {
+    const id = searchParams.get('id');
+    if (id) {
+      const res = await CmsService.getBlog(Number(id)) as any;
+      if (res?.isSucceed) {
+        setBlogInfo(res?.data);
       }
-    }).catch(error => {
-      console.log(error);
-    });
+    }
   }
 
   return (
@@ -25,7 +26,7 @@ const BlogPage = () => {
       <div className="content__wrapper products__content-wrapper">
         <div className="content__inner w-full">
           <WebDirectional items={[
-            { path: '/', name: 'BlogTitle' }
+            { path: `/?id=${blogInfo?.blogId}`, name: blogInfo?.blogTitle }
           ]} />
           <div className="blog-content">
             {blogInfo && blogInfo.blogContent ? (

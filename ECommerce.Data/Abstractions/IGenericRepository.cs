@@ -19,7 +19,6 @@ namespace ECommerce.Data.Abstractions
         void Delete(TEntity entity);
         void Delete(IEnumerable<TEntity> entities);
         Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter);
-        Task<TEntity> FindLastAsync();
         Task<TEntity> FindByAsync(
             Expression<Func<TEntity, bool>> filter = null,
             string includeProperties = "");

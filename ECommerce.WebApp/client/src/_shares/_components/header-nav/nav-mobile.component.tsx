@@ -6,6 +6,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { Link } from "react-router-dom";
 import { useCartStore } from "src/_cores/_store/root-store";
+import CmsService from "src/_cores/_services/cms.service";
 
 const HeaderNavMobile = () => {
   const cartStore = useCartStore();
@@ -15,12 +16,21 @@ const HeaderNavMobile = () => {
   const logoRef = useRef<any>(null);
   const footerRef = useRef<any>(null);
   const [menuHeight, setMenuHeight] = useState(0);
+  const [config, setConfig] = useState<any>(null);
 
   useEffect(() => {
     if (wrapperListRef.current && logoRef.current && footerRef.current) {
       setMenuHeight(wrapperListRef.current.clientHeight - logoRef.current.clientHeight - footerRef.current.clientHeight);
     }
+    getConfig();
   }, []);
+
+  const getConfig = async () => {
+    const res = await CmsService.getConfig() as any;
+    if (res?.isSucceed) {
+      setConfig(res?.data);
+    }
+  }
 
   const onToggleNav = () => {
     setIsOpenedNav((toggle) => !toggle);
@@ -90,21 +100,36 @@ const HeaderNavMobile = () => {
                 </button>
               </li>
             </ul>
-            <div className="nav__mobile-info p-4">
-              <p className="pb-[1rem]">
-                <a href="tel: 0906035526">Phone: 0906035526</a>
-              </p>
-              <p className="pb-[1rem]">
-                <a href="mailto: vantuanitc1989@gmail.com">Mail: vantuanitc1989@gmail.com</a>
-              </p>
-              {FOOTER_MENU_COL_3.map((item: any, _idx: number) => (
-                <p key={`footer-col-3-${item.path}`} className={`${_idx !== FOOTER_MENU_COL_3.length - 1 ? 'pb-[1rem]' : ''}`}>
-                  <a href={item.path} className="flex items-center">
-                    <MuiIcon name={item.icon} className='mr-3' fontSize="small" /> {item.name}
+            {config && (
+              <div className="nav__mobile-info p-4">
+                <p className="pb-[1rem]">
+                  <a href={`tel: ${config?.phoneNumber || ""}`}>Phone: {config?.phoneNumber || ""}</a>
+                </p>
+                <p className="pb-[1rem]">
+                  <a href={`mailto: ${config?.mail || ""}`}>Mail: {config?.mail || ""}</a>
+                </p>
+                <p className={`pb-[1rem]`}>
+                  <a href={`${config.facebookUrl}`} className="flex items-center">
+                    <MuiIcon name={ICON_NAME.ROUNDED.FACEBOOK} className='mr-3' fontSize="small" /> Facebook
                   </a>
                 </p>
-              ))}
-            </div>
+                <p className={`pb-[1rem]`}>
+                  <a href={`${config.youtubeUrl}`} className="flex items-center">
+                    <MuiIcon name={ICON_NAME.YOUTUBE} className='mr-3' fontSize="small" /> Youtube
+                  </a>
+                </p>
+                <p className={`pb-[1rem]`}>
+                  <a href={`${config.instagramUrl}`} className="flex items-center">
+                    <MuiIcon name={ICON_NAME.INSTAGRAM} className='mr-3' fontSize="small" /> Instagram
+                  </a>
+                </p>
+                <p>
+                  <a href={`${config.facebookUrl}`} className="flex items-center">
+                    <MuiIcon name={ICON_NAME.MESSENGER} className='mr-3' fontSize="small" /> Messenger
+                  </a>
+                </p>
+              </div>
+            )}
           </div >
         </div >
         <div className="nav__mobile-action flex justify-between py-2">

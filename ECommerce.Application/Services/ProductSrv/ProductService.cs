@@ -42,20 +42,17 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
         private readonly IRepositoryBase<Rate> _rateRepo;
         private readonly IRepositoryBase<Discount> _discountRepo;
-        private readonly IInventoryService _inventoryService;
         private readonly IRateService _rateService;
         private readonly ICommonService _commonService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _uow;
         public ProductService(ECommerceContext DbContext,
-            IInventoryService inventoryService,
             IRateService rateService,
             ICommonService commonService,
             IWebHostEnvironment webHostEnvironment,
             IUnitOfWork uow)
         {
             _DbContext = DbContext;
-            _inventoryService = inventoryService;
             _rateService = rateService;
             _commonService = commonService;
             _webHostEnvironment = webHostEnvironment;
@@ -234,6 +231,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pageindex = request.PageIndex;
                 int pagesize = request.PageSize;
                 string orderBy = request.orderBy;
+                string filterBy = request.filterBy;
                 if (request.id > -1)
                     request.ids.Add(request.id);
                 List<int> ids = request.ids;
@@ -247,8 +245,10 @@ namespace ECommerce.Application.Services.ProductSrv
 
                 Func<IQueryable<Product>, IOrderedQueryable<Product>> orderByReq = _ => _.OrderByDescending(i => i.ProductAddedDate);
                 if (orderBy == "asc")
+                    orderByReq = _ => _.OrderBy(i => i.ProductAddedDate);
+                if (orderBy == "asc" && filterBy == "price")
                     orderByReq = _ => _.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
-                if (orderBy == "desc")
+                if (orderBy == "desc" && filterBy == "price")
                     orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
 
                 var extQuery = _uow.Repository<Product>().QueryableAsync(
@@ -257,8 +257,8 @@ namespace ECommerce.Application.Services.ProductSrv
                         (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
                         (brandId == -1 || _.BrandId == brandId) &&
                         (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
-                        (orderBy != "newest" || _.New == true) &&
-                        (orderBy != "discount" || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
+                        (request.isNew == false || _.New == true) &&
+                        (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
                     orderByReq, 
                     "Brand");
 
@@ -453,10 +453,9 @@ namespace ECommerce.Application.Services.ProductSrv
                  */
                 var product = await _uow.Repository<Product>().FindByAsync(_ => _.ProductId == request.id);
                 if (product == null)
-                    product = new Data.Entities.ProductSchema.Product();
+                    product = new Product();
                 product.ProductCode = request.code.Trim();
                 product.ProductName = request.name.Trim(); // required
-                product.Ppc = await getNewPPC();
                 product.ProductDescription = request.description ?? null;
                 product.SizeGuide = request.sizeGuide ?? null;
                 product.Note = string.IsNullOrEmpty(request.note) ? "" : request.note.Trim();
@@ -498,10 +497,13 @@ namespace ECommerce.Application.Services.ProductSrv
                         : (request.pricePreOrder - request.priceImport);
                 if (request.id > -1)
                 {
+                    if (request.isNew == true)
+                        product.NewUpdatedDate = DateTime.Now;
                     _uow.Repository<Product>().Update(product);
                 } 
                 else
                 {
+                    product.Ppc = await getNewPPC();
                     await _uow.Repository<Product>().AddAsync(product);
                 }
                 await _uow.SaveChangesAsync();
@@ -822,6 +824,22 @@ namespace ECommerce.Application.Services.ProductSrv
                 return new FailResponse<List<string>>(error.Message);
             }
         }
+        public async Task processUpdateNewProduct()
+        {
+            int dayCheck = (await _uow.Repository<ProductSetting>().FindByAsync()).NewPeriod;
+            var products = await _uow.Repository<Product>()
+                .GetByAsync(_ => _.New == true && _.NewUpdatedDate.AddDays(dayCheck) <= DateTime.Now);
+            if (products.Count() == 0)
+                return;
+
+            foreach (var product in products)
+            {
+                product.New = false;
+            }
+            _uow.Repository<Product>().Update(products);
+            await _uow.SaveChangesAsync();
+        }
+
         // private functions
         private async Task addProductOptionValueByProductId(int productId, List<int> optValIds)
         {
@@ -842,7 +860,8 @@ namespace ECommerce.Application.Services.ProductSrv
         private async Task<string> getNewPPC()
         {
             var newestId = (await _uow.Repository<Product>()
-                .FindLastAsync()).ProductId;
+                .GetByAsync(null, _ => _.OrderByDescending(p => p.ProductId)))
+                .FirstOrDefault()?.ProductId;
 
             byte[] buffer = Guid.NewGuid().ToByteArray();
             string guid = BitConverter.ToUInt32(buffer, 8).ToString();

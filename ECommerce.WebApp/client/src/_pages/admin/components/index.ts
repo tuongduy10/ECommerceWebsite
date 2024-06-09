@@ -10,3 +10,4 @@ export { default as UserDetail } from "./user/user-detail";
 export { default as Attributes } from "./inventory/attributes";
 export { default as Options } from "./inventory/options";
 export { default as OrderList } from "./oms/order-list";
+export { default as Blog } from './cms/blog';

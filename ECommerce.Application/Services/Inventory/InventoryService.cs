@@ -249,6 +249,7 @@ namespace ECommerce.Application.Services.Inventory
                                 name = sa.Attribute.AttributeName
                             })
                             .ToList(),
+                        
                         sizeGuide = subc.SizeGuide != null 
                             ? new SizeGuideModel
                             {
@@ -733,6 +734,38 @@ namespace ECommerce.Application.Services.Inventory
             {
                 return new FailResponse<List<SizeGuideModel>>(error.Message);
             }
+        }
+        public async Task<Response<bool>> saveSizeGuide(SizeGuideModel request)
+        {
+            bool isUpading = request.id > -1;
+            if (isUpading)
+            {
+                var ent = await _uow.Repository<SizeGuide>().GetByIdAsync(request.id);
+                if (ent != null)
+                {
+                    ent.SizeContent = request.content;
+                    _uow.Repository<SizeGuide>().Update(ent);
+                }
+                await _uow.SaveChangesAsync();
+            }
+            else
+            {
+                var newEnt = new SizeGuide
+                {
+                    SizeContent = request.content
+                };
+                await _uow.Repository<SizeGuide>().AddAsync(newEnt);
+                await _uow.SaveChangesAsync();
+                
+                var sub = await _uow.Repository<SubCategory>().GetByIdAsync(request.subCategoryId);
+                if (sub != null)
+                {
+                    sub.SizeGuideId = newEnt.SizeGuideId;
+                }
+                _uow.Repository<SubCategory>().Update(sub);
+                await _uow.SaveChangesAsync();
+            }
+            return new SuccessResponse<bool>();
         }
     }
 }

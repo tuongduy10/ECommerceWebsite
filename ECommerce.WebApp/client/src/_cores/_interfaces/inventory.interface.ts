@@ -37,6 +37,7 @@ export interface ISubCategory {
   category?: ICategory;
   optionList?: IOption[];
   attributes?: IAttribute[];
+  sizeGuide?: any | null;
 }
 
 export interface IAttribute {

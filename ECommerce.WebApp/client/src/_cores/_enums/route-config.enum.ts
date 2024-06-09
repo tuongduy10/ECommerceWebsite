@@ -3,6 +3,8 @@ export const ROUTE_NAME = {
     HOME: ROUTE_PREFIX + '/',
     LOGIN: ROUTE_PREFIX + '/login',
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
+    HOT_SALE: ROUTE_PREFIX + '/hot-sale',
+    NEW_PRODUCTS: ROUTE_PREFIX + '/new-products',
     PRODUCT_DETAIL: ROUTE_PREFIX + '/product-detail',
     EXAMPLE: ROUTE_PREFIX + '/example',
     
@@ -42,5 +44,7 @@ export const ADMIN_ROUTE_NAME = {
     MANAGE_USERS: ADMIN_ROUTE_PREFIX + '/manage-users',
     MANAGE_STATISTICAL: ADMIN_ROUTE_PREFIX + '/manage-statistical',
 
-    MANAGE_OMS_ORDER_LIST: ADMIN_ROUTE_PREFIX + '/manage-oms/order-list'
+    MANAGE_OMS_ORDER_LIST: ADMIN_ROUTE_PREFIX + '/manage-oms/order-list',
+
+    MANAGE_BLOGS: ADMIN_ROUTE_PREFIX + '/manage-blogs',
 }

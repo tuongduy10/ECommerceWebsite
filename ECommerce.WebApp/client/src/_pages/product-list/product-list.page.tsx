@@ -9,14 +9,21 @@ import { setParam, setProductList, setSubCategories } from "src/_cores/_reducers
 import InventoryService from "src/_cores/_services/inventory.service";
 import { IOption, IOptionValue, ISubCategory } from "src/_cores/_interfaces/inventory.interface";
 import { setSelectedBrand } from "src/_cores/_reducers/home.reducer";
+import { useLocation, useSearchParams } from "react-router-dom";
 
 const ProductListPage = () => {
+  const location = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
-  const _pageIndex = Number(searchParams.get('pageIndex'));
+  const _pageIndex = Number(searchParams.get('pageIndex')) || 1;
   const _brandId = Number(searchParams.get('brandId')) || -1;
-  const _orderBy = searchParams.get('orderBy');
+  const _orderBy = searchParams.get('orderBy') || "desc";
+  const _filterBy = searchParams.get('filterBy') || "";
   const _subCategoryId = Number(searchParams.get('subCategoryId')) || -1;
   const _optionValueIds = searchParams.get('optionValueIds');
+
+  const isHotSalePathName = location.pathname === '/hot-sale';
+  const isNewPathName = location.pathname === '/new-products';
+  const isFullGrid = isHotSalePathName || isNewPathName;
 
   const productStore = useProductStore();
   const homeStore = useHomeStore();
@@ -26,11 +33,39 @@ const ProductListPage = () => {
     const params = {
       pageIndex: _pageIndex,
       brandId: _brandId,
-      orderBy: _orderBy ?? '',
+      orderBy: _orderBy,
+      filterBy: _filterBy,
+      isNew: isNewPathName || _filterBy === "newest",
+      isHotSale: isHotSalePathName || _filterBy === "discount",
       subCategoryId: _subCategoryId,
       optionValueIds: _optionValueIds ? _optionValueIds.split(',').map(id => Number(id)) : [],
     }
     getData(params);
+  }, [_pageIndex, _orderBy, _subCategoryId, _optionValueIds, location]);
+
+  useEffect(() => {
+    getSubCategories({ brandId: _brandId });
+    checkAndGetBrands();
+  }, [_brandId])
+
+  const direactItem = () => {
+    let name = homeStore.selectedBrand?.name ?? '';
+    let path = `?pageIndex=${_pageIndex}&brandId=${homeStore.selectedBrand?.id}`;
+    if (isHotSalePathName) {
+      name = 'Hot sale';
+      path = '/hot-sale'
+    }
+    if (isNewPathName) {
+      name = 'Sản phẩm mới';
+      path = 'new-products';
+    }
+    return {
+      name: name,
+      path: path
+    }
+  }
+
+  const checkAndGetBrands = () => {
     if (!homeStore.selectedBrand) {
       async function getBrand() {
         const res = await InventoryService.getBrand(_brandId) as any;
@@ -38,33 +73,29 @@ const ProductListPage = () => {
           dispatch(setSelectedBrand(res.data));
         }
       }
-      getBrand();
+      if (_brandId > -1) {
+        getBrand();
+      }
     }
-  }, [_pageIndex, _orderBy, _subCategoryId, _optionValueIds]);
-
-  useEffect(() => {
-    getSubCategories({ brandId: _brandId });
-  }, [_brandId])
+  }
 
   const getData = (params: any) => {
-    if (_pageIndex > 0 && _brandId > -1) {
-      ProductService.getProductList(params).then((res: any) => {
-        if (res.data) {
-          const _data = res.data;
-          const param = {
-            ...productStore.param,
-            pageIndex: _data.currentPage,
-            totalPage: _data.totalPage,
-            currentRecord: _data.currentRecord,
-            totalRecord: _data.totalRecord,
-          }
-          dispatch(setParam(param));
-          dispatch(setProductList(_data.items));
+    ProductService.getProductList(params).then((res: any) => {
+      if (res.data) {
+        const _data = res.data;
+        const param = {
+          ...productStore.param,
+          pageIndex: _data.currentPage,
+          totalPage: _data.totalPage,
+          currentRecord: _data.currentRecord,
+          totalRecord: _data.totalRecord,
         }
-      }).catch((error: any) => {
-        console.log(error);
-      });
-    }
+        dispatch(setParam(param));
+        dispatch(setProductList(_data.items));
+      }
+    }).catch((error: any) => {
+      console.log(error);
+    });
   }
 
   const getSubCategories = (params: { brandId: number }) => {
@@ -89,16 +120,20 @@ const ProductListPage = () => {
       <div className="content__wrapper products__content-wrapper">
         <div className="content__inner w-full">
           <WebDirectional items={[
-            { name: homeStore.selectedBrand?.name ?? '', path: `?pageIndex=${_pageIndex}&brandId=${homeStore.selectedBrand?.id}` }
+            direactItem()
           ]} />
           <div className="products__content flex justify-center">
-            <div className="hidden md:block">
-              <ProlCategory />
-            </div>
-            <div className="products__list ">
+            {!isFullGrid && (
+              <div className="hidden md:block">
+                <ProlCategory />
+              </div>
+            )}
+            <div className={`products__list ${isFullGrid ? 'w-full' : ''}`}>
               <div className="filter__control-top">
                 <ProlFilter />
-                <ProlCategoryMb />
+                {!isFullGrid && (
+                  <ProlCategoryMb />
+                )}
                 <ProlPagination />
               </div>
               <div className="product__grid-wrapper">
@@ -106,7 +141,7 @@ const ProductListPage = () => {
                   <p className="product__grid-title text-center">Tất cả sản phẩm</p>
                   <div className="product__grid-inner w-full flex flex-wrap">
                     {productStore.productList.map((product: any) => (
-                      <ProductItem key={product.id} grid={3} data={product} />
+                      <ProductItem key={product.id} grid={isFullGrid ? 4 : 3} data={product} />
                     ))}
                   </div>
                 </>) : (

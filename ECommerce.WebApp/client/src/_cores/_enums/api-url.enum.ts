@@ -46,6 +46,8 @@ export const INVENTORY_API_URL = {
     UPDATE_SUB_CATEGORY: '/inventory/update-sub-category',
     ADD_SUB_CATEGORY: '/inventory/add-sub-category',
     SUB_CATEGORIES: '/inventory/sub-categories',
+
+    SAVE_SIZE: '/inventory/save-size',
 }
 
 export const SALES_API_URL = {
