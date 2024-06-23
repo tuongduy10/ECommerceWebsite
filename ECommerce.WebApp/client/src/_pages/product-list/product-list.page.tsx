@@ -10,6 +10,7 @@ import InventoryService from "src/_cores/_services/inventory.service";
 import { IOption, IOptionValue, ISubCategory } from "src/_cores/_interfaces/inventory.interface";
 import { setSelectedBrand } from "src/_cores/_reducers/home.reducer";
 import { useLocation, useSearchParams } from "react-router-dom";
+import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 
 const ProductListPage = () => {
   const location = useLocation();
@@ -21,9 +22,11 @@ const ProductListPage = () => {
   const _subCategoryId = Number(searchParams.get('subCategoryId')) || -1;
   const _optionValueIds = searchParams.get('optionValueIds');
 
-  const isHotSalePathName = location.pathname === '/hot-sale';
-  const isNewPathName = location.pathname === '/new-products';
-  const isFullGrid = isHotSalePathName || isNewPathName;
+  const isHotSalePathName = location.pathname === ROUTE_NAME.HOT_SALE;
+  const isNewPathName = location.pathname === ROUTE_NAME.NEW_PRODUCTS;
+  const isAvailable = location.pathname === ROUTE_NAME.AVAILABLE_PRODUCTS;
+  const isPreOrder = location.pathname === ROUTE_NAME.PREORDER_PRODUCTS;
+  const isFullGrid = isHotSalePathName || isNewPathName || isAvailable || isPreOrder;
 
   const productStore = useProductStore();
   const homeStore = useHomeStore();
@@ -37,6 +40,8 @@ const ProductListPage = () => {
       filterBy: _filterBy,
       isNew: isNewPathName || _filterBy === "newest",
       isHotSale: isHotSalePathName || _filterBy === "discount",
+      isAvailable: isAvailable,
+      isPreOrder: isPreOrder,
       subCategoryId: _subCategoryId,
       optionValueIds: _optionValueIds ? _optionValueIds.split(',').map(id => Number(id)) : [],
     }
@@ -53,11 +58,19 @@ const ProductListPage = () => {
     let path = `?pageIndex=${_pageIndex}&brandId=${homeStore.selectedBrand?.id}`;
     if (isHotSalePathName) {
       name = 'Hot sale';
-      path = '/hot-sale'
+      path = ROUTE_NAME.HOT_SALE
     }
     if (isNewPathName) {
       name = 'Sản phẩm mới';
-      path = 'new-products';
+      path = ROUTE_NAME.NEW_PRODUCTS;
+    }
+    if (isAvailable) {
+      name = 'Hàng có sẵn';
+      path = ROUTE_NAME.AVAILABLE_PRODUCTS;
+    }
+    if (isPreOrder) {
+      name = 'Hàng đặt trước';
+      path = ROUTE_NAME.PREORDER_PRODUCTS;
     }
     return {
       name: name,

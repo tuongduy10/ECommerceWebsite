@@ -54,6 +54,11 @@ const mainListItems = [
                 label: 'Thêm sản phẩm',
                 path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_ADD,
             },
+            {
+                name: 'settings',
+                label: 'Cài đặt',
+                path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_SETTINGS,
+            },
         ]
     },
     {

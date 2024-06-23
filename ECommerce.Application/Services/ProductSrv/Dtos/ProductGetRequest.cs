@@ -18,6 +18,8 @@ namespace ECommerce.Application.Services.ProductSrv.Dtos
         public string filterBy { get; set; } = ""; // price, newest, discount, ...
         public bool isHotSale { get; set; } = false;
         public bool isNew { get; set; } = false;
+        public bool isAvailable { get; set; } = false;
+        public bool isPreOrder { get; set; } = false;
         public List<int> optionValueIds { get; set; }
         public string getBy { get; set; }
 

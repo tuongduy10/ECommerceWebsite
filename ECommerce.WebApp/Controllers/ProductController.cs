@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ECommerce.Utilities.Shared.Responses;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -130,6 +131,16 @@ namespace ECommerce.WebApp.Controllers
                 return Ok(new SuccessResponse<bool>());
             }
             return BadRequest(new FailResponse<bool>(result.Message));
+        }
+        [HttpGet("settings")]
+        public async Task<IActionResult> getSettings()
+        {
+            return Ok(await _productService.getSettings());
+        }
+        [HttpPost("update-setting")]
+        public async Task<IActionResult> updateSetting(ProductSetting request)
+        {
+            return Ok(await _productService.updateSetting(request));
         }
     }
 }

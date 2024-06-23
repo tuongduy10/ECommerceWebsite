@@ -25,4 +25,12 @@ export default class ProductService {
   public static save(params: any) {
     return api.post(PRODUCT_API_URL.SAVE, params);
   }
+
+  public static getSettings() {
+    return api.get(PRODUCT_API_URL.GET_SETTINGS);
+  }
+
+  public static updateSettings(param: any) {
+    return api.post(PRODUCT_API_URL.UPDATE_SETTING, param)
+  }
 }
