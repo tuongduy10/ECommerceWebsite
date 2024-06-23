@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Services.ProductSrv.Dtos;
+using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Utilities.Shared.Responses;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,7 @@ namespace ECommerce.Application.Services.ProductSrv
         Task<Response<List<string>>> removeSystemImages(List<int?> ids);
         Task<Response<List<string>>> removeSystemImages(List<string> fileNames);
         Task processUpdateNewProduct();
+        Task<Response<ProductSetting>> getSettings();
+        Task<Response<ProductSetting>> updateSetting(ProductSetting request);
     }
 }

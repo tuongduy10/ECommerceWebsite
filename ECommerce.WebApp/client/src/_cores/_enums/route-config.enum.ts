@@ -3,8 +3,11 @@ export const ROUTE_NAME = {
     HOME: ROUTE_PREFIX + '/',
     LOGIN: ROUTE_PREFIX + '/login',
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
+    AVAILABLE_PRODUCTS: ROUTE_PREFIX + '/available-products',
+    PREORDER_PRODUCTS: ROUTE_PREFIX + '/preorder-products',
     HOT_SALE: ROUTE_PREFIX + '/hot-sale',
     NEW_PRODUCTS: ROUTE_PREFIX + '/new-products',
+    BRANDS: ROUTE_PREFIX + '/brands',
     PRODUCT_DETAIL: ROUTE_PREFIX + '/product-detail',
     EXAMPLE: ROUTE_PREFIX + '/example',
     
@@ -25,6 +28,7 @@ export const ADMIN_ROUTE_NAME = {
     MANAGE_PRODUCT: ADMIN_ROUTE_PREFIX + '/manage-product',
     MANAGE_PRODUCT_ADD: ADMIN_ROUTE_PREFIX + '/manage-product/add',
     MANAGE_PRODUCT_DETAIL: ADMIN_ROUTE_PREFIX + '/manage-product/detail',
+    MANAGE_PRODUCT_SETTINGS: ADMIN_ROUTE_PREFIX + '/manage-product/settings',
 
     MANAGE_USER: ADMIN_ROUTE_PREFIX + '/manage-user',
     MANAGE_USER_ADD: ADMIN_ROUTE_PREFIX + '/manage-user/add',

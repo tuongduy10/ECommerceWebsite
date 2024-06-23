@@ -25,6 +25,7 @@ const Banner = () => {
       '/product-detail',
       '/cart',
       '/login',
+      '/brands',
     ];
     if (hiddenPath.includes(location.pathname)) {
       setHideBanner(true);

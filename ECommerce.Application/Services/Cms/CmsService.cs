@@ -32,7 +32,7 @@ namespace ECommerce.Application.Services.Cms
         }
         public async Task<Response<Blog>> GetBlog(int id)
         {
-            var blog = (await _uow.Repository<Blog>().GetByAsync(_ => _.Status == 1 && _.BlogId == id)).FirstOrDefault();
+            var blog = (await _uow.Repository<Blog>().GetByAsync(_ => _.BlogId == id)).FirstOrDefault();
             return new SuccessResponse<Blog>(blog);
         }
         public async Task<Response<IEnumerable<Blog>>> GetBlogs()

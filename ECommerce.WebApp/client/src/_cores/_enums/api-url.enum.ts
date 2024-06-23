@@ -30,6 +30,9 @@ export const PRODUCT_API_URL = {
     UPDATE_STATUS: '/product/update-status',
     DELETE: '/product/delete',
     SAVE: '/product/save',
+
+    GET_SETTINGS: '/product/settings',
+    UPDATE_SETTING: '/product/update-setting',
 }
 
 export const INVENTORY_API_URL = {

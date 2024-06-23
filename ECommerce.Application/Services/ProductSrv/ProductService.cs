@@ -23,6 +23,7 @@ using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Abstractions;
 using ECommerce.Utilities.Shared.Responses;
+using ECommerce.Application.Services.UserSrv;
 
 namespace ECommerce.Application.Services.ProductSrv
 {
@@ -46,15 +47,18 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly ICommonService _commonService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _uow;
+        private readonly IUserService _userService;
         public ProductService(ECommerceContext DbContext,
             IRateService rateService,
             ICommonService commonService,
+            IUserService userService,
             IWebHostEnvironment webHostEnvironment,
             IUnitOfWork uow)
         {
             _DbContext = DbContext;
             _rateService = rateService;
             _commonService = commonService;
+            _userService = userService;
             _webHostEnvironment = webHostEnvironment;
             if (_brandCategoryRepo == null)
                 _brandCategoryRepo = new RepositoryBase<BrandCategory>(_DbContext);
@@ -251,16 +255,19 @@ namespace ECommerce.Application.Services.ProductSrv
                 if (orderBy == "desc" && filterBy == "price")
                     orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
 
-                var extQuery = _uow.Repository<Product>().QueryableAsync(
-                    _ => _.Status == (byte)ProductStatusEnum.Available &&
-                        (ids.Count == 0 || ids.Contains(_.ProductId)) &&
-                        (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId)) &&
-                        (brandId == -1 || _.BrandId == brandId) &&
-                        (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
-                        (request.isNew == false || _.New == true) &&
-                        (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null), 
-                    orderByReq, 
-                    "Brand");
+                var extQuery = _uow.Repository<Product>()
+                    .QueryableAsync(
+                        _ => _.Status == (byte)ProductStatusEnum.Available
+                            && (ids.Count == 0 || ids.Contains(_.ProductId))
+                            && (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId))
+                            && (brandId == -1 || _.BrandId == brandId)
+                            && (subCategoryId == -1 || _.SubCategoryId == subCategoryId)
+                            && (request.isNew == false || _.New == true)
+                            && (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null)
+                            && (request.isAvailable == false || (_.PricePreOrder == null && _.DiscountPreOrder == null))
+                            && (request.isPreOrder == false || (_.PriceAvailable == null && _.DiscountAvailable == null))
+                        , orderByReq 
+                        , "Brand");
 
                 var list = extQuery.Select(i => new ProductModel()
                 {
@@ -839,7 +846,25 @@ namespace ECommerce.Application.Services.ProductSrv
             _uow.Repository<Product>().Update(products);
             await _uow.SaveChangesAsync();
         }
-
+        public async Task<Response<ProductSetting>> getSettings()
+        {
+            var data = await _uow.Repository<ProductSetting>().QueryableAsync(_ => _.IsDeleted != true).FirstOrDefaultAsync();
+            return new SuccessResponse<ProductSetting>(data);
+        }
+        public async Task<Response<ProductSetting>> updateSetting(ProductSetting request)
+        {
+            var ent = await _uow.Repository<ProductSetting>().FindByAsync(_ => _.Id  == request.Id);
+            if (ent != null)
+            {
+                ent.NewPeriod = request.NewPeriod;
+                ent.UpdatedDate = DateTime.Now;
+                ent.UpdatedBy = _userService.getCurrentUserName();
+                _uow.Repository<ProductSetting>().Update(ent);
+                await _uow.SaveChangesAsync();
+                return new SuccessResponse<ProductSetting>(ent);
+            }
+            return new SuccessResponse<ProductSetting>();
+        }
         // private functions
         private async Task addProductOptionValueByProductId(int productId, List<int> optValIds)
         {
