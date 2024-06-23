@@ -73,4 +73,8 @@ export default class InventoryService {
   public static saveSizeGuide(params: any) {
     return api.post(INVENTORY_API_URL.SAVE_SIZE, params);
   }
+
+  public static deleteAttribute(id: number) {
+    return api.post(INVENTORY_API_URL.DELETE_ATTRIBUTE, id);
+  }
 }

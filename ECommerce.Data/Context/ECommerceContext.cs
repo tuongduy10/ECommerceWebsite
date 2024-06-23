@@ -13,6 +13,7 @@ using ECommerce.Data.Configurations;
 using ECommerce.Data.Configurations.UserSchema;
 using ECommerce.Data.Configurations.OmsSchema;
 using ECommerce.Data.Entities;
+using ECommerce.Data.Configurations.InventorySchema;
 
 #nullable disable
 
@@ -88,12 +89,7 @@ namespace ECommerce.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Entities.Inventory.Attribute>(entity =>
-            {
-                entity.ToTable("Attribute");
-
-                entity.Property(e => e.AttributeName).HasMaxLength(50);
-            });
+            modelBuilder.ApplyConfiguration(new AttributeConfiguration());
 
             modelBuilder.Entity<Bank>(entity =>
             {
@@ -297,14 +293,7 @@ namespace ECommerce.Data.Context
                 entity.Property(e => e.AccessDate).HasColumnType("datetime");
             });
 
-            modelBuilder.Entity<Option>(entity =>
-            {
-                entity.ToTable("Option");
-
-                entity.Property(e => e.OptionName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-            });
+            modelBuilder.ApplyConfiguration(new OptionConfiguration());
 
             modelBuilder.Entity<OptionValue>(entity =>
             {
@@ -639,25 +628,7 @@ namespace ECommerce.Data.Context
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SubCategory>(entity =>
-            {
-                entity.ToTable("SubCategory");
-
-                entity.Property(e => e.SubCategoryName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.HasOne(d => d.Category)
-                    .WithMany(p => p.SubCategories)
-                    .HasForeignKey(d => d.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_SubCategory_Category");
-
-                entity.HasOne(d => d.SizeGuide)
-                    .WithMany(p => p.SubCategories)
-                    .HasForeignKey(d => d.SizeGuideId)
-                    .HasConstraintName("FK_SubCategory_SizeGuide");
-            });
+            modelBuilder.ApplyConfiguration(new SubCategoryConfiguration());
 
             modelBuilder.Entity<SubCategoryAttribute>(entity =>
             {

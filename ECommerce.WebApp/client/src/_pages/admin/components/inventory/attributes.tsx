@@ -9,6 +9,8 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
 import { GlobalConfig } from "src/_configs/global.config";
+import { showSuccess } from "src/_cores/_reducers/alert.reducer";
+import { useDispatch } from "react-redux";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -28,6 +30,7 @@ type TableRowProps = {
 }
 
 function Row(props: TableRowProps) {
+    const dispatch = useDispatch();
     const { rowData, isSelected, onUpdateStatus, onDelete, onSelected, onViewDetail } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
@@ -115,6 +118,7 @@ function Row(props: TableRowProps) {
 }
 
 export default function Attributes() {
+    const dispatch = useDispatch();
     const [params, setParams] = useState<any>({
         keyword: "",
         pageIndex: 1,
@@ -185,11 +189,12 @@ export default function Attributes() {
         }
     }
 
-    const deleteCategory = (id?: number) => {
-        const _params = {
-            ids: selectedItems.length > 0 ? selectedItems : [id ?? -1]
+    const deleteItem = async (id: number) => {
+        const res = await InventoryService.deleteAttribute(id) as any;
+        if (res?.isSucceed) {
+            dispatch(showSuccess("Xóa thành công"));
+            search();
         }
-
     }
 
     const selectCategory = (id: number) => {
@@ -280,7 +285,7 @@ export default function Attributes() {
                                 rowData={item}
                                 isSelected={selectedItems.includes(item.id)}
                                 onUpdateStatus={(id, status) => updateStatus(id, status)}
-                                onDelete={(id) => deleteCategory(id)}
+                                onDelete={(id) => deleteItem(id)}
                                 onSelected={(id) => selectCategory(id)}
                                 onViewDetail={(id) => viewDetail(id)}
                             />

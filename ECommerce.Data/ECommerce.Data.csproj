@@ -29,4 +29,8 @@
     <ProjectReference Include="..\ECommerce.Utilities\ECommerce.Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Configurations\ProductSchema\" />
+  </ItemGroup>
+
 </Project>
