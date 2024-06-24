@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { SLICE_NAME } from "../_enums/state.enum";
 import { ICartInitState } from "../_interfaces/state.interface";
 import {
@@ -7,6 +7,8 @@ import {
 } from "../_interfaces/product.interface";
 import { CartHelper } from "src/_shares/_helpers/cart.helper";
 import { sumBy } from "lodash";
+import ProductService from "../_services/product.service";
+import { IOption } from "../_interfaces/inventory.interface";
 
 const initialState: ICartInitState = {
   productsInCart: [],
@@ -14,10 +16,26 @@ const initialState: ICartInitState = {
   totalPrice: 0,
 };
 
+export const updateProductPrice = createAsyncThunk(
+  'data/updateProductPrice',
+  async (ids: number[]) => {
+    const _params = {
+      ids: ids
+    };
+    const response = await ProductService.getProductList(_params);
+    return response.data?.items;
+  }
+);
+
 const cartSlice = createSlice({
   name: SLICE_NAME.CART,
   initialState: initialState,
   reducers: {
+    clearCart: (state) => {
+      state.totalPrice = 0;
+      state.totalQty = 0;
+      state.productsInCart = [];
+    },
     addToCart: (state, action: PayloadAction<INewProductInCart>) => {
       const _product = action.payload;
       const _uniqId = CartHelper.getUniqId(_product);
@@ -65,9 +83,32 @@ const cartSlice = createSlice({
       }
     }
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(updateProductPrice.fulfilled, (state, action) => {
+        const products = action.payload;
+        state.productsInCart.forEach(_product => {
+          const idx = products.findIndex((_: any) => _.id === _product.id);
+          if (idx > -1) {
+            if (_product.priceType === 'AVAILABLE') {
+              _product.price = products[idx].priceAvailable;
+              _product.discount = products[idx].discountAvailable;
+            }
+            if (_product.priceType === 'PREORDER') {
+              _product.price = products[idx].pricePreOrder;
+              _product.discount = products[idx].discountPreOrder;
+            }
+          }
+        });
+        state.totalPrice = sumBy(
+          state.productsInCart,
+          (_) => (_.discount ?? _.price) * _.qty
+        );
+      })
+  }
 });
 
-export const { addToCart, removeItem, changeItemQty } = cartSlice.actions;
+export const { addToCart, removeItem, changeItemQty, clearCart } = cartSlice.actions;
 
 const cartReducer = cartSlice.reducer;
 export default cartReducer;

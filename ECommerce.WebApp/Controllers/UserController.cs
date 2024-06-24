@@ -1,8 +1,7 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.User.Dtos;
 using ECommerce.Application.BaseServices.User;
-using ECommerce.Application.Services.User;
-using ECommerce.WebApp.Configs.AppSettings;
+using ECommerce.Application.Services.UserSrv;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,8 +15,11 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using ECommerce.WebApp.Utils;
-using ECommerce.Application.Services.User.Dtos;
-using UserUpdateRequest = ECommerce.Application.Services.User.Dtos.UserUpdateRequest;
+using ECommerce.Application.Services.UserSrv.Dtos;
+using UserUpdateRequest = ECommerce.Application.Services.UserSrv.Dtos.UserUpdateRequest;
+using ECommerce.Utilities.Helpers;
+using ECommerce.Utilities.AppSettings;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -48,35 +50,25 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [HttpPost("login")]
         [AllowAnonymous]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(SignInRequest request)
         {
             var result = await _userService.ValidateUser(request);
             if (!result.isSucceed)
-            {
                 return BadRequest(result);
-            }
-
-            return Ok(new SuccessResponse<string>
-            {
-                Status = "success",
-                isSucceed = result.isSucceed,
-                Message = result.Message,
-                Data = GenerateToken(result.Data)
-            });
+            return Ok(result);
         }
         [HttpPost("info")]
         public async Task<IActionResult> UserInfo()
         {
             try
             {
-                var token = _contextHelper.getAccessToken();
+                var token = _userService.getAccessToken();
                 if (string.IsNullOrEmpty(token))
                     return Unauthorized();
 
-                var userClaims = this.DecodeToken(token).Claims;
-                int id = Int32.Parse(userClaims.FirstOrDefault(claim => claim.Type == "id").Value);
+                int id = _userService.getCurrentUserId();
                 var result = await _userService.GetUser(id);
                 if (!result.isSucceed)
                     return BadRequest(result);
@@ -119,39 +111,11 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        
-        private string GenerateToken(UserModel user)
+        [HttpPost("update-username")]
+        public async Task<IActionResult> updateUserName()
         {
-            var jwtTokenHandler = new JwtSecurityTokenHandler();
-            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
-            var description = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("id", user.id.ToString()),
-                    new Claim("tokenId", Guid.NewGuid().ToString()),
-                    new Claim("fullName", user.fullName),
-                    new Claim("phone", user.phone),
-                }),
-                Expires = DateTime.UtcNow.AddHours(4),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var createToken = jwtTokenHandler.CreateToken(description);
-            var writeToken = jwtTokenHandler.WriteToken(createToken);
-
-            return writeToken;
-        }
-        private ClaimsPrincipal DecodeToken(string token)
-        {
-            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
-            var jwtTokenHandler = new JwtSecurityTokenHandler()
-                .ValidateToken(token, new TokenValidationParameters()
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                }, out SecurityToken secToken);
-            return jwtTokenHandler;
+            await _userService.updateUserName();
+            return Ok();
         }
     }
 }

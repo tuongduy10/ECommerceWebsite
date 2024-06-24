@@ -26,7 +26,6 @@ import { GlobalConfig } from "src/_configs/global.config";
 import { ENV } from "src/_configs/enviroment.config";
 import { PRODUCT_STATUS } from "src/_cores/_enums/product.enum";
 import { ADMIN_ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { Link as RouterLink } from "react-router-dom";
 
 const header: ITableHeader[] = [
@@ -182,14 +181,14 @@ function Row(props: TableRowProps) {
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>{getFormatedPrice(rowData.priceAvailable)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.discountAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.pricePreOrder)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.discountPreOrder)}</TableCell>
+                                        <TableCell>{getFormatedPrice(rowData.priceAvailable)}</TableCell>
+                                        <TableCell>{getFormatedPrice(rowData.discountAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.priceImport)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.priceForSeller)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.profitAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.profitPreOrder)}</TableCell>
+                                        <TableCell>{getFormatedPrice(rowData.profitAvailable)}</TableCell>
                                         <TableCell>{getFormatedPrice(rowData.profitForSeller)}</TableCell>
                                     </TableRow>
                                 </TableBody>

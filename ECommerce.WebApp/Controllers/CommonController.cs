@@ -1,10 +1,10 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Constants;
+using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Common;
 using ECommerce.Application.Services.Common.DTOs.Requests;
-using ECommerce.Application.Services.Product;
-using ECommerce.WebApp.Dtos.Common;
+using ECommerce.Application.Services.ProductSrv;
+using ECommerce.Dtos.Common;
 using ECommerce.WebApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +14,11 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Shared.Responses;
+using ECommerce.Infrastructure.Authentications;
+using ECommerce.Data.Entities.UserSchema;
+using System.Reflection;
+using System.ComponentModel;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -53,19 +58,19 @@ namespace ECommerce.WebApp.Controllers
                 string path = "";
                 switch (request.uploadType)
                 {
-                    case UploadTypeConstant.PRODUCT:
+                    case FilePathConstant.PRODUCT:
                         {
                             prefix = PRODUCT_FILE_PREFIX;
                             path = PRODUCT_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.BRAND:
+                    case FilePathConstant.BRAND:
                         {
                             prefix = BRAND_FILE_PREFIX;
                             path = BRAND_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.RATING:
+                    case FilePathConstant.RATING:
                         {
                             prefix = RATING_FILE_PREFIX;
                             path = RATING_FILE_PATH;
@@ -86,27 +91,45 @@ namespace ECommerce.WebApp.Controllers
             }
         }
         [AllowAnonymous]
+        [HttpPost("upload-test")]
+        public async Task<IActionResult> uploadTest([FromForm] UploadRequest request)
+        {
+            var res = await _commonService.UploadAsync(request);
+            if (res.isSucceed)
+                return Ok(res);
+            return BadRequest(res);
+        }
+        [AllowAnonymous]
+        [HttpPost("remove-files-test")]
+        public async Task<IActionResult> removeUploadTest(RemoveFilesRequest request)
+        {
+            var res = await _commonService.DeleteFilesAsync(request);
+            if (res.isSucceed)
+                return Ok(res);
+            return BadRequest(res);
+        }
+        [AllowAnonymous]
         [HttpPost("remove-files")]
-        public async Task<IActionResult> removeFiles(RemoveUploadRequest request)
+        public async Task<IActionResult> removeFiles(RemoveFilesRequest request)
         {
             try
             {
                 string path = "";
                 switch (request.uploadType)
                 {
-                    case UploadTypeConstant.PRODUCT:
+                    case FilePathConstant.PRODUCT:
                         {
                             path = PRODUCT_FILE_PATH;
                             await _productService.removeUserImages(request.fileNames);
                             await _productService.removeSystemImages(request.fileNames);
                             break;
                         }
-                    case UploadTypeConstant.BRAND:
+                    case FilePathConstant.BRAND:
                         {
                             path = BRAND_FILE_PATH;
                             break;
                         }
-                    case UploadTypeConstant.RATING:
+                    case FilePathConstant.RATING:
                         {
                             path = RATING_FILE_PATH;
                             break;
@@ -164,6 +187,7 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(new FailResponse<string>(error.Message));
             }
         }
+        //[HasPermission(PermissionConstant.Common.COMMON_READ)]
         [AllowAnonymous]
         [HttpGet("provinces")]
         public async Task<IActionResult> getProvinces()
@@ -191,19 +215,18 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-
         [AllowAnonymous]
-        [HttpPost("encrypt-conn")]
-        public IActionResult EncryptConnString(EncryptRequest request)
+        [HttpPost("encrypt")]
+        public IActionResult EncryptString(HashRequest request)
         {
-            string encryptedConn = EncryptHelper.EncryptString(request.connectionString);
+            string encryptedConn = _commonService.EncryptString(request);
             return Ok(encryptedConn);
         }
         [AllowAnonymous]
-        [HttpPost("decrypt-conn")]
-        public IActionResult DecryptConnString(EncryptRequest request)
+        [HttpPost("decrypt")]
+        public IActionResult DecryptString(HashRequest request)
         {
-            string decryptedConn = EncryptHelper.DecryptString(request.connectionString);
+            string decryptedConn = _commonService.DecryptString(request);
             return Ok(decryptedConn);
         }
     }

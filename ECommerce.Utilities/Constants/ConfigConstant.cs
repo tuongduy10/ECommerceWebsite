@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ECommerce.Utilities.Constants
+{
+    public class ConfigConstant
+    {
+        public const string CORS_POLICY = "_myCorsPolicy";
+        public const string DATE_FORMAT = "HH:mm:ss, dd/MM/yyyy";
+
+        // tinymce init config
+        public const string TINY_PLUGINS = "image autolink lists media table";
+        public const string TINY_TOOLBAR = "addcomment showcomments code image pageembed permanentpen table tableofcontents";
+    }
+}

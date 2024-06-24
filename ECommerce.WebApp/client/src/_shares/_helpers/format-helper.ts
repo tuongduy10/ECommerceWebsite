@@ -1,3 +1,5 @@
+import { ORDER_STATUSES } from "src/_cores/_constants/order-constants";
+
 export class FormatHelper {
   public static getNumber(inputString?: string) {
     if (inputString) {
@@ -8,5 +10,18 @@ export class FormatHelper {
       return number;
     }
     return null;
+  }
+  public static getOrderStatus(status: string) {
+    const idx = ORDER_STATUSES.findIndex(_ => _.code === status);
+    if (idx > -1)
+      return ORDER_STATUSES[idx]
+    return null;
+  }
+  public static getPaymentMethod(method: string) {
+    switch (method) {
+      case 'cash': return "Tiền mặt";
+      case 'bank': return "Chuyển khoản";
+      default: return method
+    }
   }
 }

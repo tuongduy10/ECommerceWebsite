@@ -5,6 +5,7 @@ using ECommerce.Application.BaseServices.Rate.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.BaseServices.Rate
 {

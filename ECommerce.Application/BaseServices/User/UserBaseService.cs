@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.UserSchema;
 
 namespace ECommerce.Application.BaseServices.User
 {
@@ -143,7 +144,7 @@ namespace ECommerce.Application.BaseServices.User
                 var checkPhone = await _DbContext.Users.Where(i => i.UserPhone == request.UserPhone).FirstOrDefaultAsync();
                 if (checkPhone != null) return new ApiFailResponse("Số điện thoại đã tồn tại");
 
-                Data.Entities.User user = new Data.Entities.User();
+                Data.Entities.UserSchema.User user = new Data.Entities.UserSchema.User();
                 user.UserMail = !string.IsNullOrEmpty(request.UserMail) ? request.UserMail.Trim() : null;
                 user.UserJoinDate = DateTime.Now;
                 user.UserFullName = !string.IsNullOrEmpty(request.UserFullName) ? request.UserFullName.Trim() : null;
@@ -158,10 +159,11 @@ namespace ECommerce.Application.BaseServices.User
                 await _DbContext.Users.AddAsync(user);
                 await _DbContext.SaveChangesAsync();
 
-                Data.Entities.UserRole role = new Data.Entities.UserRole();
-                role.RoleId = request.RoleId != 0 ? request.RoleId : (int)enumRole.Buyer;
-                role.UserId = user.UserId;
-                await _DbContext.UserRoles.AddAsync(role);
+                // UserRole
+                //UserRole role = new Data.Entities.UserSchema.UserRole();
+                //role.RoleId = request.RoleId != 0 ? request.RoleId : (int)enumRole.Buyer;
+                //role.UserId = user.UserId;
+                //await _DbContext.UserRoles.AddAsync(role);
                 await _DbContext.SaveChangesAsync();
 
                 return new ApiSuccessResponse("Tạo tài khoản thành công");
@@ -205,7 +207,7 @@ namespace ECommerce.Application.BaseServices.User
                 if (checkPhone != null) 
                     return new ApiFailResponse("Số điện thoại đã tồn tại");
 
-                Data.Entities.User user = new Data.Entities.User();
+                Data.Entities.UserSchema.User user = new Data.Entities.UserSchema.User();
                 user.UserMail = request.UserMail != null ? request.UserMail.Trim() : null;
                 user.UserJoinDate = DateTime.Now;
                 user.UserFullName = request.UserFullName != null ? request.UserFullName.Trim() : null;
@@ -222,11 +224,11 @@ namespace ECommerce.Application.BaseServices.User
                 await _DbContext.Users.AddAsync(user);
                 await _DbContext.SaveChangesAsync();
 
-                // Role
-                Data.Entities.UserRole role = new Data.Entities.UserRole();
-                role.RoleId = (int)enumRole.Seller;
-                role.UserId = user.UserId;
-                await _DbContext.UserRoles.AddAsync(role);
+                // UserRole
+                //UserRole role = new Data.Entities.UserSchema.UserRole();
+                //role.RoleId = (int)enumRole.Seller;
+                //role.UserId = user.UserId;
+                //await _DbContext.UserRoles.AddAsync(role);
                 await _DbContext.SaveChangesAsync();
 
                 // Shop

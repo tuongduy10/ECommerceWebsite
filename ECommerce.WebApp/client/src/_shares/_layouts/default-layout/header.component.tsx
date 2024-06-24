@@ -20,16 +20,16 @@ const Header = () => {
     const [hideCart, setHideCart] = useState(false);
 
     useEffect(() => {
-        async function getUserInfo() {
-            const response = await UserService.getUserInfo() as any;
-            if (response) {
-                dispatch(setUser(response));
-            }
-        }
-        if (!authStore.user) {
-            getUserInfo();
-        }
-    }, [authStore.accessToken]);
+        // async function getUserInfo() {
+        //     const response = await UserService.getUserInfo() as any;
+        //     if (response) {
+        //         dispatch(setUser(response));
+        //     }
+        // }
+        // if (!authStore.user) {
+        //     getUserInfo();
+        // }
+    }, []);
 
 
     useEffect(() => {
@@ -38,12 +38,12 @@ const Header = () => {
             '/payment',
         ];
         setHideCart(hiddenPath.includes(location.pathname));
-    }, [location.pathname]);
+    }, [location.pathname, authStore.user?.fullName]);
 
     const leftHeader = [
         { path: '', field: 'findOrder', text: 'Tra cứu đơn hàng', icon: ICON_NAME.FEATHER.HELP_CIRCLE },
         { path: 'tel:0906035526', field: '', text: '0906035526', icon: ICON_NAME.FEATHER.SMARTPHONE },
-        { path: authStore.accessToken ? ROUTE_NAME.USER_PROFILE : ROUTE_NAME.LOGIN, field: 'profile', text: authStore.user?.fullName ? `Hi, ${authStore.user?.fullName}` : 'Tài khoản của tôi', icon: ICON_NAME.FEATHER.USER },
+        { path: ROUTE_NAME.USER_PROFILE_INFO, field: 'profile', text: authStore.user?.fullName ? `Hi, ${authStore.user?.fullName}` : 'Tài khoản của tôi', icon: ICON_NAME.FEATHER.USER },
     ];
 
     return (

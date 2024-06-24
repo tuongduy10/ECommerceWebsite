@@ -167,6 +167,11 @@ const ProductDetail = () => {
         setAttributes(value.attributes || []);
     }
 
+    const onChangeSizeGuide = (value: any) => {
+        const _val = value?.sizeGuide?.content || '';
+        sizeGuideRef.current.setContent(_val);
+    }
+
     const onBlurOption = (idx: number, value: string) => {
         if (options[idx]) {
             const _value = value ? value.trim() : "";
@@ -626,7 +631,10 @@ const ProductDetail = () => {
                                     sx={{ marginBottom: 1 }}
                                     size="small"
                                     disablePortal
-                                    options={[]}
+                                    onChange={(event, value) => onChangeSizeGuide(value)}
+                                    options={subCategories.filter(_ => _.sizeGuide != null)}
+                                    getOptionLabel={(option) => `${option.name}`}
+                                    renderOption={(props, option) => <li {...props}>{option.name}</li>}
                                     renderInput={(params) => <TextField {...params} label="Chọn size theo loại" />}
                                 />
                                 <Editor

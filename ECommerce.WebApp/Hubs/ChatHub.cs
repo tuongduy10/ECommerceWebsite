@@ -1,4 +1,4 @@
-﻿using ECommerce.Application.Constants;
+﻿using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Chat;
 using ECommerce.Application.Services.Chat.Dtos;
 using ECommerce.Data.Entities;
@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Helpers;
 
 namespace ECommerce.WebApp.Hubs
 {

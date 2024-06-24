@@ -14,8 +14,8 @@ import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
 
 const PRICE_TYPE = {
-  'available': 'Có sẵn',
-  'preOrder': 'Đặt trước',
+  'AVAILABLE': 'Có sẵn',
+  'PREORDER': 'Đặt trước',
 }
 const ProductDetailInfo = () => {
   const dispatch = useDispatch();
@@ -34,10 +34,10 @@ const ProductDetailInfo = () => {
       const prices = [productDetail.priceAvailable, productDetail.pricePreOrder];
       if (prices.some(_ => !_)) {
         if (productDetail.priceAvailable) {
-          setSelectedPriceType('available');
+          setSelectedPriceType('AVAILABLE');
         }
         if (productDetail.pricePreOrder) {
-          setSelectedPriceType('preOrder');
+          setSelectedPriceType('PREORDER');
         }
       }
     }
@@ -78,10 +78,10 @@ const ProductDetailInfo = () => {
 
       let price = null;
       let discount = null;
-      if (selectedPriceType === 'available') {
+      if (selectedPriceType === 'AVAILABLE') {
         price = priceAvailable;
         discount = discountAvailable;
-      } else if (selectedPriceType === 'preOrder') {
+      } else if (selectedPriceType === 'PREORDER') {
         price = pricePreOrder;
         discount = discountPreOrder;
       }
@@ -133,7 +133,7 @@ const ProductDetailInfo = () => {
     }
   };
 
-  const renderPrice = (type: 'available' | 'preOrder', price: number, discount?: number) => {
+  const renderPrice = (type: 'AVAILABLE' | 'PREORDER', price: number, discount?: number) => {
     return (
       <div className="option-price w-full flex mt-2 ">
         <div className="option-title">
@@ -158,7 +158,7 @@ const ProductDetailInfo = () => {
 
   const renderOptions = () => {
     return (
-      productDetail && productDetail.options && productDetail.options.map((option) => (
+      productDetail?.options?.map((option) => (
         <div key={`option-${option.id}`} className="option-size flex mb-2 items-center">
           <div className="option-title">{option.name}</div>
           <div className="options-wrapper">
@@ -170,19 +170,13 @@ const ProductDetailInfo = () => {
             </select> */}
             <Select
               displayEmpty
-              className="options form-select w-full pro-options md:h-[30px]"
+              className="options form-select w-full pro-options h-[30px]"
               inputProps={{ 'aria-label': 'Without label' }}
               sx={{
                 boxShadow: "none",
                 ".MuiOutlinedInput-notchedOutline": { border: 0 },
-                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                {
-                  border: 0,
-                },
-                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                {
-                  border: 0,
-                },
+                "&.MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": { border: 0 },
+                "&.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": { border: 0 },
               }}
               value={options.find(_ => _.id === option.id)?.value || -1}
               onChange={e => onChangeOption(e, option)}
@@ -190,7 +184,7 @@ const ProductDetailInfo = () => {
               <MenuItem value={-1} disabled>
                 <em>- Chọn -</em>
               </MenuItem>
-              {option.values && option.values.map((value) => (
+              {option.values?.map((value) => (
                 <MenuItem key={`option-value-${value.id}`} value={value.id}>{value.name}</MenuItem>
               ))}
             </Select>
@@ -317,7 +311,7 @@ const ProductDetailInfo = () => {
           </div>
           <hr />
           <div className="product__detail-bottom mt-4">
-            {/* options */}
+            {/* Quantity */}
             <div className="product__detail-options">
               <div className="option-quality flex mb-2 items-center">
                 <div className="option-title">Chọn số lượng</div>
@@ -331,6 +325,7 @@ const ProductDetailInfo = () => {
                   step="1"
                 />
               </div>
+              {/* Options */}
               {renderOptions()}
             </div>
             <div className="product__detail-price">
@@ -339,11 +334,11 @@ const ProductDetailInfo = () => {
               )}
 
               {productDetail.pricePreOrder > 0 && (
-                renderPrice('preOrder', productDetail.pricePreOrder, productDetail.discountPreOrder)
+                renderPrice('PREORDER', productDetail.pricePreOrder, productDetail.discountPreOrder)
               )}
 
               {productDetail.priceAvailable > 0 && (
-                renderPrice('available', productDetail.priceAvailable, productDetail.discountAvailable)
+                renderPrice('AVAILABLE', productDetail.priceAvailable, productDetail.discountAvailable)
               )}
 
               {/* Discount */}

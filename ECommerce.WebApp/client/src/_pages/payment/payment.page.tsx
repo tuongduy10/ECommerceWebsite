@@ -1,10 +1,15 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces";
+import { showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
+import { clearCart } from "src/_cores/_reducers/cart.reducer";
 import CommonService from "src/_cores/_services/common.service";
-import { useCartStore } from "src/_cores/_store/root-store";
+import OmsService from "src/_cores/_services/oms.service";
+import SalesService from "src/_cores/_services/sales.service";
+import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { MuiIcon, WebDirectional } from "src/_shares/_components";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
@@ -12,18 +17,50 @@ import { ProductHelper } from "src/_shares/_helpers/product-helper";
 const PaymentPage = () => {
     const navigate = useNavigate();
     const cartStore = useCartStore();
+    const dispatch = useDispatch<AppDispatch>();
     const [open, setOpen] = useState(false);
     const [cities, setCitites] = useState<ICity[]>([]);
     const [districts, setDistricts] = useState<IDistrict[]>([]);
     const [wards, setWards] = useState<IWard[]>([]);
+    const [orderResponse, setOrderResponses] = useState<any>(undefined);
     const [dataDetail, setDataDetail] = useState<{ [key: string]: any }>({});
+    const [banks, setBanks] = useState<any>([]);
 
     useEffect(() => {
         getCities();
     }, []);
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleProcessOrder = async () => {
+        // if (!dataDetail['phoneNumber'] || !dataDetail['cityCode'] || !dataDetail['districtCode'] || !dataDetail['wardCode'] || !dataDetail['address']) {
+        //     dispatch(showError('Vui lòng nhập đầy đủ thông tin'));
+        //     return;
+        // }
+        // if (!dataDetail['paymentMethod']) {
+        //     dispatch(showError('Vui lòng phương thức thanh toán'));
+        //     return;
+        // }
+
+        const param = {
+            deliveryInfo: dataDetail,
+            products: cartStore.productsInCart
+        }
+
+        const response = await OmsService.createOrder(param) as any;
+        if (response?.isSucceed) {
+            setOrderResponses(response.data);
+            dispatch(showSuccess(`Đặt hàng thành công`));
+            dispatch(clearCart());
+            if (dataDetail['paymentMethod'] === 'bank') {
+                const resBanks = await SalesService.getPaymentMethods() as any;
+                if (resBanks?.isSucceed) {
+                    setBanks(resBanks.data);
+                    setOpen(true);
+                }
+                return;
+            }
+            setOrderResponses(undefined);
+            window.location.reload();
+        }
     };
 
     const handleClose = () => {
@@ -45,6 +82,8 @@ const PaymentPage = () => {
             wardCode: ''
         }
         setDataDetail(_dataDetail);
+        setDistricts([]);
+        setWards([]);
         await getDistricts(code);
     }
 
@@ -62,6 +101,7 @@ const PaymentPage = () => {
             wardCode: ''
         }
         setDataDetail(_dataDetail);
+        setWards([]);
         await getWards(code);
     }
 
@@ -77,14 +117,12 @@ const PaymentPage = () => {
     }
 
     const onChangeFieldValue = (field: string, value: any) => {
-        if (dataDetail[field]) {
-            setDataDetail({ ...dataDetail, [field]: value });
-        }
+        setDataDetail({ ...dataDetail, [field]: value });
     }
 
     const getFormatedPrice = (price: number) => {
         return ProductHelper.getFormatedPrice(price);
-      }
+    }
 
     return (
         <div className="custom-container">
@@ -148,7 +186,7 @@ const PaymentPage = () => {
                                                     x{_.qty}
                                                 </div>
                                                 <div className="cart-product--col totalprice text-right">
-                                                    <span className="total-value">{_.discount ? getFormatedPrice(_.discount*_.qty) : getFormatedPrice(_.price*_.qty)}</span>
+                                                    <span className="total-value">{_.discount ? getFormatedPrice(_.discount * _.qty) : getFormatedPrice(_.price * _.qty)}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -185,43 +223,48 @@ const PaymentPage = () => {
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Họ tên" />
+                                    <input className="w-full" type="text" placeholder="Họ tên"
+                                        onChange={e => onChangeFieldValue('fullName', e.target.value)} value={dataDetail['fullName'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Số điện thoại" />
+                                    <input className="w-full" type="text" placeholder="Số điện thoại"
+                                        onChange={e => onChangeFieldValue('phoneNumber', e.target.value)} value={dataDetail['phoneNumber'] || ""} />
                                 </div>
                                 <div
                                     className="payment-info__line payment-bank w-full flex items-center justify-between flex-wrap">
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="city-select w-full" onChange={e => onChangeCity(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['cityCode']}>Tỉnh/Thành...</option>
+                                        <select className="city-select w-full"
+                                            onChange={e => onChangeCity(e.target.value)} defaultValue={""} value={dataDetail['cityCode']}>
+                                            <option value="" disabled>Tỉnh/Thành...</option>
                                             {cities.length > 0 && (
                                                 cities.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['cityCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
                                     </div>
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="district-select w-full" onChange={e => onChangeDistrict(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['districtCode']}>Quận/Huyện...</option>
+                                        <select className="district-select w-full"
+                                            onChange={e => onChangeDistrict(e.target.value)} defaultValue={""} value={dataDetail['districtCode']}>
+                                            <option value="" disabled>Quận/Huyện...</option>
                                             {districts.length > 0 && (
                                                 districts.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['districtCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
                                     </div>
                                     <div className="location">
                                         <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                        <select name="" id="" className="ward-select w-full" onChange={e => onChangeWard(e.target.value)}>
-                                            <option value="" disabled selected={!dataDetail || !dataDetail['wardCode']}>Phường/Xã...</option>
+                                        <select className="ward-select w-full"
+                                            onChange={e => onChangeWard(e.target.value)} defaultValue={""} value={dataDetail['wardCode']}>
+                                            <option value="" disabled>Phường/Xã...</option>
                                             {wards.length > 0 && (
                                                 wards.map((item) => (
-                                                    <option key={item.code} value={item.code} selected={item.code === (dataDetail['wardCode'] ?? "")}>{item.name}</option>
+                                                    <option key={item.code} value={item.code}>{item.name}</option>
                                                 ))
                                             )}
                                         </select>
@@ -229,13 +272,16 @@ const PaymentPage = () => {
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
                                     <span style={{ color: 'red', position: 'absolute', left: '8px', top: '3px' }}>*</span>
-                                    <input className="w-full" type="text" placeholder="Địa chỉ" />
+                                    <input className="w-full" type="text" placeholder="Địa chỉ"
+                                        onChange={e => onChangeFieldValue('address', e.target.value)} value={dataDetail['address'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
-                                    <input className="w-full" type="text" placeholder="Email" />
+                                    <input className="w-full" type="text" placeholder="Email"
+                                        onChange={e => onChangeFieldValue('email', e.target.value)} value={dataDetail['email'] || ""} />
                                 </div>
                                 <div className="payment-info__line w-full flex items-center relative">
-                                    <input className="w-full" type="text" placeholder="Ghi chú" />
+                                    <input className="w-full" type="text" placeholder="Ghi chú"
+                                        onChange={e => onChangeFieldValue('remark', e.target.value)} value={dataDetail['remark'] || ""} />
                                 </div>
                             </Grid>
                             <Grid className="payment-method" item xs={5}>
@@ -243,41 +289,48 @@ const PaymentPage = () => {
                                     <strong>PHƯƠNG THỨC THANH TOÁN</strong>
                                 </div>
                                 <div className="payment-info__line w-full items-center flex">
-                                    <input name="payment-method" type="radio" style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} />
-                                    <label className="ml-2 mb-0 cursor-pointer">Thanh toán khi nhận hàng</label>
+                                    <input name="payment-method" id="pmt-01" type="radio" value="cash" checked={dataDetail['paymentMethod'] === 'cash'}
+                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }}
+                                        onChange={e => onChangeFieldValue('paymentMethod', 'cash')} />
+                                    <label className="ml-2 mb-0 cursor-pointer" htmlFor="pmt-01">Thanh toán khi nhận hàng</label>
                                 </div>
                                 <div className="payment-info__line w-full items-center flex">
-                                    <input name="payment-method" type="radio"
-                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }} />
-                                    <label className="ml-2 mb-0 cursor-pointer">Chuyển khoản</label>
+                                    <input name="payment-method" id="pmt-02" type="radio" value="bank" checked={dataDetail['paymentMethod'] === 'bank'}
+                                        style={{ height: 'calc(48px + (57 - 48) * ((100vw - 375px)/ (1920 - 375)))' }}
+                                        onChange={e => onChangeFieldValue('paymentMethod', 'bank')} />
+                                    <label className="ml-2 mb-0 cursor-pointer" htmlFor="pmt-02">Chuyển khoản</label>
                                 </div>
                                 <div className="payment-checkout text-center block">
                                     <button className="inline-block btn-black" data-toggle="modal" data-target="#exampleModal" style={{ border: '1px solid #333' }}
-                                        onClick={handleClickOpen}
+                                        onClick={handleProcessOrder}
                                     >
                                         Đặt hàng
                                     </button>
-                                    <PaymentDialog
-                                        open={open}
-                                        onClose={handleClose}
-                                    />
                                 </div>
                             </Grid>
                         </Grid>
                     </>)}
                 </div>
             </div>
+            <PaymentDialog
+                open={open}
+                banks={banks}
+                order={orderResponse}
+                onClose={handleClose}
+            />
         </div>
     )
 }
 
 interface DialogProps {
     open: boolean;
+    banks: any[];
+    order: any;
     onClose: () => void;
 }
 
 const PaymentDialog = (props: DialogProps) => {
-    const { onClose, open } = props;
+    const { onClose, open, banks, order } = props;
 
     const handleClose = () => {
         onClose();
@@ -301,77 +354,49 @@ const PaymentDialog = (props: DialogProps) => {
                 <MuiIcon name={ICON_NAME.FEATHER.X} />
             </IconButton>
             <DialogContent>
-                <div className="payment-expand">
-                    <div><strong>Mã đơn hàng: 11111</strong></div>
-                    <div className="mb-4">
-                        Cảm ơn quý khách đã mua hàng.
-                        Quý khách vui lòng chuyển khoản để thanh toán đơn hàng với thông tin:
+                {order && (
+                    <div className="payment-expand">
+                        <div><strong>Mã đơn hàng: {order.orderCode}</strong></div>
+                        <div className="mb-4">
+                            Cảm ơn quý khách đã mua hàng.
+                            Quý khách vui lòng chuyển khoản để thanh toán đơn hàng với thông tin:
+                        </div>
+                        <hr className="mb-4" />
+                        <ul className="bank-list">
+                            {banks.map((_: any) => (
+                                <li key={_.bankId} className="bank">
+                                    <div className="flex">
+                                        {/* <div className="bank-image">
+                                        <img className="max-w-full max-h-full" src="assets/images/logo/bidv.png" alt="" />
+                                    </div> */}
+                                        <div className="bank-info flex items-center">
+                                            <div className="">
+                                                <div className="bank-name mb-2">{_.bankName}</div>
+                                                <div className="bank-accnumber flex mb-2">
+                                                    <span className="mr-2">STK: <strong className="stk">{_.bankAccountNumber}</strong></span>
+                                                    <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
+                                                        <span className="--tooltip-text">Sao chép</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="22"
+                                                            height="22" viewBox="0 0 24 24" fill="none"
+                                                            stroke="#333" strokeWidth="1"
+                                                            strokeLinecap="round" strokeLinejoin="round"
+                                                            className="feather feather-copy">
+                                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <div className="bank-username">Tên: <strong>{_.bankAccountName}</strong></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                        <hr className="mb-4" />
+                        <div>Nội dung chuyển khoản: <strong>Thanh toan cho ma don hang: {order.orderCode}</strong></div>
                     </div>
-                    <hr className="mb-4" />
-                    <ul className="bank-list">
-                        <li className="bank">
-                            <div className="flex">
-                                <div className="bank-image">
-                                    <img className="max-w-full max-h-full" src="assets/images/logo/bidv.png" alt="" />
-                                </div>
-                                <div className="bank-info flex items-center">
-                                    <div className="">
-                                        <div className="bank-name mb-2">Ngân hàng Thương mại cổ phần Đầu tư và
-                                            Phát
-                                            triển Việt Nam</div>
-                                        <div className="bank-accnumber flex mb-2">
-                                            <span className="mr-2">STK: <strong className="stk">987654321000</strong></span>
-                                            <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
-                                                <span className="--tooltip-text">Sao chép</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                                    height="22" viewBox="0 0 24 24" fill="none"
-                                                    stroke="#333" strokeWidth="1"
-                                                    strokeLinecap="round" strokeLinejoin="round"
-                                                    className="feather feather-copy">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div className="bank-username">Tên: <strong>NGUYEN VAN A</strong></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li className="bank">
-                            <div className="flex">
-                                <div className="bank-image">
-                                    <img className="max-w-full max-h-full" src="assets/images/logo/sacombank.png"
-                                        alt="" />
-                                </div>
-                                <div className="bank-info flex items-center">
-                                    <div className="">
-                                        <div className="bank-name mb-2">Ngân hàng thương mại cổ phần Sài Gòn Thương Tín</div>
-                                        <div className="bank-accnumber mb-2 flex items-center">
-                                            <span className="mr-2">
-                                                STK: <strong className="stk">000123456789</strong>
-                                            </span>
-                                            <button className="--tooltip copy-stk" style={{ height: '22px', background: 'none', cursor: 'pointer' }}>
-                                                <span className="--tooltip-text">Sao chép</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="22"
-                                                    height="22" viewBox="0 0 24 24" fill="none"
-                                                    stroke="#333" strokeWidth="1"
-                                                    strokeLinecap="round" strokeLinejoin="round"
-                                                    className="feather feather-copy">
-                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div className="bank-username">Tên: <strong>NGUYEN VAN A</strong></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                    <hr className="mb-4" />
-                    <div>Nội dung chuyển khoản: <strong>Thanh toan cho ma don hang: 11111</strong></div>
-                </div>
+                )}
             </DialogContent>
         </Dialog>
     )

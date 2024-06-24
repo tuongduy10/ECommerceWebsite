@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.BaseServices.SubCategory.Dtos;
 using ECommerce.Data.Context;
+using ECommerce.Data.Entities.Inventory;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                     return new ApiFailResponse("Đã tồn tại");
                 }
 
-                var subcate = new Data.Entities.SubCategory
+                var subcate = new Data.Entities.Inventory.SubCategory
                 {
                     SubCategoryName = request.SubCategoryName.Trim(),
                     CategoryId = request.CategoryId
@@ -107,7 +108,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                     // Add new or re-add
                     foreach (var id in request.optIds)
                     {
-                        var newOpt = new Data.Entities.SubCategoryOption
+                        var newOpt = new SubCategoryOption
                         {
                             SubCategoryId = request.id,
                             OptionId = id
@@ -131,7 +132,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                     // Add new or re-add
                     foreach (var attr in request.attrIds)
                     {
-                        var newAttr = new Data.Entities.SubCategoryAttribute
+                        var newAttr = new SubCategoryAttribute
                         {
                             SubCategoryId = request.id,
                             AttributeId = attr
@@ -340,7 +341,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                 if (option == null) // Create new option and update option in subcategory
                 {
                     // Create new
-                    var newOption = new Data.Entities.Option
+                    var newOption = new Option
                     {
                         OptionName = request.name.Trim()
                     };
@@ -349,7 +350,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
 
                     // update option in subcategory
                     var newSubOpts = request.ids
-                        .Select(id => new Data.Entities.SubCategoryOption
+                        .Select(id => new SubCategoryOption
                         {
                             SubCategoryId = id,
                             OptionId = newOption.OptionId
@@ -360,7 +361,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                 else // Update option in subcategory
                 {
                     var newSubOpt = request.ids
-                        .Select(id => new Data.Entities.SubCategoryOption
+                        .Select(id => new SubCategoryOption
                         {
                             SubCategoryId = id,
                             OptionId = option.OptionId
@@ -386,7 +387,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                 if (attribute == null) // Create new attribute and update attribute in subcategory
                 {
                     // Create new
-                    var newAttribute = new Data.Entities.Attribute
+                    var newAttribute = new Data.Entities.Inventory.Attribute
                     {
                         AttributeName = request.name.Trim()
                     };
@@ -401,7 +402,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                             .FirstOrDefaultAsync();
                         if (attrs == null)
                         {
-                            var attr = new Data.Entities.SubCategoryAttribute
+                            var attr = new SubCategoryAttribute
                             {
                                 SubCategoryId = id,
                                 AttributeId = newAttribute.AttributeId
@@ -420,7 +421,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                             .FirstOrDefaultAsync() == null;
                         if (attrIsNotExist)
                         {
-                            var attr = new Data.Entities.SubCategoryAttribute
+                            var attr = new SubCategoryAttribute
                             {
                                 SubCategoryId = id,
                                 AttributeId = attribute.AttributeId
@@ -470,7 +471,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                     if (value == null)
                     {
                         // Add new option value
-                        var newValue = new Data.Entities.OptionValue
+                        var newValue = new OptionValue
                         {
                             OptionValueName = request.value,
                             OptionId = id,
@@ -494,7 +495,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                                 #region using for to remove option values from option values and product option
                                 //foreach (var pro in pros)
                                 //{
-                                //    var newProductOptionValue = new Data.Entities.ProductOptionValue
+                                //    var newProductOptionValue = new ProductSchemaOptionValue
                                 //    {
                                 //        ProductId = pro.ProductId,
                                 //        OptionValueId = newValue.OptionValueId
@@ -504,7 +505,7 @@ namespace ECommerce.Application.BaseServices.SubCategory
                                 //}
                                 #endregion
                                 
-                                var newProOptVals = pros.Select(pro => new Data.Entities.ProductOptionValue
+                                var newProOptVals = pros.Select(pro => new Data.Entities.ProductSchema.ProductOptionValue
                                 {
                                     ProductId = pro.ProductId,
                                     OptionValueId = newValue.OptionValueId

@@ -1,10 +1,10 @@
 ﻿using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.Common;
-using ECommerce.Application.Constants;
+using ECommerce.Utilities.Constants;
 using ECommerce.Application.Services.Comment;
 using ECommerce.Application.Services.Comment.Request;
-using ECommerce.Application.Services.Product;
-using ECommerce.Application.Services.Product.Dtos;
+using ECommerce.Application.Services.ProductSrv;
+using ECommerce.Application.Services.ProductSrv.Dtos;
 using ECommerce.WebApp.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ECommerce.Utilities.Shared.Responses;
+using ECommerce.Data.Entities.ProductSchema;
 
 namespace ECommerce.WebApp.Controllers
 {
@@ -36,7 +38,6 @@ namespace ECommerce.WebApp.Controllers
             _commentService = commentService;
             _manageFiles = new ManageFiles(webHostEnvironment);
         }
-        [AllowAnonymous]
         [HttpPost("product-managed-list")]
         public async Task<IActionResult> getProductManagedList(ProductGetRequest request)
         {
@@ -99,7 +100,6 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [AllowAnonymous]
         [HttpPost("update-status")]
         public async Task<IActionResult> updateStatus(UpdateStatusRequest request)
         {
@@ -108,7 +108,6 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-        [AllowAnonymous]
         [HttpPost("save")]
         public async Task<IActionResult> save(ProductSaveRequest request)
         {
@@ -120,7 +119,6 @@ namespace ECommerce.WebApp.Controllers
             }
             return BadRequest(result);
         }
-        [AllowAnonymous]
         [HttpPost("delete")]
         public async Task<IActionResult> delete(ProductDeleteRequest request)
         {
@@ -133,6 +131,16 @@ namespace ECommerce.WebApp.Controllers
                 return Ok(new SuccessResponse<bool>());
             }
             return BadRequest(new FailResponse<bool>(result.Message));
+        }
+        [HttpGet("settings")]
+        public async Task<IActionResult> getSettings()
+        {
+            return Ok(await _productService.getSettings());
+        }
+        [HttpPost("update-setting")]
+        public async Task<IActionResult> updateSetting(ProductSetting request)
+        {
+            return Ok(await _productService.updateSetting(request));
         }
     }
 }

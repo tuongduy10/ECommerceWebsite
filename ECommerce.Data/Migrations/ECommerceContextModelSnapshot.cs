@@ -19,23 +19,7 @@ namespace ECommerce.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Attribute", b =>
-                {
-                    b.Property<int>("AttributeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AttributeName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.HasKey("AttributeId");
-
-                    b.ToTable("Attribute");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Bank", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Bank", b =>
                 {
                     b.Property<int>("BankId")
                         .ValueGeneratedOnAdd()
@@ -67,7 +51,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Bank");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Banner", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Banner", b =>
                 {
                     b.Property<int>("BannerId")
                         .ValueGeneratedOnAdd()
@@ -87,7 +71,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Banner");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Blog", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Blog", b =>
                 {
                     b.Property<int>("BlogId")
                         .ValueGeneratedOnAdd()
@@ -112,83 +96,129 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Blog");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Brand", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Configuration", b =>
                 {
-                    b.Property<int>("BrandId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BrandImagePath")
-                        .IsRequired()
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
+
+                    b.Property<string>("AddressUrl")
+                        .HasColumnType("varchar(500)")
+                        .HasMaxLength(500)
+                        .IsUnicode(false);
+
+                    b.Property<TimeSpan?>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<string>("FacebookUrl")
                         .HasColumnType("varchar(100)")
                         .HasMaxLength(100)
                         .IsUnicode(false);
 
-                    b.Property<string>("BrandName")
-                        .IsRequired()
+                    b.Property<string>("FaviconPath")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.Property<string>("InstagramUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LogoPath")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.Property<string>("Mail")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
+
+                    b.Property<string>("Owner")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("date");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("varchar(20)")
+                        .HasMaxLength(20)
+                        .IsUnicode(false);
 
-                    b.Property<string>("Description")
-                        .HasColumnType("ntext");
+                    b.Property<TimeSpan?>("StartTime")
+                        .HasColumnType("time");
 
-                    b.Property<string>("DescriptionTitle")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
+                    b.Property<string>("WebsiteName")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
-                    b.Property<int?>("DiscountId")
-                        .HasColumnType("int");
+                    b.Property<string>("YoutubeUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("Highlights")
-                        .HasColumnType("bit");
+                    b.HasKey("Id");
 
-                    b.Property<bool?>("New")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.HasKey("BrandId");
-
-                    b.HasIndex("DiscountId");
-
-                    b.ToTable("Brand");
+                    b.ToTable("Configurations");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.BrandCategory", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Header", b =>
                 {
-                    b.Property<int>("BrandId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BrandId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("BrandCategory");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Category", b =>
-                {
-                    b.Property<int>("CategoryId")
+                    b.Property<int>("HeaderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
+                    b.Property<string>("HeaderName")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<byte?>("HeaderPosition")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("HeaderUrl")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
+
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("HeaderId");
+
+                    b.ToTable("Header");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Cms.Social", b =>
+                {
+                    b.Property<int>("SocialId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.Property<byte?>("Position")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("SocialName")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.HasKey("CategoryId");
+                    b.Property<string>("SocialUrl")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
 
-                    b.ToTable("Category");
+                    b.Property<byte?>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("SocialId");
+
+                    b.ToTable("Social");
                 });
 
             modelBuilder.Entity("ECommerce.Data.Entities.Common.District", b =>
@@ -284,67 +314,139 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Wards");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Configuration", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.Attribute", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AttributeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
+                    b.Property<string>("AttributeName")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
-                    b.Property<string>("AddressUrl")
-                        .HasColumnType("varchar(500)")
-                        .HasMaxLength(500)
-                        .IsUnicode(false);
+                    b.HasKey("AttributeId");
 
-                    b.Property<TimeSpan?>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("FacebookUrl")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<string>("FaviconPath")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<string>("LogoPath")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Mail")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Owner")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("varchar(20)")
-                        .HasMaxLength(20)
-                        .IsUnicode(false);
-
-                    b.Property<TimeSpan?>("StartTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("WebsiteName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Configurations");
+                    b.ToTable("Attribute");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Discount", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.Option", b =>
+                {
+                    b.Property<int>("OptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("OptionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("OptionId");
+
+                    b.ToTable("Option");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.OptionValue", b =>
+                {
+                    b.Property<int>("OptionValueId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool?>("IsBaseValue")
+                        .HasColumnName("isBaseValue")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OptionValueName")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("OptionValueId");
+
+                    b.HasIndex("OptionId");
+
+                    b.ToTable("OptionValue");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategory", b =>
+                {
+                    b.Property<int>("SubCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SizeGuideId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubCategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("SubCategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("SizeGuideId");
+
+                    b.ToTable("SubCategory");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategoryAttribute", b =>
+                {
+                    b.Property<int>("AttributeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AttributeId", "SubCategoryId");
+
+                    b.HasIndex("SubCategoryId");
+
+                    b.ToTable("SubCategoryAttribute");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategoryOption", b =>
+                {
+                    b.Property<int>("SubCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SubCategoryId", "OptionId");
+
+                    b.HasIndex("OptionId");
+
+                    b.ToTable("SubCategoryOption");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.Discount", b =>
                 {
                     b.Property<int>("DiscountId")
                         .ValueGeneratedOnAdd()
@@ -392,34 +494,205 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Discount");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Header", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.Order", b =>
                 {
-                    b.Property<int>("HeaderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CityCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DistrictCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OrderCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalFinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("TotalQty")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WardCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityCode");
+
+                    b.HasIndex("DistrictCode");
+
+                    b.HasIndex("WardCode");
+
+                    b.ToTable("Orders","oms");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.OrderDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Options")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceOnSell")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalFinalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderDetails","oms");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Brand", b =>
+                {
+                    b.Property<int>("BrandId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("HeaderName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<byte?>("HeaderPosition")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("HeaderUrl")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
+                    b.Property<string>("BrandImagePath")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
                         .IsUnicode(false);
 
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
-                    b.HasKey("HeaderId");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("date");
 
-                    b.ToTable("Header");
+                    b.Property<string>("Description")
+                        .HasColumnType("ntext");
+
+                    b.Property<string>("DescriptionTitle")
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
+
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("Highlights")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("New")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("BrandId");
+
+                    b.HasIndex("DiscountId");
+
+                    b.ToTable("Brand");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Interest", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.BrandCategory", b =>
+                {
+                    b.Property<int>("BrandId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BrandId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("BrandCategory");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Interest", b =>
                 {
                     b.Property<int>("RateId")
                         .HasColumnType("int");
@@ -437,324 +710,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Interest");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.MessageHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Attachment")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("FromName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("FromPhoneNumber")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
-
-                    b.Property<string>("Status")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("ToPhoneNumber")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Type")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MessageHistory");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("CreateDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int?>("InfoId")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("JsLink")
-                        .HasColumnType("ntext");
-
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SenderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TextContent")
-                        .HasColumnType("ntext");
-
-                    b.Property<int?>("TypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.HasIndex("TypeId");
-
-                    b.ToTable("Notification");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.NotificationType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("TypeCode")
-                        .HasColumnType("varchar(256)")
-                        .HasMaxLength(256)
-                        .IsUnicode(false);
-
-                    b.Property<string>("TypeName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NotificationType");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OnlineHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime?>("AccessDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<int?>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OnlineHistory");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Option", b =>
-                {
-                    b.Property<int>("OptionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("OptionName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.HasKey("OptionId");
-
-                    b.ToTable("Option");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OptionValue", b =>
-                {
-                    b.Property<int>("OptionValueId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool?>("IsBaseValue")
-                        .HasColumnName("isBaseValue")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OptionValueName")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.HasKey("OptionValueId");
-
-                    b.HasIndex("OptionId");
-
-                    b.ToTable("OptionValue");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Order", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<byte?>("Amount")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("DiscountCode")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("DiscountType")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<decimal?>("DiscountValue")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int?>("PaymentMethodId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Recipient")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<decimal?>("Temporary")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("Total")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderId");
-
-                    b.HasIndex("PaymentMethodId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Order");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OrderDetail", b =>
-                {
-                    b.Property<int>("OrderDetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShopId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AttributeValue")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("OptionValue")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.Property<bool?>("Paid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal?>("PayForAdmin")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<decimal?>("PriceOnSell")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ProductName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("ShopName")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<decimal?>("Total")
-                        .HasColumnType("decimal(18, 0)");
-
-                    b.Property<DateTime?>("VerifiedDate")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("OrderDetailId", "OrderId", "ShopId");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("OrderDetail");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.PaymentMethod", b =>
-                {
-                    b.Property<int>("PaymentMethodId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("PaymentMethod1")
-                        .HasColumnName("PaymentMethod")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
-
-                    b.HasKey("PaymentMethodId");
-
-                    b.ToTable("PaymentMethod");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Product", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Product", b =>
                 {
                     b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
@@ -791,6 +747,9 @@ namespace ECommerce.Data.Migrations
 
                     b.Property<bool?>("New")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("NewUpdatedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(500)")
@@ -876,7 +835,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductAttribute", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductAttribute", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -895,7 +854,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductAttribute");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductImage", b =>
                 {
                     b.Property<int>("ProductImageId")
                         .ValueGeneratedOnAdd()
@@ -918,7 +877,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductImage");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductOptionValue", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductOptionValue", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -933,7 +892,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductOptionValue");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductPrice", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductPrice", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -954,7 +913,42 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductPrice");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductType", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductSetting", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("NewPeriod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProductSetting");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductType", b =>
                 {
                     b.Property<int>("ProductTypeId")
                         .ValueGeneratedOnAdd()
@@ -970,7 +964,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductType");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductUserImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductUserImage", b =>
                 {
                     b.Property<int>("ProductUserImageId")
                         .ValueGeneratedOnAdd()
@@ -992,7 +986,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ProductUserImage");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Rate", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Rate", b =>
                 {
                     b.Property<int>("RateId")
                         .ValueGeneratedOnAdd()
@@ -1044,7 +1038,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Rate");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.RatingImage", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.RatingImage", b =>
                 {
                     b.Property<int>("RatingImageId")
                         .ValueGeneratedOnAdd()
@@ -1066,25 +1060,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("RatingImage");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Role", b =>
-                {
-                    b.Property<int>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)")
-                        .HasMaxLength(50)
-                        .IsUnicode(false);
-
-                    b.HasKey("RoleId");
-
-                    b.ToTable("Role");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Shop", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Shop", b =>
                 {
                     b.Property<int>("ShopId")
                         .ValueGeneratedOnAdd()
@@ -1150,7 +1126,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("Shop");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ShopBank", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ShopBank", b =>
                 {
                     b.Property<int>("ShopBankId")
                         .ValueGeneratedOnAdd()
@@ -1183,7 +1159,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ShopBank");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.ShopBrand", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ShopBrand", b =>
                 {
                     b.Property<int>("ShopId")
                         .HasColumnType("int");
@@ -1198,7 +1174,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("ShopBrand");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SizeGuide", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.SizeGuide", b =>
                 {
                     b.Property<int>("SizeGuideId")
                         .ValueGeneratedOnAdd()
@@ -1217,96 +1193,297 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("SizeGuide");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Social", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.MessageHistory", b =>
                 {
-                    b.Property<int>("SocialId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Icon")
+                    b.Property<string>("Attachment")
                         .HasColumnType("varchar(100)")
                         .HasMaxLength(100)
                         .IsUnicode(false);
 
-                    b.Property<byte?>("Position")
-                        .HasColumnType("tinyint");
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
 
-                    b.Property<string>("SocialName")
+                    b.Property<string>("FromName")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<string>("SocialUrl")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
+                    b.Property<string>("FromPhoneNumber")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
                         .IsUnicode(false);
 
-                    b.Property<byte?>("Status")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
-                    b.HasKey("SocialId");
+                    b.Property<string>("Status")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
 
-                    b.ToTable("Social");
+                    b.Property<string>("ToPhoneNumber")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
+
+                    b.Property<string>("Type")
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageHistory");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategory", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.Notification", b =>
                 {
-                    b.Property<int>("SubCategoryId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CategoryId")
+                    b.Property<DateTime?>("CreateDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("InfoId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SizeGuideId")
+                    b.Property<bool?>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JsLink")
+                        .HasColumnType("ntext");
+
+                    b.Property<int?>("ReceiverId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SubCategoryName")
+                    b.Property<int?>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TextContent")
+                        .HasColumnType("ntext");
+
+                    b.Property<string>("TypeCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.OnlineHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("AccessDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OnlineHistory");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.Permission", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Module")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Permissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "ACCESS_ALL",
+                            Name = "ACCESS_ALL"
+                        },
+                        new
+                        {
+                            Id = "COMMON_CREATE",
+                            Module = "COMMON",
+                            Name = "COMMON_CREATE"
+                        },
+                        new
+                        {
+                            Id = "COMMON_READ",
+                            Module = "COMMON",
+                            Name = "COMMON_READ"
+                        },
+                        new
+                        {
+                            Id = "COMMON_UPDATE",
+                            Module = "COMMON",
+                            Name = "COMMON_UPDATE"
+                        },
+                        new
+                        {
+                            Id = "COMMON_DELETE",
+                            Module = "COMMON",
+                            Name = "COMMON_DELETE"
+                        },
+                        new
+                        {
+                            Id = "USER_LIST_CREATE",
+                            Module = "USER",
+                            Name = "USER_LIST_CREATE"
+                        },
+                        new
+                        {
+                            Id = "USER_LIST_READ",
+                            Module = "USER",
+                            Name = "USER_LIST_READ"
+                        },
+                        new
+                        {
+                            Id = "USER_LIST_UPDATE",
+                            Module = "USER",
+                            Name = "USER_LIST_UPDATE"
+                        },
+                        new
+                        {
+                            Id = "USER_LIST_DELETE",
+                            Module = "USER",
+                            Name = "USER_LIST_DELETE"
+                        },
+                        new
+                        {
+                            Id = "USER_DETAIL_CREATE",
+                            Module = "USER",
+                            Name = "USER_DETAIL_CREATE"
+                        },
+                        new
+                        {
+                            Id = "USER_DETAIL_READ",
+                            Module = "USER",
+                            Name = "USER_DETAIL_READ"
+                        },
+                        new
+                        {
+                            Id = "USER_DETAIL_UPDATE",
+                            Module = "USER",
+                            Name = "USER_DETAIL_UPDATE"
+                        },
+                        new
+                        {
+                            Id = "USER_DETAIL_DELETE",
+                            Module = "USER",
+                            Name = "USER_DETAIL_DELETE"
+                        },
+                        new
+                        {
+                            Id = "ORDER_CREATE",
+                            Module = "ORDER",
+                            Name = "ORDER_CREATE"
+                        },
+                        new
+                        {
+                            Id = "ORDER_READ",
+                            Module = "ORDER",
+                            Name = "ORDER_READ"
+                        },
+                        new
+                        {
+                            Id = "ORDER_UPDATE",
+                            Module = "ORDER",
+                            Name = "ORDER_UPDATE"
+                        },
+                        new
+                        {
+                            Id = "ORDER_DELETE",
+                            Module = "ORDER",
+                            Name = "ORDER_DELETE"
+                        });
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.Role", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("RoleName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("varchar(50)")
+                        .HasMaxLength(50)
+                        .IsUnicode(false);
 
-                    b.HasKey("SubCategoryId");
+                    b.HasKey("RoleId");
 
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("SizeGuideId");
-
-                    b.ToTable("SubCategory");
+                    b.ToTable("Role");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategoryAttribute", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.RoleToPermission", b =>
                 {
-                    b.Property<int>("AttributeId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
+                    b.Property<string>("PermissionId")
+                        .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("AttributeId", "SubCategoryId");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("SubCategoryId");
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
 
-                    b.ToTable("SubCategoryAttribute");
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("RoleToPermissions");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategoryOption", b =>
-                {
-                    b.Property<int>("SubCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SubCategoryId", "OptionId");
-
-                    b.HasIndex("OptionId");
-
-                    b.ToTable("SubCategoryOption");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.User", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -1364,6 +1541,9 @@ namespace ECommerce.Data.Migrations
                         .HasMaxLength(50)
                         .IsUnicode(false);
 
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserPhone")
                         .HasColumnType("varchar(50)")
                         .HasMaxLength(50)
@@ -1382,7 +1562,7 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.UserRole", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.UserRole", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -1397,292 +1577,310 @@ namespace ECommerce.Data.Migrations
                     b.ToTable("UserRole");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Brand", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.OptionValue", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Discount", "Discount")
-                        .WithMany("Brands")
-                        .HasForeignKey("DiscountId")
-                        .HasConstraintName("FK_Brand_Discount");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.BrandCategory", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Brand", "Brand")
-                        .WithMany("BrandCategories")
-                        .HasForeignKey("BrandId")
-                        .HasConstraintName("FK_BrandCategory_Brand")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.Category", "Category")
-                        .WithMany("BrandCategories")
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("FK_BrandCategory_Category")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Interest", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Rate", "Rate")
-                        .WithMany("Interests")
-                        .HasForeignKey("RateId")
-                        .HasConstraintName("FK_Interest_Rate")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
-                        .WithMany("Interests")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Interest_User")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Notification", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.User", "Receiver")
-                        .WithMany("NotificationReceivers")
-                        .HasForeignKey("ReceiverId")
-                        .HasConstraintName("FK_Notification_User");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "Sender")
-                        .WithMany("NotificationSenders")
-                        .HasForeignKey("SenderId")
-                        .HasConstraintName("FK_Notification_User1");
-
-                    b.HasOne("ECommerce.Data.Entities.NotificationType", "Type")
-                        .WithMany("Notifications")
-                        .HasForeignKey("TypeId")
-                        .HasConstraintName("FK_Notification_NotificationType");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OptionValue", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Option", "Option")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Option", "Option")
                         .WithMany("OptionValues")
                         .HasForeignKey("OptionId")
                         .HasConstraintName("FK_OptionValue_Option")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.Order", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategory", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.PaymentMethod", "PaymentMethod")
-                        .WithMany("Orders")
-                        .HasForeignKey("PaymentMethodId")
-                        .HasConstraintName("FK_Order_PaymentMethod");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Order_User");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.OrderDetail", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Order", "Order")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
-                        .HasConstraintName("FK_OrderDetail_Order")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Product", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Brand", "Brand")
-                        .WithMany("Products")
-                        .HasForeignKey("BrandId")
-                        .HasConstraintName("FK_Product_Brand")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.Shop", "Shop")
-                        .WithMany("Products")
-                        .HasForeignKey("ShopId")
-                        .HasConstraintName("FK_Product_Shop")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.SubCategory", "SubCategory")
-                        .WithMany("Products")
-                        .HasForeignKey("SubCategoryId")
-                        .HasConstraintName("FK_Product_SubCategory")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductAttribute", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Attribute", "Attribute")
-                        .WithMany("ProductAttributes")
-                        .HasForeignKey("AttributeId")
-                        .HasConstraintName("FK_ProductAttribute_Attribute")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("ProductAttributes")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_ProductAttribute_Product")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductImage", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_ProductImage_Product")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductOptionValue", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.OptionValue", "OptionValue")
-                        .WithMany("ProductOptionValues")
-                        .HasForeignKey("OptionValueId")
-                        .HasConstraintName("FK_ProductOptionValue_OptionValue")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("ProductOptionValues")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_ProductOptionValue_Product")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductPrice", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("ProductPrices")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_ProductPrice_Product")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.ProductType", "ProductType")
-                        .WithMany("ProductPrices")
-                        .HasForeignKey("ProductTypeId")
-                        .HasConstraintName("FK_ProductPrice_ProductType")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ProductUserImage", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("ProductUserImages")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_ProductUserImage_Product");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Rate", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Product", "Product")
-                        .WithMany("Rates")
-                        .HasForeignKey("ProductId")
-                        .HasConstraintName("FK_Rate_Product");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
-                        .WithMany("RateUsers")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Rate_User");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "UserReplied")
-                        .WithMany("RateUserReplieds")
-                        .HasForeignKey("UserRepliedId")
-                        .HasConstraintName("FK_Rate_UserReplied");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.RatingImage", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Rate", "Rate")
-                        .WithMany("RatingImages")
-                        .HasForeignKey("RateId")
-                        .HasConstraintName("FK_RatingImage_Rate");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.Shop", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Discount", "Discount")
-                        .WithMany("Shops")
-                        .HasForeignKey("DiscountId")
-                        .HasConstraintName("FK_Shop_Discount");
-
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
-                        .WithMany("Shops")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK_Shop_User");
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ShopBank", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Shop", "Shop")
-                        .WithMany("ShopBanks")
-                        .HasForeignKey("ShopId")
-                        .HasConstraintName("FK_ShopBank_Shop")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.ShopBrand", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Brand", "Brand")
-                        .WithMany("ShopBrands")
-                        .HasForeignKey("BrandId")
-                        .HasConstraintName("FK_ShopBrand_Brand")
-                        .IsRequired();
-
-                    b.HasOne("ECommerce.Data.Entities.Shop", "Shop")
-                        .WithMany("ShopBrands")
-                        .HasForeignKey("ShopId")
-                        .HasConstraintName("FK_ShopBrand_Shop")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategory", b =>
-                {
-                    b.HasOne("ECommerce.Data.Entities.Category", "Category")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Category", "Category")
                         .WithMany("SubCategories")
                         .HasForeignKey("CategoryId")
                         .HasConstraintName("FK_SubCategory_Category")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.SizeGuide", "SizeGuide")
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.SizeGuide", "SizeGuide")
                         .WithMany("SubCategories")
                         .HasForeignKey("SizeGuideId")
                         .HasConstraintName("FK_SubCategory_SizeGuide");
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategoryAttribute", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategoryAttribute", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Attribute", "Attribute")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Attribute", "Attribute")
                         .WithMany("SubCategoryAttributes")
                         .HasForeignKey("AttributeId")
                         .HasConstraintName("FK_SubCategoryAttribute_Attribute")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.SubCategory", "SubCategory")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.SubCategory", "SubCategory")
                         .WithMany("SubCategoryAttributes")
                         .HasForeignKey("SubCategoryId")
                         .HasConstraintName("FK_SubCategoryAttribute_SubCategory")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.SubCategoryOption", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.Inventory.SubCategoryOption", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Option", "Option")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Option", "Option")
                         .WithMany("SubCategoryOptions")
                         .HasForeignKey("OptionId")
                         .HasConstraintName("FK_SubCategoryOption_Option")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.SubCategory", "SubCategory")
+                    b.HasOne("ECommerce.Data.Entities.Inventory.SubCategory", "SubCategory")
                         .WithMany("SubCategoryOptions")
                         .HasForeignKey("SubCategoryId")
                         .HasConstraintName("FK_SubCategoryOption_SubCategory")
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ECommerce.Data.Entities.UserRole", b =>
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.Order", b =>
                 {
-                    b.HasOne("ECommerce.Data.Entities.Role", "Role")
+                    b.HasOne("ECommerce.Data.Entities.Common.Province", "City")
+                        .WithMany()
+                        .HasForeignKey("CityCode");
+
+                    b.HasOne("ECommerce.Data.Entities.Common.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictCode");
+
+                    b.HasOne("ECommerce.Data.Entities.Common.Ward", "Ward")
+                        .WithMany()
+                        .HasForeignKey("WardCode");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.OmsSchema.OrderDetail", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.OmsSchema.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Brand", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.OmsSchema.Discount", "Discount")
+                        .WithMany("Brands")
+                        .HasForeignKey("DiscountId")
+                        .HasConstraintName("FK_Brand_Discount");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.BrandCategory", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Brand", "Brand")
+                        .WithMany("BrandCategories")
+                        .HasForeignKey("BrandId")
+                        .HasConstraintName("FK_BrandCategory_Brand")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Category", "Category")
+                        .WithMany("BrandCategories")
+                        .HasForeignKey("CategoryId")
+                        .HasConstraintName("FK_BrandCategory_Category")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Interest", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Rate", "Rate")
+                        .WithMany("Interests")
+                        .HasForeignKey("RateId")
+                        .HasConstraintName("FK_Interest_Rate")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "User")
+                        .WithMany("Interests")
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_Interest_User")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Product", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Brand", "Brand")
+                        .WithMany("Products")
+                        .HasForeignKey("BrandId")
+                        .HasConstraintName("FK_Product_Brand")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Shop", "Shop")
+                        .WithMany("Products")
+                        .HasForeignKey("ShopId")
+                        .HasConstraintName("FK_Product_Shop")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.Inventory.SubCategory", "SubCategory")
+                        .WithMany("Products")
+                        .HasForeignKey("SubCategoryId")
+                        .HasConstraintName("FK_Product_SubCategory")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductAttribute", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.Inventory.Attribute", "Attribute")
+                        .WithMany("ProductAttributes")
+                        .HasForeignKey("AttributeId")
+                        .HasConstraintName("FK_ProductAttribute_Attribute")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("ProductAttributes")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_ProductAttribute_Product")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductImage", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("ProductImages")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_ProductImage_Product")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductOptionValue", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.Inventory.OptionValue", "OptionValue")
+                        .WithMany("ProductOptionValues")
+                        .HasForeignKey("OptionValueId")
+                        .HasConstraintName("FK_ProductOptionValue_OptionValue")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("ProductOptionValues")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_ProductOptionValue_Product")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductPrice", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("ProductPrices")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_ProductPrice_Product")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.ProductType", "ProductType")
+                        .WithMany("ProductPrices")
+                        .HasForeignKey("ProductTypeId")
+                        .HasConstraintName("FK_ProductPrice_ProductType")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ProductUserImage", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("ProductUserImages")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_ProductUserImage_Product");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Rate", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Product", "Product")
+                        .WithMany("Rates")
+                        .HasForeignKey("ProductId")
+                        .HasConstraintName("FK_Rate_Product");
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "User")
+                        .WithMany("RateUsers")
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_Rate_User");
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "UserReplied")
+                        .WithMany("RateUserReplieds")
+                        .HasForeignKey("UserRepliedId")
+                        .HasConstraintName("FK_Rate_UserReplied");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.RatingImage", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Rate", "Rate")
+                        .WithMany("RatingImages")
+                        .HasForeignKey("RateId")
+                        .HasConstraintName("FK_RatingImage_Rate");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.Shop", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.OmsSchema.Discount", "Discount")
+                        .WithMany("Shops")
+                        .HasForeignKey("DiscountId")
+                        .HasConstraintName("FK_Shop_Discount");
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "User")
+                        .WithMany("Shops")
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("FK_Shop_User");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ShopBank", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Shop", "Shop")
+                        .WithMany("ShopBanks")
+                        .HasForeignKey("ShopId")
+                        .HasConstraintName("FK_ShopBank_Shop")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.ProductSchema.ShopBrand", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Brand", "Brand")
+                        .WithMany("ShopBrands")
+                        .HasForeignKey("BrandId")
+                        .HasConstraintName("FK_ShopBrand_Brand")
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.ProductSchema.Shop", "Shop")
+                        .WithMany("ShopBrands")
+                        .HasForeignKey("ShopId")
+                        .HasConstraintName("FK_ShopBrand_Shop")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.Notification", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "Receiver")
+                        .WithMany("NotificationReceivers")
+                        .HasForeignKey("ReceiverId")
+                        .HasConstraintName("FK_Notification_User");
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "Sender")
+                        .WithMany("NotificationSenders")
+                        .HasForeignKey("SenderId")
+                        .HasConstraintName("FK_Notification_User1");
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.RoleToPermission", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ECommerce.Data.Entities.UserSchema.UserRole", b =>
+                {
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .HasConstraintName("FK_UserRole_Role")
                         .IsRequired();
 
-                    b.HasOne("ECommerce.Data.Entities.User", "User")
+                    b.HasOne("ECommerce.Data.Entities.UserSchema.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .HasConstraintName("FK_UserRole_User")

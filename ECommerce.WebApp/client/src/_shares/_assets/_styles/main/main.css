@@ -106,8 +106,8 @@
 
 @media only screen and (max-width: 600px) {
   .bran__list-item {
-    width: calc(50% - 10px) !important;
-    margin: 0 10px 10px 0px !important;
+    /* width: calc(50% - 10px) !important; */
+    /* margin: 0 10px 10px 0px !important; */
   }
 
   .bran__list-img {
@@ -171,8 +171,8 @@
 
 .bran__list-item {
   position: relative;
-  width: calc(20% - 1.04167vw);
-  margin: 0 0.52083vw 1.04167vw;
+  /* width: calc(20% - 1.04167vw); */
+  /* margin: 0 0.52083vw 1.04167vw; */
   background-color: #fafafa;
   border: unset;
 }
@@ -2276,7 +2276,7 @@ hr {
 
 .control-list .active,
 .control-list .active svg,
-.control-list li:hover a,
+.control-list li:hover span,
 .control-list li:hover span svg {
   color: var(--blue-dior);
   stroke: var(--blue-dior);

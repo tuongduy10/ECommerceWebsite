@@ -4,6 +4,8 @@ using ECommerce.Application.BaseServices.Product.Models;
 using ECommerce.Application.BaseServices.Product.Response;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.BaseServices.Product
 {
@@ -27,9 +29,9 @@ namespace ECommerce.Application.BaseServices.Product
         Task<List<SizeGuideModel>> SizeGuideList();
         Task<ApiResponse> AddSizeGuide(SizeGuideAddRequest request);
         Task<ApiResponse> UpdateSizeGuide(SizeGuideAddRequest request);
-        Task<Response<Data.Entities.SizeGuide>> SizeGuideDetail(int id);
+        Task<Response<SizeGuide>> SizeGuideDetail(int id);
         Task<ApiResponse> DeleteSizeGuide(int id);
-        Task<Response<Data.Entities.SizeGuide>> GetSizeGuideBySub(int id);
+        Task<Response<SizeGuide>> GetSizeGuideBySub(int id);
         Task<Response<string>> DeleteProductImage(int id);
         Task<Response<string>> DeleteProductUserImage(int id);
     }

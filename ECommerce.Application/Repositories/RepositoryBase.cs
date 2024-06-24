@@ -17,12 +17,6 @@ namespace ECommerce.Application.Repositories
             _DbContext = DbContext;
         }
         // Base
-        public virtual IQueryable<T> Query(Expression<Func<T, bool>> expression = null)
-        {
-            if (expression != null)
-                return _DbContext.Set<T>().Where(expression).AsNoTracking();
-            return _DbContext.Set<T>().AsNoTracking();
-        }
         public virtual IQueryable<T> Queryable(Expression<Func<T, bool>> expression = null, string includes = "")
         {
             IQueryable<T> query = _DbContext.Set<T>().AsQueryable();
@@ -44,15 +38,6 @@ namespace ECommerce.Application.Repositories
         {
             return _DbContext.Set<T>();
         }
-        // Custom
-        public virtual bool Any(Expression<Func<T, bool>> expression)
-        {
-            return _DbContext.Set<T>().Any(expression);
-        }
-        public virtual async Task<bool> AnyAsyncWhere(Expression<Func<T, bool>> expression)
-        {
-            return await _DbContext.Set<T>().AnyAsync(expression);
-        }
         // Single Obj
         public virtual async Task<T> GetAsyncWhere(Expression<Func<T, bool>> expression, string includes = "")
         {
@@ -66,23 +51,6 @@ namespace ECommerce.Application.Repositories
                 }
             }
             return await query.FirstOrDefaultAsync();
-        }
-        public virtual async Task<T> FindLastAsyncWhere(Expression<Func<T, bool>> expression)
-        {
-            return await _DbContext.Set<T>().Where(expression).LastOrDefaultAsync();
-        }
-        // List
-        public virtual IEnumerable<T> ToList()
-        {
-            return _DbContext.Set<T>().ToList();
-        }
-        public virtual IEnumerable<T> ToListWhere(Expression<Func<T, bool>> expression)
-        {
-            return _DbContext.Set<T>().Where(expression).ToList();
-        }
-        public virtual async Task<IEnumerable<T>> ToListAsync()
-        {
-            return await _DbContext.Set<T>().ToListAsync();
         } 
         public virtual async Task<IEnumerable<T>> ToListAsyncWhere(Expression<Func<T, bool>> expression)
         {
@@ -104,38 +72,16 @@ namespace ECommerce.Application.Repositories
         {
             _DbContext.Set<T>().Update(entity);
         }
-        public virtual void UpdateRange(IEnumerable<T> entities)
-        {
-            if (entities != null && entities.Count() > 0)
-                _DbContext.Set<T>().UpdateRange(entities);
-        }
-        // Remove
-        public virtual async Task RemoveAsyncWhere(Expression<Func<T, bool>> expression)
-        {
-            var entity = await GetAsyncWhere(expression);
-            if(entity != null)
-                Remove(entity);
-        }
         public virtual async Task RemoveRangeAsyncWhere(Expression<Func<T, bool>> expression)
         {
             var entities = await ToListAsyncWhere(expression);
             if(entities != null && entities.Count() > 0)
                 RemoveRange(entities);
         }
-        public virtual void Remove(T entity)
-        {
-            if(entity != null)
-                _DbContext.Set<T>().Remove(entity);
-        }
         public virtual void RemoveRange(IEnumerable<T> entities)
         {
             if(entities != null && entities.Count() > 0)
                 _DbContext.Set<T>().RemoveRange(entities);
-        }
-        // Save changes
-        public virtual async Task SaveChangesAsync()
-        {
-            await _DbContext.SaveChangesAsync();
         }
     }
 }

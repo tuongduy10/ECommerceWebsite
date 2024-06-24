@@ -1,3 +1,8 @@
+export interface ICodeName {
+  code: string;
+  name: string;
+}
+
 export interface ICity {
   code: string; // 1
   name: string; // "Thành phố Hà Nội"
@@ -12,8 +17,14 @@ export interface IDistrict {
 }
 
 export interface IWard {
-    code: string; // 1
-    name: string; // "Thành phố Hà Nội"
-    codeName: string; // "thanh_pho_ha_noi"
-    districtCode: string;
+  code: string; // 1
+  name: string; // "Thành phố Hà Nội"
+  codeName: string; // "thanh_pho_ha_noi"
+  districtCode: string;
+}
+
+export interface IPagedRequest {
+  pageIndex: number;
+  pageSize: number;
+  searchKey: string;
 }

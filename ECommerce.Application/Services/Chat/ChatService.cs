@@ -1,14 +1,10 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.Constants;
-using ECommerce.Application.Helpers;
-using ECommerce.Application.Repositories.Message;
-using ECommerce.Application.Repositories.Message.Dtos;
-using ECommerce.Application.Repositories.Notification;
-using ECommerce.Application.Repositories.User;
+using ECommerce.Utilities.Constants;
+using ECommerce.Utilities.Helpers;
 using ECommerce.Application.Services.Chat.Dtos;
-using ECommerce.Application.Services.User;
+using ECommerce.Application.Services.UserSrv;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
+using ECommerce.Data.Entities.UserSchema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;
@@ -16,24 +12,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Abstractions;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.Services.Chat
 {
     public class ChatService : IChatService
     {
-        private ECommerceContext _DbContext;
-        private INotificationRepository _notiRepo;
-        private IMessageRepository _msgRepo;
-        private IUserRepository _userRepo;
-        public ChatService(ECommerceContext DbContext)
+        private readonly IUnitOfWork _uow;
+        public ChatService(IUnitOfWork uow)
         {
-            _DbContext = DbContext;
-            if(_notiRepo == null)
-                _notiRepo = new NotificationRepository(_DbContext);
-            if(_msgRepo == null)
-                _msgRepo = new MessageRepository(_DbContext);
-            if(_userRepo == null)
-                _userRepo = new UserRepository(_DbContext);
+            _uow = uow;
         }
         public async Task<Response<MessageModel>> SendMessage(MessageModel request)
         {
@@ -41,7 +30,7 @@ namespace ECommerce.Application.Services.Chat
             {
                 if (String.IsNullOrEmpty(request.Message))
                     return new FailResponse<MessageModel>("Nội dung không được để trống");
-                var fromUserInfo = await _userRepo.GetAsyncWhere(user => user.UserPhone == request.FromPhoneNumber);
+                var fromUserInfo = await _uow.Repository<User>().FindByAsync(user => user.UserPhone == request.FromPhoneNumber);
 
                 var newMessageHistory = new MessageHistory();
                 newMessageHistory.Message = request.Message.Trim();
@@ -54,8 +43,8 @@ namespace ECommerce.Application.Services.Chat
                 if(!String.IsNullOrEmpty(request.Attachment))
                     newMessageHistory.Attachment = request.Attachment.Trim();
 
-                await _msgRepo.AddAsync(newMessageHistory);
-                await _msgRepo.SaveChangesAsync();
+                await _uow.Repository<MessageHistory>().AddAsync(newMessageHistory);
+                await _uow.SaveChangesAsync();
 
                 // response model
                 var resModel = new MessageModel();
@@ -94,14 +83,14 @@ namespace ECommerce.Application.Services.Chat
                         request.FromPhoneNumber = "0" + request.FromPhoneNumber;
                     }
                 }
-                var userInfo = await _userRepo.GetAsyncWhere(i => i.UserPhone == request.FromPhoneNumber);
+                var userInfo = await _uow.Repository<User>().FindByAsync(i => i.UserPhone == request.FromPhoneNumber);
                 if (userInfo != null)
                 {
                     request.FromName = userInfo.UserFullName;
                 } 
                 else
                 {
-                    var userMsg = await _msgRepo.GetAsyncWhere(i => i.FromPhoneNumber == request.FromPhoneNumber);
+                    var userMsg = await _uow.Repository<MessageHistory>().FindByAsync(i => i.FromPhoneNumber == request.FromPhoneNumber);
                     if (userMsg != null)
                     {
                         request.FromName = userMsg.FromName;
@@ -117,8 +106,8 @@ namespace ECommerce.Application.Services.Chat
                 newMessageHistory.Type = TypeConstant.MSG_FROM_CLIENT;
                 newMessageHistory.Status = StatusConstant.MSG_UNREAD;
 
-                await _msgRepo.AddAsync(newMessageHistory);
-                await _msgRepo.SaveChangesAsync();
+                await _uow.Repository<MessageHistory>().AddAsync(newMessageHistory);
+                await _uow.SaveChangesAsync();
 
                 // response model
                 var resModel = new MessageModel();
@@ -142,15 +131,19 @@ namespace ECommerce.Application.Services.Chat
         {
             try
             {
-                var list = await _userRepo
-                    .Query()
+                var list = (await _uow.Repository<User>().GetByAsync(_ => _.UserId == userId))
                     .Select(i => new UserMessage() { 
                         UserId = i.UserId,
                         FromName = i.UserFullName,
                         FromPhoneNumber = i.UserPhone,
-                        MessageList = _DbContext.MessageHistories
-                            .Where(msg => msg.FromPhoneNumber == i.UserPhone)
-                            .Select(msg => new MessageModel() { 
+                    })
+                    .ToList();
+                foreach (var user in list)
+                {
+                    user.MessageList = (await _uow.Repository<MessageHistory>()
+                            .GetByAsync(msg => msg.FromPhoneNumber == user.FromPhoneNumber))
+                            .Select(msg => new MessageModel()
+                            {
                                 Id = msg.Id,
                                 Message = msg.Message,
                                 Attachment = msg.Attachment,
@@ -158,13 +151,9 @@ namespace ECommerce.Application.Services.Chat
                                 ToPhoneNumber = msg.ToPhoneNumber,
                                 Status = msg.Status
                             })
-                            .ToList()
-                    })
-                    .ToListAsync();
+                            .ToList();
+                }
                 list = list.Where(item => item.MessageList.Count > 0).ToList();
-                if(userId != 0)
-                    list = list.Where(item => item.UserId == userId).ToList();
-
                 return new SuccessResponse<List<UserMessage>>("", list);
             }
             catch (Exception error)
@@ -176,7 +165,7 @@ namespace ECommerce.Application.Services.Chat
         {
             try
             {
-                var groupMsg = from msg in _msgRepo.Query().ToList()
+                var groupMsg = from msg in _uow.Repository<MessageHistory>().QueryableAsync()
                                group msg by new
                                {
                                    msg.FromName,
@@ -217,7 +206,7 @@ namespace ECommerce.Application.Services.Chat
         {
             try
             {
-                var groupMsg = from msg in _msgRepo.Query().ToList()
+                var groupMsg = from msg in _uow.Repository<MessageHistory>().QueryableAsync()
                                where msg.Type == TypeConstant.MSG_FROM_CLIENT
                                group msg by new
                                {
@@ -228,12 +217,11 @@ namespace ECommerce.Application.Services.Chat
                 var list = new List<UserMessage>();
                 foreach (var msg in groupMsg)
                 {
-                    var messages = await _msgRepo
-                            .Query()
-                            .Where(item =>
+                    var messages = (await _uow.Repository<MessageHistory>()
+                        .GetByAsync(
+                            item =>
                                 item.FromPhoneNumber == msg.Key.FromPhoneNumber && 
-                                item.ToPhoneNumber == null
-                            )
+                                item.ToPhoneNumber == null))
                             .Select(i => new MessageModel()
                             {
                                 Message = i.Message,
@@ -241,7 +229,7 @@ namespace ECommerce.Application.Services.Chat
                                 CreateDateLabel = ((DateTime)i.CreateDate).ToString(ConfigConstant.DATE_FORMAT),
                                 Status = i.Status
                             })
-                            .ToListAsync();
+                            .ToList();
                     list.Add(new UserMessage()
                     {
                         FromName = msg.Key.FromName,
@@ -261,12 +249,11 @@ namespace ECommerce.Application.Services.Chat
         {
             try
             {
-                var list = await _msgRepo
-                    .Query()
-                    .Where(item => 
+                var list = (await _uow.Repository<MessageHistory>()
+                    .GetByAsync(item => 
                         (item.FromPhoneNumber == request.fromPhoneNumber && item.ToPhoneNumber == null) ||
-                        item.ToPhoneNumber == request.fromPhoneNumber
-                    ).Select(msg => new MessageModel() {
+                        item.ToPhoneNumber == request.fromPhoneNumber, _ => _.OrderByDescending(i => i.CreateDate)))
+                    .Select(msg => new MessageModel() {
                         Id = msg.Id,
                         Attachment = msg.Attachment,
                         CreateDate = msg.CreateDate,
@@ -278,8 +265,7 @@ namespace ECommerce.Application.Services.Chat
                         Type = msg.Type,
                         Status = msg.Status,
                     })
-                    .OrderBy(item => item.CreateDate)
-                    .ToListAsync();
+                    .ToList();
 
                 if (list != null && list.Count() > 0)
                 {
@@ -303,13 +289,13 @@ namespace ECommerce.Application.Services.Chat
                 .ToList();
             if (unReadMsgIds.Count() > 0)
             {
-                var unReadMsg = await _msgRepo.ToListAsyncWhere(i => unReadMsgIds.Contains(i.Id));
+                var unReadMsg = await _uow.Repository<MessageHistory>().GetByAsync(i => unReadMsgIds.Contains(i.Id));
                 foreach (var msg in unReadMsg)
                 {
                     msg.Status = StatusConstant.MSG_READ;
                 }
-                _msgRepo.UpdateRange(unReadMsg);
-                await _msgRepo.SaveChangesAsync();
+                _uow.Repository<MessageHistory>().Update(unReadMsg);
+                await _uow.SaveChangesAsync();
             }
         }
         public async Task<Response<MessageModel>> SaveOfflineMessageAsync(OfflineMessage request)
@@ -334,8 +320,8 @@ namespace ECommerce.Application.Services.Chat
                 messageModel.Message = request.Message.Trim();
                 messageModel.FromName = request.FromName.Trim();
                 messageModel.FromPhoneNumber = request.FromPhoneNumber.Trim();
-                await _msgRepo.AddAsync(messageModel);
-                await _msgRepo.SaveChangesAsync();
+                await _uow.Repository<MessageHistory>().AddAsync(messageModel);
+                await _uow.SaveChangesAsync();
 
 
                 return new SuccessResponse<MessageModel>("success");

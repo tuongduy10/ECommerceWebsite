@@ -34,8 +34,10 @@ export interface ISubCategory {
   id: number;
   name: string;
   categoryId?: number;
+  category?: ICategory;
   optionList?: IOption[];
   attributes?: IAttribute[];
+  sizeGuide?: any | null;
 }
 
 export interface IAttribute {

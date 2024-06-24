@@ -2,13 +2,14 @@
 using ECommerce.Application.BaseServices.Configurations.Dtos;
 using ECommerce.Application.BaseServices.Configurations.Dtos.Footer;
 using ECommerce.Data.Context;
-using ECommerce.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ECommerce.Data.Entities.Cms;
+using ECommerce.Utilities.Shared.Responses;
 
 namespace ECommerce.Application.BaseServices.Configurations
 {
@@ -60,7 +61,7 @@ namespace ECommerce.Application.BaseServices.Configurations
             if (request.BlogTitle == null) return new ApiFailResponse("Tiêu đề không được để trống");
             if (request.BlogPosition == null) return new ApiFailResponse("Vị trí không được để trống");
 
-            Data.Entities.Blog blog = new Data.Entities.Blog();
+            Blog blog = new Blog();
             blog.BlogTitle = request.BlogTitle;
             blog.BlogContent = request.BlogContent;
             blog.BlogPosition = request.BlogPosition;

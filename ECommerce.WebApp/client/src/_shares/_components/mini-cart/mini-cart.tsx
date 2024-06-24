@@ -3,33 +3,19 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
-import ProductService from "src/_cores/_services/product.service";
-import { useCartStore } from "src/_cores/_store/root-store";
+import { AppDispatch, useCartStore } from "src/_cores/_store/root-store";
 import { ProductHelper } from "src/_shares/_helpers/product-helper";
 import MuiIcon from "../mui-icon/mui-icon.component";
 import { ICON_NAME } from "../mui-icon/_enums/mui-icon.enum";
-import { removeItem } from "src/_cores/_reducers/cart.reducer";
+import { removeItem, updateProductPrice } from "src/_cores/_reducers/cart.reducer";
 
 export default function MiniCart() {
-    const [products, setProducts] = useState<any>([]);
     const cartStore = useCartStore();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
-        getProducts();
+        dispatch(updateProductPrice(cartStore.productsInCart.map(_ => _.id)));
     }, [cartStore.totalQty]);
-
-    const getProducts = async () => {
-        if (cartStore.productsInCart.length > 0) {
-            const params = {
-                ids: cartStore.productsInCart.map(_ => _.id)
-            }
-            const response = await ProductService.getProductList(params) as any;
-            if (response.isSucceed) {
-                setProducts(response.data?.items);
-            }
-        }
-    }
 
     const removeCartItem = (uniqId: string) => {
         dispatch(removeItem(uniqId));

@@ -21,6 +21,7 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     getProductDetail();
+    window.scrollTo(0, 0);
   }, [_id]);
 
   const getProductDetail = () => {

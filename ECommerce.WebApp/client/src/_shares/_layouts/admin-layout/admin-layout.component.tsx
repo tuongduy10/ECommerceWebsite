@@ -14,6 +14,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import ArticleIcon from '@mui/icons-material/Article';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Accordion, AccordionDetails, AccordionSummary, Collapse, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
@@ -25,17 +26,21 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import CategoryIcon from '@mui/icons-material/Category';
+import StorageIcon from '@mui/icons-material/Storage';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Outlet, useNavigate } from 'react-router-dom';
 import SessionService from 'src/_cores/_services/session.service';
 import { ADMIN_ROUTE_NAME } from 'src/_cores/_enums/route-config.enum';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { useAuthStore } from 'src/_cores/_store/root-store';
+import { useDispatch } from 'react-redux';
+import { logout } from 'src/_cores/_reducers/auth.reducer';
 
 const mainListItems = [
     { name: "dashboard", icon: <HomeRoundedIcon />, label: "Trang chủ", path: "/" },
     {
         name: "product",
-        icon: <InventoryIcon />,
+        icon: <StorageIcon />,
         label: "Sản phẩm",
         path: "",
         childs: [
@@ -48,6 +53,11 @@ const mainListItems = [
                 name: 'add',
                 label: 'Thêm sản phẩm',
                 path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_ADD,
+            },
+            {
+                name: 'settings',
+                label: 'Cài đặt',
+                path: ADMIN_ROUTE_NAME.MANAGE_PRODUCT_SETTINGS,
             },
         ]
     },
@@ -62,6 +72,21 @@ const mainListItems = [
                 label: 'Danh mục',
                 path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_CATEGORY,
             },
+            {
+                name: 'subCategory',
+                label: 'Loại sản phẩm',
+                path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_SUB_CATEGORY,
+            },
+            {
+                name: 'options',
+                label: 'Thông tin tùy chọn',
+                path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_OPTIONS,
+            },
+            {
+                name: 'attributes',
+                label: 'Thông tin chi tiết',
+                path: ADMIN_ROUTE_NAME.MANAGE_INVENTORY_ATTRIBUTES,
+            },
         ]
     },
     {
@@ -70,16 +95,9 @@ const mainListItems = [
         label: "Bán hàng",
         path: "",
         childs: [
-            {
-                name: 'shops',
-                label: 'Cửa hàng',
-                path: '',
-            },
-            {
-                name: 'brands',
-                label: 'Thương hiệu',
-                path: '',
-            },
+            { name: 'paymentMethods', label: 'Phương thức thanh toán', path: ADMIN_ROUTE_NAME.MANAGE_SALES_PAYMENT_METHODS },
+            { name: 'shops', label: 'Cửa hàng', path: '', },
+            { name: 'brands', label: 'Thương hiệu', path: '', },
         ]
     },
     {
@@ -89,9 +107,9 @@ const mainListItems = [
         path: "",
         childs: [
             {
-                name: 'pending',
-                label: 'Chờ xác nhận',
-                path: '',
+                name: 'order-list',
+                label: 'Danh sách Đơn hàng',
+                path: ADMIN_ROUTE_NAME.MANAGE_OMS_ORDER_LIST,
             },
         ]
     },
@@ -113,6 +131,7 @@ const mainListItems = [
             }
         ]
     },
+    { name: 'blogs', icon: <ArticleIcon />, label: 'Nội dung', path: ADMIN_ROUTE_NAME.MANAGE_BLOGS },
     { name: "statistical", icon: <BarChartIcon />, label: "Thống kê", path: "" },
 ];
 
@@ -180,6 +199,8 @@ export default function AdminLayout() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [open, setOpen] = React.useState(true);
     const [selectedItem, setSelectedItem] = React.useState('');
+    const authStore = useAuthStore();
+    const dispatch = useDispatch();
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -281,7 +302,7 @@ export default function AdminLayout() {
                             <MenuItem onClick={() => setAnchorEl(null)}>Hồ sơ</MenuItem>
                             <MenuItem onClick={() => {
                                 setAnchorEl(null);
-                                SessionService.deleteAccessToken();
+                                dispatch(logout());
                                 window.location.href = ADMIN_ROUTE_NAME.LOGIN;
                             }}>Đăng xuất</MenuItem>
                         </Menu>
