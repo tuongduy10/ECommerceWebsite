@@ -34,4 +34,5 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./publish
-        server-dir: /httpdocs # Adjust this path if necessary
+        server-dir: /httpdocs
+        exclude: 'wwwroot/**/*' # Adjust this path if necessary
