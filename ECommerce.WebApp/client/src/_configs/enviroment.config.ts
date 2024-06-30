@@ -1,4 +1,4 @@
-const APP_URL = 'https://hihichi.com';
+const APP_URL = 'https://www.hihichi.com';
 // const APP_URL = 'https://localhost:44330';
 
 export const ENV = {
