@@ -51,13 +51,47 @@ jobs:
           name: publish
           path: ./publish
 
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
+      - name: Install PowerShell
+        uses: actions/setup-powershell@v1
+        with:
+          pwsh-version: '7.x' # Replace with the version of PowerShell you need
 
-      - name: Deploy to Plesk
+      - name: Deploy to FTP
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -c "set ftp:ssl-allow no; open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER; mirror -R --exclude-glob wwwroot/* ./publish /httpdocs"
+          $ftpServer = "${{ secrets.FTP_SERVER }}"
+          $ftpUsername = "${{ secrets.FTP_USERNAME }}"
+          $ftpPassword = "${{ secrets.FTP_PASSWORD }}"
+          
+          # FTP connection details
+          $ftpUrl = "ftp://$ftpUsername:$ftpPassword@$ftpServer/"
+          
+          # Local path to your published files
+          $localPath = "./publish"
+          
+          # Remote path on FTP server
+          $remotePath = "/httpdocs"
+          
+          # Create FTP session
+          $session = New-Object -TypeName System.Net.WebClient
+          $session.Credentials = New-Object System.Net.NetworkCredential($ftpUsername, $ftpPassword)
+          
+          try {
+              # Change to remote directory
+              $session.ChangeDirectory($remotePath)
+              
+              # Upload files
+              $files = Get-ChildItem -Path $localPath -Recurse -File
+              foreach ($file in $files) {
+                  $remoteFile = ($remotePath + $file.FullName.Substring($localPath.Length)).Replace("\", "/")
+                  Write-Output "Uploading $($file.FullName) to $($remoteFile)"
+                  $session.UploadFile($file.FullName, $remoteFile)
+              }
+          }
+          finally {
+              # Dispose of the FTP session
+              $session.Dispose()
+          }
