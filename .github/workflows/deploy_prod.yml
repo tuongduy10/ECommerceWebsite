@@ -52,7 +52,7 @@ jobs:
       - name: Update database
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-        run: dotnet ef database update --project ECommerce.Data/ECommerce.Data.csproj --connection "$CONNECTION_STRING"
+        run: dotnet ef database update --project ECommerce.Data/ECommerce.Data.csproj
 
   deploy:
     runs-on: ubuntu-latest
