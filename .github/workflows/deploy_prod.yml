@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - deploy/prod
+      - workout/cicd
 
 jobs:
   build:
@@ -50,8 +51,8 @@ jobs:
           name: publish
           path: ./publish
 
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
+      - name: Install ftp-upload
+        run: sudo apt-get install ftp-upload
 
       - name: Deploy to Plesk
         env:
@@ -59,4 +60,4 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -c "set ftp:ssl-allow no; open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER; mirror -R --exclude-glob wwwroot/* ./publish /httpdocs"
+          ftp-upload -h $FTP_SERVER -u $FTP_USERNAME --password $FTP_PASSWORD -d /httpdocs ./publish
