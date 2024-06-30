@@ -18,11 +18,19 @@ jobs:
         with:
           dotnet-version: "3.1.x"
 
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef --version 3.1.8
+
       - name: Restore dependencies
         run: dotnet restore ECommerce.WebApp/ECommerce.WebApp.csproj
 
       - name: Build
         run: dotnet build --configuration Release ECommerce.WebApp/ECommerce.WebApp.csproj --no-restore
+
+      - name: Update database
+        env:
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+        run: dotnet ef database update
 
       - name: Publish
         run: dotnet publish --configuration Release --output ./publish ECommerce.WebApp/ECommerce.WebApp.csproj
@@ -32,27 +40,6 @@ jobs:
         with:
           name: publish
           path: ./publish
-
-  update-database:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: "3.1.x"
-
-      - name: Install EF Core tools
-        run: dotnet tool install --global dotnet-ef --version 3.1.8
-
-      - name: Update database
-        env:
-          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-        run: dotnet ef database update --project ECommerce.Data/ECommerce.Data.csproj
 
   deploy:
     runs-on: ubuntu-latest
