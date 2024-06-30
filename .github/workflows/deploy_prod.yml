@@ -47,7 +47,7 @@ jobs:
           dotnet-version: "3.1.x"
 
       - name: Install EF Core tools
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 3.1.8
 
       - name: Update database
         env:
