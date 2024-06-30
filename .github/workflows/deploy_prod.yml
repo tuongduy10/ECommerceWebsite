@@ -58,6 +58,6 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
-          server-dir: /httpdocs
+          server-dir: /httpdocs/
           exclude: 'wwwroot/**' # Example exclusion, adjust as needed
           timeout: 120000 # Optional: Timeout in milliseconds
