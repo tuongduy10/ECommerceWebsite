@@ -27,11 +27,6 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release ECommerce.WebApp/ECommerce.WebApp.csproj --no-restore
 
-      - name: Update database
-        env:
-          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-        run: dotnet ef database update
-
       - name: Publish
         run: dotnet publish --configuration Release --output ./publish ECommerce.WebApp/ECommerce.WebApp.csproj
 
