@@ -1,0 +1,80 @@
+name: Deploy to Plesk
+
+on:
+  push:
+    branches:
+      - deploy/prod
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "7.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore ECommerce.WebApp/ECommerce.WebApp.csproj
+
+      - name: Build
+        run: dotnet build --configuration Release ECommerce.WebApp/ECommerce.WebApp.csproj --no-restore
+
+      - name: Publish
+        run: dotnet publish --configuration Release --output ./publish ECommerce.WebApp/ECommerce.WebApp.csproj
+
+      - name: Save publish output
+        uses: actions/upload-artifact@v2
+        with:
+          name: publish
+          path: ./publish
+
+  update-database:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "7.0.x"
+
+      - name: Install EF Core tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Update database
+        env:
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+        run: dotnet ef database update --project ECommerce.Data/ECommerce.Data.csproj --connection "$CONNECTION_STRING"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: update-database
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download publish output
+        uses: actions/download-artifact@v2
+        with:
+          name: publish
+          path: ./publish
+
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy to Plesk
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -c "set ftp:ssl-allow no; open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER; mirror -R --exclude-glob wwwroot/* ./publish /httpdocs"
