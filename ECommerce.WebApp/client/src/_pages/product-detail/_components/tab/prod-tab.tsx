@@ -13,7 +13,7 @@ const ProductDetailTab = () => {
   const productStore = useProductStore();
   const productDetail = productStore.productDetail;
   const [activeTab, setActiveTab] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);//
 
   const [comments, setComments] = useState<IComment[]>([]);
 
