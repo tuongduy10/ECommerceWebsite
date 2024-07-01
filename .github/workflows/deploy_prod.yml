@@ -62,11 +62,10 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
+          local-dir: ./tmp/
           server-dir: /httpdocs/
           exclude: |
-            *
-            !tmp/app_offline.htm
+            !**
       
       - name: Wait 5 seconds
         uses: MintPlayer/github-actions/delay@v3
@@ -81,7 +80,9 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
           server-dir: /httpdocs/
-          exclude: 'wwwroot/**' # Example exclusion, adjust as needed
+          exclude: |
+            app_offline.htm
+            'wwwroot/**' 
           timeout: 1200000
 
       - name: Wait 5 seconds
