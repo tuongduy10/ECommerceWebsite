@@ -23,6 +23,7 @@ namespace ECommerce.Application.Services.Inventory
         Task<Response<SubCategory>> updateSubCategory(SubCategoryModel request);
         Task<Response<SubCategory>> addSubCategory(SubCategoryModel request);
         Task<Response<bool>> deleteSubCategory(int id);
+        Task<Response<bool>> deleteAttribute(int id);
         Task<Response<List<OptionModel>>> getOptions(InventoryRequest request);
         Task<Response<bool>> addOptions(OptionModel request);
         Task<Response<bool>> updateOptions(OptionModel request);

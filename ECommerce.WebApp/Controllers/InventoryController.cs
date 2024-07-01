@@ -161,6 +161,14 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [HttpPost("delete-attribute")]
+        public async Task<IActionResult> deleteAttribute([FromBody] int id)
+        {
+            var result = await _inventoryService.deleteAttribute(id);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
         [HttpPost("save-attributes")]
         public async Task<IActionResult> saveAttributes(InventoryRequest request)
         {

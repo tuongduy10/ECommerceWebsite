@@ -15,6 +15,7 @@ namespace ECommerce.Data.Entities.Inventory
 
         public int OptionId { get; set; }
         public string OptionName { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual ICollection<OptionValue> OptionValues { get; set; }
         public virtual ICollection<SubCategoryOption> SubCategoryOptions { get; set; }

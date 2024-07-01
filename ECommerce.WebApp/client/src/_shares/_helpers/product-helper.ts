@@ -5,6 +5,12 @@ export class ProductHelper {
     const formattedList = [];
 
     for (const item of productList) {
+      const price = Number(item.pricePreOrder) || Number(item.priceAvailable);
+      const priceOnSell = Number(item.discountPreOrder) || Number(item.discountAvailable);
+      const discountPercent = priceOnSell
+        ? Math.round(((price - priceOnSell) * 100) / price)
+        : item.discountPercent;
+
       const pro = {
         id: item.id,
         name: item.name,
@@ -12,14 +18,14 @@ export class ProductHelper {
           item.imagePaths && item.imagePaths.length > 0
             ? item.imagePaths[0]
             : "",
-        discountPercent: item.discountPercent,
+        discountPercent: discountPercent,
         isNew: item.isNew,
         isHighlight: item.isHighlight,
         shopName: item.shopName,
         brandName: item.brandName,
         importDate: item.importDate,
-        price: item.pricePreOrder ?? item.priceAvailable,
-        priceOnSell: item.discountPreOrder ?? item.discountAvailable,
+        price: price,
+        priceOnSell: priceOnSell,
         nameType:
           item.pricePreOrder != null || item.discountPreOrder != null ? "Hàng đặt trước" : 
           item.priceAvailable != null || item.discountAvailable != null ? "Hàng có sẵn" : "",
