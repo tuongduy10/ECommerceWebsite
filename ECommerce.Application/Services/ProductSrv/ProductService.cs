@@ -41,7 +41,6 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly IRepositoryBase<ProductImage> _productImageRepo;
         private readonly IRepositoryBase<ProductUserImage> _productUserImageRepo;
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
-        private readonly IRepositoryBase<Rate> _rateRepo;
         private readonly IRepositoryBase<Discount> _discountRepo;
         private readonly IRateService _rateService;
         private readonly ICommonService _commonService;
@@ -82,8 +81,6 @@ namespace ECommerce.Application.Services.ProductSrv
                 _shopRepo = new RepositoryBase<Shop>(_DbContext);
             if (_productAttributeRepo == null)
                 _productAttributeRepo = new RepositoryBase<ProductAttribute>(_DbContext);
-            if (_rateRepo == null)
-                _rateRepo = new RepositoryBase<Rate>(_DbContext);
             if (_discountRepo == null)
                 _discountRepo = new RepositoryBase<Discount>(_DbContext);
             _uow = uow;
@@ -92,8 +89,8 @@ namespace ECommerce.Application.Services.ProductSrv
         {
             try
             {
-                var rates = _rateRepo.Entity()
-                    .Where(i => i.ProductId == id)
+                var rates = (await _uow.Repository<Rate>()
+                    .GetByAsync(i => i.ProductId == id))
                     .Select(i => new RateModel
                     {
                         id = i.RateId,
