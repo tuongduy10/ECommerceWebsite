@@ -64,7 +64,9 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish/
           server-dir: /httpdocs/
-          exclude: 'wwwroot/**'
+          exclude: |
+            *
+            !tmp/app_offline.htm
       
       - name: Wait 5 seconds
         uses: MintPlayer/github-actions/delay@v3
