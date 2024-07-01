@@ -17,6 +17,7 @@ const Footer = () => {
         const res = await CmsService.getConfig() as any;
         if (res?.isSucceed) {
             setConfig(res?.data);
+            localStorage.setItem('config', JSON.stringify(res?.data));
         }
     }
 

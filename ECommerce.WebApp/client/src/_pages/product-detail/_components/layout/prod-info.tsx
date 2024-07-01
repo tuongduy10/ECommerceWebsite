@@ -28,6 +28,8 @@ const ProductDetailInfo = () => {
   const [options, setOptions] = useState<{ id: any, value: any }[]>([]);
   const [isShowCodeDis, setShowCodeDis] = useState(false);
   const [openBrandDes, setOpenBrandDes] = useState(false);
+  const [config, setConfig] = useState<any>();
+  const configLocalStorage = localStorage.getItem('config');
 
   useEffect(() => {
     if (productDetail) {
@@ -40,6 +42,9 @@ const ProductDetailInfo = () => {
           setSelectedPriceType('PREORDER');
         }
       }
+    }
+    if (configLocalStorage) {
+      setConfig(JSON.parse(configLocalStorage));
     }
   }, [productDetail]);
 
@@ -222,11 +227,11 @@ const ProductDetailInfo = () => {
           </div>
           <div className="flex mb-4">
             <div className="w-6/12">
-              <a className="product__detail-action" href="tel: 0935939401">
+              <a className="product__detail-action" href={'tel:' + (config?.phoneNumber ?? '')}>
                 <span className="icon mr-2">
                   <MuiIcon name={ICON_NAME.FEATHER.PHONE_PRODUCT_DETAIL} className="feather feather-phone" />
                 </span>
-                <span className="text text-[#707070]">0935939401</span>
+                <span className="text text-[#707070]">{config?.phoneNumber ?? ''}</span>
               </a>
             </div>
             <div className="w-6/12">
