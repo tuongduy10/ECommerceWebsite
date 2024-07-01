@@ -66,13 +66,14 @@ jobs:
           server-dir: /httpdocs/
           exclude: |
             !**
+            'wwwroot/**'
       
       - name: Wait 5 seconds
         uses: MintPlayer/github-actions/delay@v3
         with:
           milliseconds: 5000
 
-      - name: FTP Deploy
+      - name: Deploy App
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ${{ secrets.FTP_SERVER }}
