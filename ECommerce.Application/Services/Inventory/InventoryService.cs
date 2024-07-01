@@ -380,15 +380,14 @@ namespace ECommerce.Application.Services.Inventory
         }
         public async Task<Response<bool>> deleteSubCategory(int id)
         {
-            try
+            var ent = await _uow.Repository<SubCategory>().FindByAsync(_ => _.SubCategoryId == id);
+            if (ent != null)
             {
-                
-                return new SuccessResponse<bool>();
+                ent.IsDeleted = true;
+                _uow.Repository<SubCategory>().Update(ent);
+                await _uow.SaveChangesAsync();
             }
-            catch
-            {
-                throw;
-            }
+            return new SuccessResponse<bool>();
         }
         public async Task<Response<List<OptionModel>>> getOptions(InventoryRequest request)
         {
@@ -632,6 +631,17 @@ namespace ECommerce.Application.Services.Inventory
             {
                 return new FailResponse<List<AttributeModel>>(error.Message);
             }
+        }
+        public async Task<Response<bool>> deleteAttribute(int id)
+        {
+            var ent = await _uow.Repository<Data.Entities.Inventory.Attribute>().FindByAsync(_ => _.AttributeId == id);
+            if (ent != null)
+            {
+                ent.IsDeleted = true;
+                _uow.Repository<Data.Entities.Inventory.Attribute>().Update(ent);
+                await _uow.SaveChangesAsync();
+            }
+            return new SuccessResponse<bool>();
         }
         public async Task<Response<bool>> saveAttributes(InventoryRequest request)
         {

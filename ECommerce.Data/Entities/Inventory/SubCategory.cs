@@ -19,6 +19,7 @@ namespace ECommerce.Data.Entities.Inventory
         public string SubCategoryName { get; set; }
         public int CategoryId { get; set; }
         public int? SizeGuideId { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual Category Category { get; set; }
         public virtual SizeGuide SizeGuide { get; set; }
