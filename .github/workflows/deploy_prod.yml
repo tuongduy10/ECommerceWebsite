@@ -82,7 +82,7 @@ jobs:
           server-dir: /httpdocs/
           exclude: |
             app_offline.htm
-            'wwwroot/**' 
+            wwwroot/** 
           timeout: 1200000
 
       - name: Wait 5 seconds
