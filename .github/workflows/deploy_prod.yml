@@ -55,6 +55,17 @@ jobs:
         run: |
           mkdir tmp
           echo "" > tmp/app_offline.htm
+
+      - name: Upload app_offline.htm
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /httpdocs/
+          exclude: |
+            !**
       
       - name: Wait 5 seconds
         uses: MintPlayer/github-actions/delay@v3
