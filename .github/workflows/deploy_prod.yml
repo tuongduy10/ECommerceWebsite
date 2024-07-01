@@ -70,6 +70,7 @@ jobs:
           local-dir: ./publish/
           server-dir: /httpdocs/
           exclude: 'wwwroot/**' # Example exclusion, adjust as needed
+          timeout: 1200000
 
       - name: Wait 5 seconds
         uses: MintPlayer/github-actions/delay@v3
