@@ -380,6 +380,7 @@ namespace ECommerce.Application.Services.Inventory
         }
         public async Task<Response<bool>> deleteSubCategory(int id)
         {
+            // soft delete
             var ent = await _uow.Repository<SubCategory>().FindByAsync(_ => _.SubCategoryId == id);
             if (ent != null)
             {
