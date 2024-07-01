@@ -50,6 +50,17 @@ jobs:
         with:
           name: publish
           path: ./publish
+      
+      - name: Create app_offline.htm
+        shell: bash
+        run: |
+          mkdir tmp
+          echo "" > tmp/app_offline.htm
+      
+      - name: Wait 5 seconds
+        uses: MintPlayer/github-actions/delay@v3
+        with:
+          milliseconds: 5000
 
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.2.0
@@ -60,4 +71,17 @@ jobs:
           local-dir: ./publish/
           server-dir: /httpdocs/
           exclude: 'wwwroot/**' # Example exclusion, adjust as needed
-          timeout: 120000 # Optional: Timeout in milliseconds
+
+      - name: Wait 5 seconds
+        uses: MintPlayer/github-actions/delay@v3
+        with:
+          milliseconds: 5000
+
+      - name: Delete app_offline.htm
+        uses: StephanThierry/ftp-delete-action@v2.1
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          remoteFiles: httpdocs/app_offline.htm
+          ignoreSSL: 1
