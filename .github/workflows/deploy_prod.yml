@@ -3,7 +3,7 @@ name: Deploy to Plesk
 on:
   push:
     branches:
-      - workout/cicd
+      - deploy/prod
 
 jobs:
   build:
@@ -50,13 +50,13 @@ jobs:
           name: publish
           path: ./publish
       
-      - name: Create app_offline.htm
+      - name: Prepare to shut down
         shell: bash
         run: |
           mkdir tmp
           echo "" > tmp/app_offline.htm
 
-      - name: Upload app_offline.htm
+      - name: Shutting down...
         uses: SamKirkland/FTP-Deploy-Action@v4.3.3
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -66,13 +66,14 @@ jobs:
           server-dir: /httpdocs/
           exclude: |
             !**
+          timeout: 1200000
       
-      - name: Wait 5 seconds
+      - name: Prepare to deploy
         uses: MintPlayer/github-actions/delay@v3
         with:
           milliseconds: 5000
 
-      - name: Deploy App
+      - name: Deploying...
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -85,12 +86,12 @@ jobs:
             wwwroot/** 
           timeout: 1200000
 
-      - name: Wait 5 seconds
+      - name: Prepare to turn on
         uses: MintPlayer/github-actions/delay@v3
         with:
           milliseconds: 5000
 
-      - name: Delete app_offline.htm
+      - name: Turning on...
         uses: StephanThierry/ftp-delete-action@v2.1
         with:
           host: ${{ secrets.FTP_SERVER }}
