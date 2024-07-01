@@ -3,7 +3,7 @@ name: Deploy to Plesk
 on:
   push:
     branches:
-      - deploy/prod
+      - workout/cicd
 
 jobs:
   build:
@@ -49,14 +49,39 @@ jobs:
         with:
           name: publish
           path: ./publish
-
-      - name: Install lftp
-        run: sudo apt-get install -y lftp
-
-      - name: Deploy to Plesk
-        env:
-          FTP_SERVER: ${{ secrets.FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      
+      - name: Create app_offline.htm
+        shell: bash
         run: |
-          lftp -c "set ftp:ssl-allow no; open -u $FTP_USERNAME,$FTP_PASSWORD $FTP_SERVER; mirror -R --exclude-glob wwwroot/* ./publish /httpdocs"
+          mkdir tmp
+          echo "" > tmp/app_offline.htm
+      
+      - name: Wait 5 seconds
+        uses: MintPlayer/github-actions/delay@v3
+        with:
+          milliseconds: 5000
+
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /httpdocs/
+          exclude: 'wwwroot/**' # Example exclusion, adjust as needed
+          timeout: 1200000
+
+      - name: Wait 5 seconds
+        uses: MintPlayer/github-actions/delay@v3
+        with:
+          milliseconds: 5000
+
+      - name: Delete app_offline.htm
+        uses: StephanThierry/ftp-delete-action@v2.1
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          remoteFiles: httpdocs/app_offline.htm
+          ignoreSSL: 1
