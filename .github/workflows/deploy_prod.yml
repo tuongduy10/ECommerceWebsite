@@ -3,7 +3,7 @@ name: Deploy to Plesk
 on:
   push:
     branches:
-      - deploy/prod
+      - workout/cicd
 
 jobs:
   build:
