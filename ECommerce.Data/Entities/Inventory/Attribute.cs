@@ -14,6 +14,7 @@ namespace ECommerce.Data.Entities.Inventory
             SubCategoryAttributes = new HashSet<SubCategoryAttribute>();
         }
 
+        public bool IsDeleted { get; set; }
         public int AttributeId { get; set; }
         public string AttributeName { get; set; }
 

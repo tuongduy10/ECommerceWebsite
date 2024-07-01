@@ -38,7 +38,7 @@ const ProductListPage = () => {
       brandId: _brandId,
       orderBy: _orderBy,
       filterBy: _filterBy,
-      isNew: isNewPathName || _filterBy === "newest",
+      isNew: isNewPathName,
       isHotSale: isHotSalePathName || _filterBy === "discount",
       isAvailable: isAvailable,
       isPreOrder: isPreOrder,

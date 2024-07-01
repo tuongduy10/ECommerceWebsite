@@ -36,9 +36,11 @@ export const PRODUCT_API_URL = {
 }
 
 export const INVENTORY_API_URL = {
-    OPTIONS: '/inventory/options',
     ATTRIBUTES: '/inventory/attributes',
     SAVE_ATTRIBUTES: '/inventory/save-attributes',
+    DELETE_ATTRIBUTE: '/inventory/delete-attribute',
+
+    OPTIONS: '/inventory/options',
     SAVE_OPTIONS: '/inventory/save-options',
     DELETE_OPTION: '/inventory/delete-option',
     GET_BRAND: '/inventory/get-brand',
