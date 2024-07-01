@@ -37,7 +37,6 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly IRepositoryBase<SubCategory> _subCategoryRepo;
         private readonly IRepositoryBase<SubCategoryOption> _subCategoryOptionRepo;
         private readonly IRepositoryBase<ProductOptionValue> _productOptionValueRepo;
-        private readonly IRepositoryBase<Shop> _shopRepo;
         private readonly IRepositoryBase<ProductImage> _productImageRepo;
         private readonly IRepositoryBase<ProductUserImage> _productUserImageRepo;
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
@@ -77,8 +76,6 @@ namespace ECommerce.Application.Services.ProductSrv
                 _productUserImageRepo = new RepositoryBase<ProductUserImage>(_DbContext);
             if (_brandRepo == null)
                 _brandRepo = new RepositoryBase<Brand>(_DbContext);
-            if (_shopRepo == null)
-                _shopRepo = new RepositoryBase<Shop>(_DbContext);
             if (_productAttributeRepo == null)
                 _productAttributeRepo = new RepositoryBase<ProductAttribute>(_DbContext);
             if (_discountRepo == null)
