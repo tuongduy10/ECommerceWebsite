@@ -1,3 +1,4 @@
+import { Autocomplete, Input, InputAdornment, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -11,6 +12,7 @@ import { MiniCart } from "src/_shares/_components";
 import HeaderNavMobile from "src/_shares/_components/header-nav/nav-mobile.component";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import MuiIcon from "src/_shares/_components/mui-icon/mui-icon.component";
+import SearchForm from "src/_shares/_components/search-form/search-form.component";
 
 const Header = () => {
     const authStore = useAuthStore();
@@ -56,14 +58,7 @@ const Header = () => {
                     </div>
                     <ul className="header__top-action items-center">
                         <li>
-                            <span className="header-searchform header__top-link">
-                                <span className="text">
-                                    <input type="text" placeholder="Thương hiệu, Dịch vụ, Sản phẩm cần tìm" />
-                                </span>
-                                <span className="icon">
-                                    <MuiIcon name={ICON_NAME.FEATHER.SEARCH} />
-                                </span>
-                            </span>
+                            <SearchForm />
                         </li>
                         <li className="wishlist-action">
                             <a href="/" className="header__top-link">
@@ -106,5 +101,6 @@ const Header = () => {
         </header >
     );
 }
+const options = ['Option 1', 'Option 2'];
 
 export default Header;
