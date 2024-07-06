@@ -6,7 +6,7 @@ const SearchForm = (props: any) => {
                     placeholder="Thương hiệu, dịch vụ, sản phẩm cần tìm" aria-label="Search"
                     aria-describedby="search-addon" />
             </div>
-            <div className="searchresult hidden">
+            <div className="searchresult">
                 <p>
                     <a href="/">Thế giới di động (Điện thoại di động)</a>
                 </p>

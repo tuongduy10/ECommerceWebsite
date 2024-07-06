@@ -20,19 +20,6 @@ const Header = () => {
     const [hideCart, setHideCart] = useState(false);
 
     useEffect(() => {
-        // async function getUserInfo() {
-        //     const response = await UserService.getUserInfo() as any;
-        //     if (response) {
-        //         dispatch(setUser(response));
-        //     }
-        // }
-        // if (!authStore.user) {
-        //     getUserInfo();
-        // }
-    }, []);
-
-
-    useEffect(() => {
         const hiddenPath = [
             '/cart',
             '/payment',
@@ -81,7 +68,7 @@ const Header = () => {
                         <li className="wishlist-action">
                             <a href="/" className="header__top-link">
                                 <span className="icon favorite">
-                                    <span className="quantity">1</span>
+                                    {/* <span className="quantity">1</span> */}
                                     <MuiIcon name={ICON_NAME.FEATHER.HEART} />
                                 </span>
                             </a>
