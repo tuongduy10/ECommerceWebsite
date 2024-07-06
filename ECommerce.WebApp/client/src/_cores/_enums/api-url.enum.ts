@@ -48,8 +48,10 @@ export const INVENTORY_API_URL = {
     CATEGORY: '/inventory/get-category',
     UPDATE_CATEGORY: '/inventory/update-category',
     ADD_CATEGORY: '/inventory/add-category',
+
     UPDATE_SUB_CATEGORY: '/inventory/update-sub-category',
     ADD_SUB_CATEGORY: '/inventory/add-sub-category',
+    DELETE_SUB_CATEGORY: '/inventory/delete-sub-category',
     SUB_CATEGORIES: '/inventory/sub-categories',
 
     SAVE_SIZE: '/inventory/save-size',
