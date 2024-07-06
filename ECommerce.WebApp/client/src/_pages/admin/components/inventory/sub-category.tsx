@@ -10,6 +10,8 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import InventoryService from "src/_cores/_services/inventory.service";
 import { Editor } from "@tinymce/tinymce-react";
 import { GlobalConfig } from "src/_configs/global.config";
+import { useDispatch } from "react-redux";
+import { showSuccess } from "src/_cores/_reducers/alert.reducer";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -144,6 +146,7 @@ export default function SubCategory() {
     const sizeGuideRef = useRef<any>(null);
     const [sizeGuide, setSizeGuide] = useState<any>(undefined);
     const [sizeGuideSubId, setSizeGuideSubId] = useState(-1);
+    const dispatch = useDispatch();
     
     const [formData, setFormData] = useState({
         id: -1,
@@ -233,11 +236,12 @@ export default function SubCategory() {
         }
     }
 
-    const deleteSubCategory = (id?: number) => {
-        const _params = {
-            ids: selectedSubCategories.length > 0 ? selectedSubCategories : [id ?? -1]
+    const deleteSubCategory = async (id: number) => {
+        const response = await InventoryService.deleteSubCategory(id) as any;
+        if (response?.isSucceed) { 
+            dispatch(showSuccess("Xóa thành công"));
+            await search();
         }
-
     }
 
     const selectSubCategory = (id: number) => {
