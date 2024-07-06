@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Attribute = ECommerce.Data.Entities.Inventory.Attribute;
 using Option = ECommerce.Data.Entities.Inventory.Option;
 
 namespace ECommerce.Application.Services.Inventory
@@ -20,25 +21,22 @@ namespace ECommerce.Application.Services.Inventory
     public class InventoryService : IInventoryService
     {
         private readonly ECommerceContext _DbContext;
-        private readonly IRepositoryBase<Data.Entities.ProductSchema.Product> _productRepo;
         private readonly IRepositoryBase<Option> _optionRepo;
-        private readonly IRepositoryBase<Data.Entities.Inventory.OptionValue> _optionValueRepo;
+        private readonly IRepositoryBase<OptionValue> _optionValueRepo;
         private readonly IRepositoryBase<Brand> _brandRepo;
         private readonly IRepositoryBase<Category> _categoryRepo;
         private readonly IRepositoryBase<BrandCategory> _brandCategoryRepo;
-        private readonly IRepositoryBase<ShopBrand> _shopBrandRepo;
         private readonly IRepositoryBase<SubCategory> _subCategoryRepo;
         private readonly IRepositoryBase<SubCategoryOption> _subCategoryOptionRepo;
         private readonly IRepositoryBase<SubCategoryAttribute> _subCategoryAttributeRepo;
         private readonly IRepositoryBase<ProductOptionValue> _productOptionValuesRepo;
         private readonly IRepositoryBase<ProductAttribute> _productAttributeRepo;
         private readonly IRepositoryBase<SizeGuide> _sizeGuideRepo;
-        private readonly IRepositoryBase<Data.Entities.Inventory.Attribute> _attributeRepo;
+        private readonly IRepositoryBase<Attribute> _attributeRepo;
         private readonly IUnitOfWork _uow;
         public InventoryService(ECommerceContext DbContext,
-            IRepositoryBase<Product> productRepo,
             IRepositoryBase<Option> optionRepo,
-            IRepositoryBase<Data.Entities.Inventory.OptionValue> optionValueRepo,
+            IRepositoryBase<OptionValue> optionValueRepo,
             IRepositoryBase<Brand> brandRepo,
             IRepositoryBase<Category> categoryRepo,
             IRepositoryBase<BrandCategory> brandCategoryRepo,
@@ -49,17 +47,15 @@ namespace ECommerce.Application.Services.Inventory
             IRepositoryBase<ProductOptionValue> productOptionValuesRepo,
             IRepositoryBase<ProductAttribute> productAttributeRepo,
             IRepositoryBase<SizeGuide> sizeGuideRepo,
-            IRepositoryBase<Data.Entities.Inventory.Attribute> attributeRepo,
+            IRepositoryBase<Attribute> attributeRepo,
             IUnitOfWork uow)
         {
             _DbContext = DbContext;
-            _productRepo = productRepo;
             _optionRepo = optionRepo;
             _optionValueRepo = optionValueRepo;
             _brandRepo = brandRepo;
             _categoryRepo = categoryRepo;
             _brandCategoryRepo = brandCategoryRepo;
-            _shopBrandRepo = shopBrandRepo;
             _subCategoryRepo = subCategoryRepo;
             _subCategoryOptionRepo = subCategoryOptionRepo;
             _subCategoryAttributeRepo = subCategoryAttributeRepo;
@@ -634,11 +630,11 @@ namespace ECommerce.Application.Services.Inventory
         }
         public async Task<Response<bool>> deleteAttribute(int id)
         {
-            var ent = await _uow.Repository<Data.Entities.Inventory.Attribute>().FindByAsync(_ => _.AttributeId == id);
+            var ent = await _uow.Repository<Attribute>().FindByAsync(_ => _.AttributeId == id);
             if (ent != null)
             {
                 ent.IsDeleted = true;
-                _uow.Repository<Data.Entities.Inventory.Attribute>().Update(ent);
+                _uow.Repository<Attribute>().Update(ent);
                 await _uow.SaveChangesAsync();
             }
             return new SuccessResponse<bool>();

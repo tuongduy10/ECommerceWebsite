@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces";
 import { showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
-import { clearCart } from "src/_cores/_reducers/cart.reducer";
+import { clearCart, updateProductPrice } from "src/_cores/_reducers/cart.reducer";
 import CommonService from "src/_cores/_services/common.service";
 import OmsService from "src/_cores/_services/oms.service";
 import SalesService from "src/_cores/_services/sales.service";
@@ -27,18 +27,19 @@ const PaymentPage = () => {
     const [banks, setBanks] = useState<any>([]);
 
     useEffect(() => {
+        dispatch(updateProductPrice(cartStore.productsInCart.map(_ => _.id)));
         getCities();
     }, []);
 
     const handleProcessOrder = async () => {
-        // if (!dataDetail['phoneNumber'] || !dataDetail['cityCode'] || !dataDetail['districtCode'] || !dataDetail['wardCode'] || !dataDetail['address']) {
-        //     dispatch(showError('Vui lòng nhập đầy đủ thông tin'));
-        //     return;
-        // }
-        // if (!dataDetail['paymentMethod']) {
-        //     dispatch(showError('Vui lòng phương thức thanh toán'));
-        //     return;
-        // }
+        if (!dataDetail['phoneNumber'] || !dataDetail['cityCode'] || !dataDetail['districtCode'] || !dataDetail['wardCode'] || !dataDetail['address']) {
+            dispatch(showError('Vui lòng nhập đầy đủ thông tin'));
+            return;
+        }
+        if (!dataDetail['paymentMethod']) {
+            dispatch(showError('Vui lòng phương thức thanh toán'));
+            return;
+        }
 
         const param = {
             deliveryInfo: dataDetail,

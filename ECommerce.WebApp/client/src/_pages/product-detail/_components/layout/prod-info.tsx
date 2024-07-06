@@ -3,10 +3,12 @@ import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { cloneDeep } from "lodash";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { ENV } from "src/_configs/enviroment.config";
+import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { INewProductInCart } from "src/_cores/_interfaces/product.interface";
 import { showError, showSuccess, showWarning } from "src/_cores/_reducers/alert.reducer";
-import { addToCart } from "src/_cores/_reducers/cart.reducer";
+import { addToCart, clearCart } from "src/_cores/_reducers/cart.reducer";
 import { useCartStore, useProductStore } from "src/_cores/_store/root-store";
 import { MuiIcon } from "src/_shares/_components";
 import FullScreenDialog from "src/_shares/_components/dialog/fullscreen-dialog";
@@ -28,6 +30,7 @@ const ProductDetailInfo = () => {
   const [options, setOptions] = useState<{ id: any, value: any }[]>([]);
   const [isShowCodeDis, setShowCodeDis] = useState(false);
   const [openBrandDes, setOpenBrandDes] = useState(false);
+  const navigate = useNavigate();
   const [config, setConfig] = useState<any>();
   const configLocalStorage = localStorage.getItem('config');
 
@@ -77,66 +80,78 @@ const ProductDetailInfo = () => {
     setSelectedPriceType(event.target.value);
   }
 
-  const handleAddToCart = () => {
-    if (productDetail) {
-      const { id, name, priceAvailable, pricePreOrder, discountAvailable, discountPreOrder, imagePaths, shop } = productDetail;
+  const getNewProductInCart = () : INewProductInCart | null => {
+    if (!productDetail) 
+      return null;
+    const { id, name, priceAvailable, pricePreOrder, discountAvailable, discountPreOrder, imagePaths, shop } = productDetail;
 
-      let price = null;
-      let discount = null;
-      if (selectedPriceType === 'AVAILABLE') {
-        price = priceAvailable;
-        discount = discountAvailable;
-      } else if (selectedPriceType === 'PREORDER') {
-        price = pricePreOrder;
-        discount = discountPreOrder;
-      }
+    let price = null;
+    let discount = null;
+    if (selectedPriceType === 'AVAILABLE') {
+      price = priceAvailable;
+      discount = discountAvailable;
+    } else if (selectedPriceType === 'PREORDER') {
+      price = pricePreOrder;
+      discount = discountPreOrder;
+    }
 
-      const _options = cloneDeep(options).map((_: any) => {
-        const idx = productDetail.options.findIndex(o => o.id === _.id);
-        if (idx > -1) {
-          const valueIdx = productDetail.options[idx].values.findIndex(v => v.id === _.value);
-          if (valueIdx > -1) {
-            _.valueName = productDetail.options[idx].values[valueIdx].name;
-          }
+    const _options = cloneDeep(options).map((_: any) => {
+      const idx = productDetail.options.findIndex(o => o.id === _.id);
+      if (idx > -1) {
+        const valueIdx = productDetail.options[idx].values.findIndex(v => v.id === _.value);
+        if (valueIdx > -1) {
+          _.valueName = productDetail.options[idx].values[valueIdx].name;
         }
-        return _;
+      }
+      return _;
+    });
+
+    // Check options selection
+    if (productDetail.options.length > 0) {
+      const optionNames: string[] = [];
+      productDetail.options.forEach(_ => {
+        const idx = cloneDeep(options).findIndex(o => o.id === _.id);
+        if (idx === -1) {
+          optionNames.push(_.name);
+        }
       });
-
-      // Check options selection
-      if (productDetail.options.length > 0) {
-        const optionNames:string[] = [];
-        productDetail.options.forEach(_ => {
-          const idx = cloneDeep(options).findIndex(o => o.id === _.id);
-          if (idx === -1) {
-            optionNames.push(_.name);
-          }
-        });
-        if (optionNames.length > 0) {
-          dispatch(showError(`Vui lòng chọn: ${optionNames.join(',')}`));
-          return;
-        }
+      if (optionNames.length > 0) {
+        dispatch(showError(`Vui lòng chọn: ${optionNames.join(',')}`));
+        return null;
       }
-      // check prices selection
-      if (!selectedPriceType) {
-        dispatch(showError(`Vui lòng chọn giá`));
-        return;
-      }
+    }
+    // check prices selection
+    if (!selectedPriceType) {
+      dispatch(showError(`Vui lòng chọn giá`));
+      return null;
+    }
 
-      const newProductInCart = {
-        id: id,
-        name: name,
-        shopName: shop?.name ?? '',
-        qty: quanity,
-        image: imagePaths[0],
-        price: price,
-        discount: discount,
-        priceType: selectedPriceType,
-        options: _options,
-      } as INewProductInCart;
+    const newProductInCart = {
+      id: id,
+      name: name,
+      shopName: shop?.name ?? '',
+      qty: quanity,
+      image: imagePaths[0],
+      price: price,
+      discount: discount,
+      priceType: selectedPriceType,
+      options: _options,
+    } as INewProductInCart;
+    return newProductInCart;
+  }
+
+  const handleAddToCart = () => {
+    const newProductInCart = getNewProductInCart();
+    if (newProductInCart) {
       dispatch(addToCart(newProductInCart));
       dispatch(showSuccess('Thêm vào giỏ hàng thành công'));
     }
   };
+
+  const processBuyNow = () => {
+    handleAddToCart();
+    navigate({ pathname: ROUTE_NAME.PAYMENT });
+  }
 
   const renderPrice = (type: 'AVAILABLE' | 'PREORDER', price: number, discount?: number) => {
     return (
@@ -167,12 +182,6 @@ const ProductDetailInfo = () => {
         <div key={`option-${option.id}`} className="option-size flex mb-2 items-center">
           <div className="option-title">{option.name}</div>
           <div className="options-wrapper">
-            {/* <select className="options form-select w-full pro-options md:h-[30px]" onChange={e => onChangeOption(e.target)}>
-              <option disabled>- Chọn -</option>
-              {option.values && option.values.map((value) => (
-                <option key={`option-value-${value.id}`} value={value.id}>{value.name}</option>
-              ))}
-            </select> */}
             <Select
               displayEmpty
               className="options form-select w-full pro-options h-[30px]"
@@ -402,7 +411,7 @@ const ProductDetailInfo = () => {
                 <button className="btn-addtocart btn-black w-[49%] bg-[#333] text-[#fff]" onClick={handleAddToCart}>
                   Thêm vào giỏ
                 </button>
-                <button className="btn-buynow btn-black w-[49%] bg-[#333] text-[#fff]">
+                <button className="btn-buynow btn-black w-[49%] bg-[#333] text-[#fff]" onClick={processBuyNow}>
                   Mua ngay
                 </button>
               </div>
