@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - workout/cicd
+      - deploy/prod
 
 jobs:
   build:
