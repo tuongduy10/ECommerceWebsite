@@ -1,7 +1,7 @@
 import { FOOTER_MENU_COL_3, HEADER_MENU } from "src/_configs/web.config";
 import { ICON_NAME } from "../mui-icon/_enums/mui-icon.enum";
 import MuiIcon from "../mui-icon/mui-icon.component";
-import SearchForm from "../search-form/search-form.component";
+import SearchForm, { SearchFormMobile } from "../search-form/search-form.component";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { Link } from "react-router-dom";
@@ -171,7 +171,7 @@ const HeaderNavMobile = () => {
             <MuiIcon name={ICON_NAME.FEATHER.SHOPPING_BAG} />
           </Link>
         </div>
-        {isOpenedSearch ? <SearchForm /> : null}
+        {isOpenedSearch ? <SearchFormMobile /> : null}
       </nav >
       <div
         className={`search__overlay ${!isOpenedSearch ? "hidden" : ""}`}

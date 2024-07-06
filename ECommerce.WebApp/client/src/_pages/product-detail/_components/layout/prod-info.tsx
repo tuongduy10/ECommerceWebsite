@@ -80,8 +80,8 @@ const ProductDetailInfo = () => {
     setSelectedPriceType(event.target.value);
   }
 
-  const getNewProductInCart = () : INewProductInCart | null => {
-    if (!productDetail) 
+  const getNewProductInCart = (): INewProductInCart | null => {
+    if (!productDetail)
       return null;
     const { id, name, priceAvailable, pricePreOrder, discountAvailable, discountPreOrder, imagePaths, shop } = productDetail;
 
@@ -140,17 +140,19 @@ const ProductDetailInfo = () => {
     return newProductInCart;
   }
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (isBuyNow: boolean = false) => {
     const newProductInCart = getNewProductInCart();
     if (newProductInCart) {
       dispatch(addToCart(newProductInCart));
       dispatch(showSuccess('Thêm vào giỏ hàng thành công'));
+      if (isBuyNow) {
+        navigate({ pathname: ROUTE_NAME.PAYMENT });
+      }
     }
   };
 
   const processBuyNow = () => {
-    handleAddToCart();
-    navigate({ pathname: ROUTE_NAME.PAYMENT });
+    handleAddToCart(true);
   }
 
   const renderPrice = (type: 'AVAILABLE' | 'PREORDER', price: number, discount?: number) => {
@@ -408,7 +410,7 @@ const ProductDetailInfo = () => {
                     */}
 
               <div className="product__detail-buttons flex justify-between w-full mt-4">
-                <button className="btn-addtocart btn-black w-[49%] bg-[#333] text-[#fff]" onClick={handleAddToCart}>
+                <button className="btn-addtocart btn-black w-[49%] bg-[#333] text-[#fff]" onClick={() => handleAddToCart(false)}>
                   Thêm vào giỏ
                 </button>
                 <button className="btn-buynow btn-black w-[49%] bg-[#333] text-[#fff]" onClick={processBuyNow}>
