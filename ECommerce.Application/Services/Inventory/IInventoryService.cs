@@ -15,10 +15,14 @@ namespace ECommerce.Application.Services.Inventory
     {
         Task<Response<BrandModel>> getBrand(int brandId);
         Task<Response<List<BrandModel>>> getBrands(BrandGetRequest request);
+        Task<Response<bool>> addBrand(BrandAddRequest request);
+        Task<Response<bool>> updateBrand(BrandAddRequest request);
+        Task<Response<bool>> deleteBrand(int id);
         Task<Response<List<CategoryModel>>> getCategories();
         Task<Response<CategoryModel>> getCategory(int id);
         Task<Response<Category>> updateCategory(CategoryModelRequest req);
         Task<Response<Category>> addCategory(CategoryModelRequest req);
+        Task<Response<bool>> deleteCategory(int id);
         Task<Response<List<SubCategoryModel>>> getSubCategories(InventoryRequest request);
         Task<Response<SubCategory>> updateSubCategory(SubCategoryModel request);
         Task<Response<SubCategory>> addSubCategory(SubCategoryModel request);

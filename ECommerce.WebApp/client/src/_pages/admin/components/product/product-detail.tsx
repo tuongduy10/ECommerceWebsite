@@ -652,20 +652,14 @@ const ProductDetail = () => {
                                 <Typography variant="subtitle1" gutterBottom>
                                     Ảnh sản phẩm
                                 </Typography>
-                                <div className="flex">
-                                    <label htmlFor="imageSys-upload">
-                                        <span className="upload mr-2 text-[#4e73df] cursor-pointer">Chọn ảnh</span>
-                                        <FormLabel>(*Tối đa 10, nếu có)</FormLabel>
-                                    </label>
-                                </div>
                                 <UploadInput
                                     id={`imageSys-upload`}
-                                    name="imageSys-upload"
                                     multiple
                                     hidden
                                     onChangeFiles={(event) => setSystemFileNames(event)}
                                     uploadType="products"
                                     filesLimit={10}
+                                    isRequired={true}
                                     selectedFiles={systemFileNames}
                                 />
                             </Grid>
@@ -673,12 +667,6 @@ const ProductDetail = () => {
                                 <Typography variant="subtitle1" gutterBottom>
                                     Ảnh thực tế
                                 </Typography>
-                                <div className="flex">
-                                    <label htmlFor="imageUser-upload">
-                                        <span className="upload mr-2 text-[#4e73df] cursor-pointer">Chọn ảnh</span>
-                                        <FormLabel>(Tối đa 10, nếu có)</FormLabel>
-                                    </label>
-                                </div>
                                 <UploadInput
                                     id={`imageUser-upload`}
                                     multiple

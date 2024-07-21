@@ -46,6 +46,25 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(res);
             return Ok(res);
         }
+        [HttpPost("add-brand")]
+        public async Task<IActionResult> addBrand(BrandAddRequest request)
+        {
+            var res = await _inventoryService.addBrand(request);
+            return Ok(res);
+        }
+        [HttpPost("update-brand")]
+        public async Task<IActionResult> updateBrand(BrandAddRequest request)
+        {
+            var res = await _inventoryService.updateBrand(request);
+            return Ok(res);
+        }
+        [HttpPost("delete-brand")]
+        public async Task<IActionResult> deleteBrand([FromBody] int id)
+        {
+            var res = await _inventoryService.deleteBrand(id);
+            return Ok(res);
+        }
+
         [HttpPost("get-categories")]
         public async Task<IActionResult> getCategories()
         {
@@ -74,6 +93,14 @@ namespace ECommerce.WebApp.Controllers
         public async Task<IActionResult> addCategory(CategoryModelRequest req)
         {
             var res = await _inventoryService.addCategory(req);
+            if (!res.isSucceed)
+                return BadRequest(res);
+            return Ok(res);
+        }
+        [HttpPost("delete-category")]
+        public async Task<IActionResult> deleteCategory([FromBody] int id)
+        {
+            var res = await _inventoryService.deleteCategory(id);
             if (!res.isSucceed)
                 return BadRequest(res);
             return Ok(res);

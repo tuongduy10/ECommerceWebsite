@@ -97,7 +97,7 @@ const mainListItems = [
         childs: [
             { name: 'paymentMethods', label: 'Phương thức thanh toán', path: ADMIN_ROUTE_NAME.MANAGE_SALES_PAYMENT_METHODS },
             { name: 'shops', label: 'Cửa hàng', path: '', },
-            { name: 'brands', label: 'Thương hiệu', path: '', },
+            { name: 'brands', label: 'Thương hiệu', path: ADMIN_ROUTE_NAME.MANAGE_SALES_BRANDS, },
         ]
     },
     {

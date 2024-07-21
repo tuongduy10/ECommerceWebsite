@@ -184,11 +184,11 @@ export default function Category() {
         }
     }
 
-    const deleteCategory = (id?: number) => {
-        const _params = {
-            ids: selectedCategories.length > 0 ? selectedCategories : [id ?? -1]
+    const deleteCategory =  async (id: number) => {
+        const res = await InventoryService.deleteCategory(id) as any;
+        if (res?.isSucceed) {
+            await search();
         }
-
     }
 
     const selectCategory = (id: number) => {

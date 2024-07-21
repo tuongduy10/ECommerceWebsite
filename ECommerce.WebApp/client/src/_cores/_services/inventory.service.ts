@@ -34,6 +34,10 @@ export default class InventoryService {
     return api.post(INVENTORY_API_URL.ADD_CATEGORY, param);
   }
 
+  public static deleteCategory(id: number) {
+    return api.post(INVENTORY_API_URL.DELETE_CATEGORY, id);
+  }
+
   public static getSubCategories(params?: {
     brandId?: number;
     subCategoryId?: number;

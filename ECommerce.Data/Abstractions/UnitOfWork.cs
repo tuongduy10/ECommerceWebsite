@@ -24,6 +24,10 @@ namespace ECommerce.Data.Abstractions
         {
             await transaction.CommitAsync();
         }
+        public async Task RollbackTransactionAsync(IDbContextTransaction transaction)
+        {
+            await transaction.RollbackAsync();
+        }
         public async Task<int> SaveChangesAsync()
         {
             return await _dbContext.SaveChangesAsync();
