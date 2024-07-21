@@ -43,11 +43,17 @@ export const INVENTORY_API_URL = {
     OPTIONS: '/inventory/options',
     SAVE_OPTIONS: '/inventory/save-options',
     DELETE_OPTION: '/inventory/delete-option',
+
     GET_BRAND: '/inventory/get-brand',
+    ADD_BRAND: '/inventory/add-brand',
+    UPDATE_BRAND: '/inventory/update-brand',
+    DELETE_BRAND: '/inventory/delete-brand',
+
     CATEGORIES: '/inventory/get-categories',
     CATEGORY: '/inventory/get-category',
     UPDATE_CATEGORY: '/inventory/update-category',
     ADD_CATEGORY: '/inventory/add-category',
+    DELETE_CATEGORY: '/inventory/delete-category',
 
     UPDATE_SUB_CATEGORY: '/inventory/update-sub-category',
     ADD_SUB_CATEGORY: '/inventory/add-sub-category',

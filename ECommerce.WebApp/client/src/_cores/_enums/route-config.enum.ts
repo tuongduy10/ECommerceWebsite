@@ -35,6 +35,8 @@ export const ADMIN_ROUTE_NAME = {
     MANAGE_USER_DETAIL: ADMIN_ROUTE_PREFIX + '/manage-user/detail',
 
     MANAGE_SALES_PAYMENT_METHODS: ADMIN_ROUTE_PREFIX + '/manage-sales/payment-methods',
+    MANAGE_SALES_BRANDS: ADMIN_ROUTE_PREFIX + '/manage-sales/brands',
+    MANAGE_SALES_SHOPS: ADMIN_ROUTE_PREFIX + '/manage-sales/shops',
 
     MANAGE_INVENTORY: ADMIN_ROUTE_PREFIX + '/manage-inventory',
     MANAGE_INVENTORY_CATEGORY: ADMIN_ROUTE_PREFIX + '/manage-inventory/category',

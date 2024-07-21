@@ -16,6 +16,7 @@ namespace ECommerce.Data.Entities.Inventory
 
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual ICollection<BrandCategory> BrandCategories { get; set; }
         public virtual ICollection<SubCategory> SubCategories { get; set; }

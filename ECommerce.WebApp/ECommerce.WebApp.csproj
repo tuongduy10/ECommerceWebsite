@@ -65,7 +65,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\images\brand\brand_7d3e21da-863b-4f1c-9d9c-bf7f4e6af7e5.webp" />
     <None Include="wwwroot\images\icon\award.svg" />
     <None Include="wwwroot\images\icon\chevron-down.svg" />
     <None Include="wwwroot\images\icon\chevron-left.svg" />
