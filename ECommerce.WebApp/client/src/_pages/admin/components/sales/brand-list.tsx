@@ -2,7 +2,6 @@ import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogConte
 import { Fragment, useEffect, useRef, useState } from "react";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import SalesService from "src/_cores/_services/sales.service";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { ENV } from "src/_configs/enviroment.config";
