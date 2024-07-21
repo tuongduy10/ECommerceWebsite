@@ -34,6 +34,7 @@ namespace ECommerce.ECommerce.Infrastructure.Middlewares
                         await writer.WriteLineAsync($"Timestamp: {DateTime.Now}");
                         await writer.WriteLineAsync($"Error: {exception?.Message}");
                         await writer.WriteLineAsync($"StackTrace: {exception?.StackTrace}");
+                        await writer.WriteLineAsync($"InnerException: {exception?.InnerException}");
                         // Add more details as needed
                     }
 
