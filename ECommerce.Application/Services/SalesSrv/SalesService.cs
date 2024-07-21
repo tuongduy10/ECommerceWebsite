@@ -4,6 +4,7 @@ using ECommerce.Application.Common;
 using ECommerce.Data.Abstractions;
 using ECommerce.Data.Entities.Cms;
 using ECommerce.Data.Entities.ProductSchema;
+using ECommerce.Data.Entities.UserSchema;
 using ECommerce.Utilities.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -60,49 +61,84 @@ namespace ECommerce.Application.Services.SalesSrv
             return new SuccessResponse<string>();
         }
 
+        public async Task<ShopDetailManagedModel> getShopDetailManage(int shopId)
+        {
+            var brands = (await _uow.Repository<ShopBrand>()
+                        .GetByAsync(br => br.ShopId == shopId))
+                        .Select(br => br.BrandId)
+                        .ToList();
+            var bank = (await _uow.Repository<ShopBank>()
+                        .GetByAsync(b => b.ShopId == shopId))
+                        .Select(b => new ShopBankModel()
+                        {
+                            ShopAccountName = b.ShopAccountName,
+                            ShopBankName = b.ShopBankName,
+                            ShopAccountNumber = b.ShopAccountNumber
+                        })
+                        .FirstOrDefault();
+
+            var shop = (await _uow.Repository<Shop>()
+                .GetByAsync(b => b.ShopId == shopId))
+                .Select(i => new ShopDetailManagedModel
+                {
+                    // Shop
+                    ShopId = i.ShopId,
+                    ShopName = i.ShopName,
+                    ShopPhoneNumber = i.ShopPhoneNumber,
+                    ShopMail = i.ShopMail,
+                    ShopAddress = i.ShopAddress,
+                    ShopCityCode = i.ShopCityCode,
+                    ShopDistrictCode = i.ShopDistrictCode,
+                    ShopJoinDate = (DateTime)i.ShopJoinDate,
+                    ShopWardCode = i.ShopWardCode,
+                    Status = (byte)i.Status,
+                    Tax = (byte)i.Tax,
+                    ShopBank = bank == null ? null : bank,
+                    ShopBrands = brands.Count() == 0 ? null : brands
+                })
+                .FirstOrDefault();
+
+            return shop;
+        }
+        public async Task<List<ShopGetModel>> getShopList()
+        {
+            var list = (await _uow.Repository<Shop>()
+                .GetByAsync(i => i.Status != 4 && i.Status != 2, null, "User"))
+                .Select(i => new ShopGetModel()
+                {
+                    ShopId = i.ShopId,
+                    ShopName = i.ShopName,
+                    ShopPhoneNumber = i.ShopPhoneNumber,
+                    ShopMail = i.ShopMail,
+                    ShopAddress = i.ShopAddress,
+                    ShopCityCode = i.ShopCityCode,
+                    ShopDistrictCode = i.ShopDistrictCode,
+                    ShopJoinDate = (DateTime)i.ShopJoinDate,
+                    ShopWardCode = i.ShopWardCode,
+                    Status = (byte)i.Status,
+                })
+                .ToList();
+            var result = list.OrderByDescending(i => i.ShopId).ToList();
+            return result;
+        }
         public async Task<Response<Shop>> addShop(ShopAddRequest request)
         {
             var transaction = await _uow.BeginTransactionAsync();
             try
             {
-                // Check null
-                if (string.IsNullOrEmpty(request.name.Trim())) return new FailResponse<Shop>("Thông tin không được để trống");
-                if (string.IsNullOrEmpty(request.phone.Trim())) return new FailResponse<Shop>("Thông tin không được để trống");
-
-                // Check already exist
-                var checkName = (await _uow.Repository<Shop>().GetByAsync(s => s.ShopName == request.name.Trim())).FirstOrDefault();
-                if (checkName != null) return new FailResponse<Shop>("Tên đã tồn tại");
-                var checkPhone = (await _uow.Repository<Shop>().GetByAsync(s => s.ShopPhoneNumber == request.phone.Trim())).FirstOrDefault();
-                if (checkPhone != null) return new FailResponse<Shop>("Số điện thoại đã tồn tại");
-                if (request.mail != null)
-                {
-                    var checkMail = (await _uow.Repository<Shop>().GetByAsync(s => s.ShopMail == request.mail.Trim())).FirstOrDefault();
-                    if (checkMail != null) return new FailResponse<Shop>("Mail đã tồn tại");
-                }
-
                 var shop = new Shop();
-                shop.ShopName = request.name.Trim();
-                shop.ShopPhoneNumber = request.phone.Trim();
-                shop.ShopAddress = request.address.Trim();
-                shop.ShopCityCode = request.cityCode;
-                shop.ShopDistrictCode = request.districtCode;
-                shop.ShopWardCode = request.wardCode;
-                shop.ShopMail = request.mail.Trim();
+                shop.ShopName = request.name;
                 shop.ShopJoinDate = DateTime.Now;
+                shop.ShopPhoneNumber = "";
+                shop.ShopMail = "";
+                shop.ShopAddress =  "";
+                shop.ShopWardCode = "";
+                shop.ShopDistrictCode = "";
+                shop.ShopCityCode = "";
                 shop.Tax = (byte)request.tax;
                 shop.Status = (int)enumShopStatus.Available; // Available..
 
                 await _uow.Repository<Shop>().AddAsync(shop);
-                await _uow.SaveChangesAsync();
-
-                var newBank = new ShopBank
-                {
-                    ShopAccountName = request.bankAccount,
-                    ShopBankName = request.bankName,
-                    ShopAccountNumber = request.accountNumber,
-                    ShopId = shop.ShopId,
-                };
-                await _uow.Repository<ShopBank>().AddAsync(newBank);
                 await _uow.SaveChangesAsync();
 
                 if (request.brandIds.Count > 0)
@@ -121,6 +157,50 @@ namespace ECommerce.Application.Services.SalesSrv
                 return new SuccessResponse<Shop>("Thêm thành công", shop);
             }
             catch
+            {
+                await _uow.RollbackTransactionAsync(transaction);
+                throw;
+            }
+        }
+
+        public async Task<ApiResponse> updateShop(ShopUpdateRequest request)
+        {
+            var transaction = await _uow.BeginTransactionAsync();
+            try
+            {
+                var shop = (await _uow.Repository<Shop>().GetByAsync(i => i.ShopId == request.id)).FirstOrDefault();
+                if (shop == null) return new ApiFailResponse("Shop không tồn tại");
+
+                shop.ShopName = request.name;
+                shop.Tax = (byte?)request.tax;
+                _uow.Repository<Shop>().Update(shop);
+                await _uow.SaveChangesAsync();
+
+                var brands = await _uow.Repository<ShopBrand>().GetByAsync(i => i.ShopId == request.id);
+                // Remove previous brands if exist
+                if (brands.Count() > 0)
+                {
+                    _uow.Repository<ShopBrand>().Delete(brands);
+                    await _uow.SaveChangesAsync();
+                }
+                // Add new brands if has items
+                if (request.shopBrands != null)
+                {
+                    foreach (var id in request.shopBrands)
+                    {
+                        var brand = new ShopBrand
+                        {
+                            BrandId = id,
+                            ShopId = shop.ShopId
+                        };
+                        await _uow.Repository<ShopBrand>().AddAsync(brand);
+                    }
+                    await _uow.SaveChangesAsync();
+                }
+                await _uow.CommitTransactionAsync(transaction);
+                return new ApiSuccessResponse("Cập nhật thành công");
+            }
+            catch (Exception error)
             {
                 await _uow.RollbackTransactionAsync(transaction);
                 throw;
