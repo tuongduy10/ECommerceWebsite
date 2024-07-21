@@ -1,4 +1,5 @@
-﻿using ECommerce.Application.Services.SalesSrv;
+﻿using ECommerce.Application.BaseServices.Shop.Dtos;
+using ECommerce.Application.Services.SalesSrv;
 using ECommerce.Data.Entities.Cms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,12 @@ namespace ECommerce.WebApp.Controllers
         public async Task<IActionResult> deletePaymentMethod([FromBody] int id)
         {
             var res = await _salesService.deletePaymentMethod(id);
+            return Ok(res);
+        }
+        [HttpPost("add-shop")]
+        public async Task<IActionResult> addShop(ShopAddRequest request)
+        {
+            var res = await _salesService.addShop(request);
             return Ok(res);
         }
     }
