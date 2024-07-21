@@ -12,6 +12,7 @@ namespace ECommerce.Data.Abstractions
         IGenericRepository<TEntity> Repository<TEntity>() where TEntity : class;
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync(IDbContextTransaction transaction);
+        Task RollbackTransactionAsync(IDbContextTransaction transaction);
         Task<int> SaveChangesAsync();
         Task DisposeAsync();
     }

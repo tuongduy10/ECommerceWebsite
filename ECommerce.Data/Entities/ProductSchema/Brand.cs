@@ -14,7 +14,7 @@ namespace ECommerce.Data.Entities.ProductSchema
             Products = new HashSet<Product>();
             ShopBrands = new HashSet<ShopBrand>();
         }
-
+        public bool IsDeleted {  get; set; }
         public int BrandId { get; set; }
         public string BrandName { get; set; }
         public string BrandImagePath { get; set; }

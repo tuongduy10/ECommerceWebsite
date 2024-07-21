@@ -40,7 +40,6 @@ namespace ECommerce.Application.Services.Inventory
             IRepositoryBase<Brand> brandRepo,
             IRepositoryBase<Category> categoryRepo,
             IRepositoryBase<BrandCategory> brandCategoryRepo,
-            IRepositoryBase<ShopBrand> shopBrandRepo,
             IRepositoryBase<SubCategory> subCategoryRepo,
             IRepositoryBase<SubCategoryOption> subCategoryOptionRepo,
             IRepositoryBase<SubCategoryAttribute> subCategoryAttributeRepo,
@@ -65,33 +64,26 @@ namespace ECommerce.Application.Services.Inventory
             _attributeRepo = attributeRepo;
             _uow = uow;
         }
-        public async Task<Response<BrandModel>> getBrand(int brandId = 0) 
+        public async Task<Response<BrandModel>> getBrand(int brandId = -1) 
         {
-            try
-            {
-                var result = await _brandRepo
-                    .Entity()
-                    .Where(i => i.BrandId == brandId)
-                    .Select(i => new BrandModel()
-                    {
-                        id = i.BrandId,
-                        name = i.BrandName,
-                        imagePath = i.BrandImagePath,
-                        isActive = i.Status,
-                        createdDate = i.CreatedDate,
-                        description = i.Description,
-                        descriptionTitle = i.DescriptionTitle,
-                        isHighlights = i.Highlights,
-                        isNew = i.New
-                    })
-                    .FirstOrDefaultAsync();
+            var result = (await _uow.Repository<Brand>()
+                .GetByAsync(_ => _.BrandId == brandId, null, "BrandCategories.Category"))
+                .Select(i => new BrandModel()
+                 {
+                     id = i.BrandId,
+                     name = i.BrandName,
+                     imagePath = i.BrandImagePath,
+                     isActive = i.Status,
+                     createdDate = i.CreatedDate,
+                     description = i.Description,
+                     descriptionTitle = i.DescriptionTitle,
+                     isHighlights = i.Highlights,
+                     isNew = i.New,
+                     categories = i.BrandCategories.Select(_ => (CategoryModel)_.Category).ToList()
+                })
+                .FirstOrDefault();
 
-                return new SuccessResponse<BrandModel>(result);
-            }
-            catch (Exception error)
-            {
-                return new FailResponse<BrandModel>(error.Message);
-            }
+            return new SuccessResponse<BrandModel>(result);
         }
         public async Task<Response<List<BrandModel>>> getBrands(BrandGetRequest request)
         {
@@ -125,53 +117,128 @@ namespace ECommerce.Application.Services.Inventory
                 return new FailResponse<List<BrandModel>>(error.Message);
             }
         }
-        public async Task<Response<List<CategoryModel>>> getCategories()
+        public async Task<Response<bool>> addBrand(BrandAddRequest request)
         {
+            var transaction = await _uow.BeginTransactionAsync();
             try
             {
-                var res = await _categoryRepo.Queryable(_ => _.CategoryId > -1, "SubCategories")
-                    .Select(_ => (CategoryModel)_)
-                    .ToListAsync();
-                return new SuccessResponse<List<CategoryModel>>(res);
+                var newEnt = new Brand
+                {
+                    BrandName = request.name,
+                    BrandImagePath = request.imagePath,
+                    DescriptionTitle = request.descriptionTitle,
+                    Description = request.description,
+                    New = true,
+                    Highlights = request.isHighLight
+                };
+                await _uow.Repository<Brand>().AddAsync(newEnt);
+                await _uow.SaveChangesAsync();
+
+                var brandCategories = request.categoryIds
+                    .Select(_ => new BrandCategory
+                    {
+                        BrandId = newEnt.BrandId,
+                        CategoryId = _
+                    })
+                    .ToList();
+                await _uow.Repository<BrandCategory>().AddAsync(brandCategories);
+                await _uow.SaveChangesAsync();
+
+                await _uow.CommitTransactionAsync(transaction);
+
+                return new SuccessResponse<bool>();
             }
-            catch (Exception error)
+            catch
             {
-                return new FailResponse<List<CategoryModel>>(error.Message);
+                await _uow.RollbackTransactionAsync(transaction);
+                throw;
             }
+        }
+        public async Task<Response<bool>> updateBrand(BrandAddRequest request)
+        {
+            var transaction = await _uow.BeginTransactionAsync();
+            try
+            {
+                var ent = (await _uow.Repository<Brand>().GetByAsync(_ => _.BrandId == request.id)).FirstOrDefault();
+                if (ent != null)
+                {
+                    if (!string.IsNullOrEmpty(request.name) && !string.IsNullOrWhiteSpace(request.name))
+                        ent.BrandName = request.name;
+                    if (!string.IsNullOrEmpty(request.imagePath) && !string.IsNullOrWhiteSpace(request.imagePath))
+                        ent.BrandImagePath = request.imagePath;
+                    if (!string.IsNullOrEmpty(request.description) && !string.IsNullOrWhiteSpace(request.description))
+                        ent.Description = request.description;
+                    if (!string.IsNullOrEmpty(request.descriptionTitle) && !string.IsNullOrWhiteSpace(request.descriptionTitle))
+                        ent.DescriptionTitle = request.descriptionTitle;
+                    ent.Highlights = request.isHighLight;
+
+                    _uow.Repository<Brand>().Update(ent);
+                    await _uow.SaveChangesAsync();
+
+                    var brCas = await _uow.Repository<BrandCategory>().GetByAsync(_ => _.BrandId == ent.BrandId);
+                    if (brCas.Count() > 0)
+                    {
+                        _uow.Repository<BrandCategory>().Delete(brCas);
+                        await _uow.SaveChangesAsync();
+                    }
+
+                    var brandCategories = request.categoryIds
+                        .Select(_ => new BrandCategory
+                        {
+                            BrandId = ent.BrandId,
+                            CategoryId = _
+                        })
+                        .ToList();
+                    await _uow.Repository<BrandCategory>().AddAsync(brandCategories);
+                    await _uow.SaveChangesAsync();
+
+                    await _uow.CommitTransactionAsync(transaction);
+                }
+                return new SuccessResponse<bool>();
+            }
+            catch
+            {
+                await _uow.RollbackTransactionAsync(transaction);
+                throw;
+            }
+        }
+        public async Task<Response<bool>> deleteBrand(int id)
+        {
+            var ent = (await _uow.Repository<Brand>().GetByAsync(_ => _.BrandId == id)).FirstOrDefault();
+            if (ent != null)
+            {
+                ent.IsDeleted = true;
+                _uow.Repository<Brand>().Update(ent);
+                await _uow.SaveChangesAsync();
+            }
+            return new SuccessResponse<bool>();
+        }
+        public async Task<Response<List<CategoryModel>>> getCategories()
+        {
+            var res = await _categoryRepo.Queryable(_ => _.CategoryId > -1, "SubCategories")
+                .Select(_ => (CategoryModel)_)
+                .ToListAsync();
+            return new SuccessResponse<List<CategoryModel>>(res);
         }
         public async Task<Response<CategoryModel>> getCategory(int id)
         {
-            try
-            {
-                var res = await _categoryRepo.Queryable(_ => _.CategoryId == id, "SubCategories")
-                    .Select(_ => (CategoryModel)_)
-                    .FirstOrDefaultAsync();
-                return new SuccessResponse<CategoryModel>(res);
-            }
-            catch (Exception error)
-            {
-                return new FailResponse<CategoryModel>(error.Message);
-            }
+            var res = await _categoryRepo.Queryable(_ => _.CategoryId == id, "SubCategories")
+                .Select(_ => (CategoryModel)_)
+                .FirstOrDefaultAsync();
+            return new SuccessResponse<CategoryModel>(res);
         }
         public async Task<Response<Category>> updateCategory(CategoryModelRequest req)
         {
-            try
-            {
-                var entity = await _categoryRepo.Queryable(_ => _.CategoryId == req.id, "")
+            var entity = await _categoryRepo.Queryable(_ => _.CategoryId == req.id, "")
                     .FirstOrDefaultAsync();
-                if (entity != null)
-                {
-                    if (!string.IsNullOrEmpty(req.name))
-                        entity.CategoryName = req.name;
-                    _categoryRepo.Update(entity);
-                    await _uow.SaveChangesAsync();
-                }
-                return new SuccessResponse<Category>(entity);
-            }
-            catch (Exception error)
+            if (entity != null)
             {
-                return new FailResponse<Category>(error.Message);
+                if (!string.IsNullOrEmpty(req.name))
+                    entity.CategoryName = req.name;
+                _categoryRepo.Update(entity);
+                await _uow.SaveChangesAsync();
             }
+            return new SuccessResponse<Category>(entity);
         }
         public async Task<Response<Category>> addCategory(CategoryModelRequest req)
         {
@@ -194,6 +261,18 @@ namespace ECommerce.Application.Services.Inventory
             {
                 return new FailResponse<Category>(error.Message);
             }
+        }
+        public async Task<Response<bool>> deleteCategory(int id)
+        {
+            // soft delete
+            var ent = await _uow.Repository<Category>().FindByAsync(_ => _.CategoryId == id);
+            if (ent != null)
+            {
+                ent.IsDeleted = true;
+                _uow.Repository<Category>().Update(ent);
+                await _uow.SaveChangesAsync();
+            }
+            return new SuccessResponse<bool>();
         }
         public async Task<Response<List<SubCategoryModel>>> getSubCategories(InventoryRequest request)
         {

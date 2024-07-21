@@ -16,5 +16,6 @@ namespace ECommerce.Application.Services.Inventory.Dtos
         public string? description { get; set; }
         public string? descriptionTitle { get; set; }
         public List<string> categoryNames { get; set; }
+        public List<CategoryModel> categories { get; set; }
     }
 }

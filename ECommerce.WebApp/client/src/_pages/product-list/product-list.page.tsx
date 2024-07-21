@@ -26,7 +26,8 @@ const ProductListPage = () => {
   const isNewPathName = location.pathname === ROUTE_NAME.NEW_PRODUCTS;
   const isAvailable = location.pathname === ROUTE_NAME.AVAILABLE_PRODUCTS;
   const isPreOrder = location.pathname === ROUTE_NAME.PREORDER_PRODUCTS;
-  const isFullGrid = isHotSalePathName || isNewPathName || isAvailable || isPreOrder;
+  const isSearchPage = location.pathname === ROUTE_NAME.PREORDER_PRODUCTS;
+  const isFullGrid = isHotSalePathName || isNewPathName || isAvailable || isPreOrder || isSearchPage;
 
   const productStore = useProductStore();
   const homeStore = useHomeStore();

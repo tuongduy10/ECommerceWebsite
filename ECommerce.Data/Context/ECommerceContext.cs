@@ -126,30 +126,7 @@ namespace ECommerce.Data.Context
                 entity.Property(e => e.BlogTitle).HasMaxLength(100);
             });
 
-            modelBuilder.Entity<Brand>(entity =>
-            {
-                entity.ToTable("Brand");
-
-                entity.Property(e => e.BrandImagePath)
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.BrandName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.CreatedDate).HasColumnType("date");
-
-                entity.Property(e => e.Description).HasColumnType("ntext");
-
-                entity.Property(e => e.DescriptionTitle).HasMaxLength(500);
-
-                entity.HasOne(d => d.Discount)
-                    .WithMany(p => p.Brands)
-                    .HasForeignKey(d => d.DiscountId)
-                    .HasConstraintName("FK_Brand_Discount");
-            });
+            modelBuilder.ApplyConfiguration(new BrandConfiguration());
 
             modelBuilder.Entity<BrandCategory>(entity =>
             {
@@ -170,14 +147,7 @@ namespace ECommerce.Data.Context
                     .HasConstraintName("FK_BrandCategory_Category");
             });
 
-            modelBuilder.Entity<Category>(entity =>
-            {
-                entity.ToTable("Category");
-
-                entity.Property(e => e.CategoryName)
-                    .IsRequired()
-                    .HasMaxLength(100);
-            });
+            modelBuilder.ApplyConfiguration(new CategoryConfiguration());
 
             modelBuilder.Entity<Configuration>(entity =>
             {
