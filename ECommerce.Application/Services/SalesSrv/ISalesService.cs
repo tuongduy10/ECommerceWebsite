@@ -1,4 +1,6 @@
-﻿using ECommerce.Data.Entities.Cms;
+﻿using ECommerce.Application.BaseServices.Shop.Dtos;
+using ECommerce.Data.Entities.Cms;
+using ECommerce.Data.Entities.ProductSchema;
 using ECommerce.Utilities.Shared.Responses;
 using System;
 using System.Collections.Generic;
@@ -12,5 +14,6 @@ namespace ECommerce.Application.Services.SalesSrv
         Task<Response<IEnumerable<Bank>>> getPaymentMethods();
         Task<Response<Bank>> savePaymentMethod(Bank dto);
         Task<Response<string>> deletePaymentMethod(int id);
+        Task<Response<Shop>> addShop(ShopAddRequest request);
     }
 }

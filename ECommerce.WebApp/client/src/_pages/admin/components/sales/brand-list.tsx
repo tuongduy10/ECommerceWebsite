@@ -189,7 +189,8 @@ const BrandList = () => {
                                         aria-haspopup="true"
                                         aria-controls={openDel ? 'basic-menu' : undefined}
                                         aria-expanded={openDel ? 'true' : undefined}
-                                        onClick={(event) => setDelAnchorEl(event.currentTarget)}
+                                        onClick={() => deleteData(_.id)}
+                                        //onClick={(event) => setDelAnchorEl(event.currentTarget)}
                                     >
                                         <DeleteOutlineIcon />
                                     </IconButton>
