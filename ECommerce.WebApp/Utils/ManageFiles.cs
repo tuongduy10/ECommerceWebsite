@@ -20,6 +20,8 @@ namespace ECommerce.WebApp.Utils
             if (files != null && filesName != null && !String.IsNullOrEmpty(path)) 
             {
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, path);
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
                 for (int i = 0; i < files.Count; i++)
                 {
                     string filePath = Path.Combine(uploadsFolder, filesName[i]);

@@ -40,7 +40,7 @@ const BrandList = () => {
             homeStore.brands.forEach((item: IBrand) => {
                 _list.push(item.name.substring(0, 1).toUpperCase());
             });
-            return _list.filter((value: any, index: number, array: any) => array.indexOf(value) === index);
+            return _list.filter((value: any, index: number, array: any) => array.indexOf(value) === index).sort();
         }
         return _list;
     }
