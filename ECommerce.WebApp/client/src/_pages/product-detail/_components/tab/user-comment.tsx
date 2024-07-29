@@ -221,10 +221,6 @@ const UserComment = (props: IUserComment) => {
                 </div>
                 <div className="text-left">
                     <div className="upload-image mb-2 mt-2">
-                        <label htmlFor={id} className="input-tile mb-2">
-                            <span className="upload">Chọn ảnh</span>
-                            <span className="ml-2">Thêm hình ảnh nếu có (Tối đa 3)</span>
-                        </label>
                         <UploadInput 
                             id={id}
                             multiple 

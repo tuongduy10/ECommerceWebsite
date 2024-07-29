@@ -221,7 +221,7 @@ const ProductDetailInfo = () => {
           <div className="product__detail-id flex flex-wrap items-center">
             <a className="product-id flex">
               <span>Mã sản phẩm:</span>
-              <span>{productDetail.code ?? ''}</span>
+              <span>{productDetail.ppc ?? ''}</span>
             </a>
             <button className="product-rating flex gap-2 mb-2 items-center">
               <div className="stars flex">

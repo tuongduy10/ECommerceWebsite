@@ -55,25 +55,13 @@ const UploadInput = forwardRef((props: IUploadProps, ref: any) => {
             }
             CommonService.uploadFiles(formData).then((res: any) => {
                 if (res.data) { // files name sent from server
-                    const fileNames = res.data; //selectedFileNames.concat(res.data);
+                    const fileNames = selectedFileNames.concat(res.data);
                     setSelectedFileNames(fileNames);
                     onChangeFiles(fileNames);
                 }
             }).catch((error: any) => {
                 console.log(error);
             });
-        }
-
-        // remove before adding new
-        if (selectedFileNames.length > 0) {
-            const params = {
-                fileNames: selectedFileNames,
-                uploadType: uploadType,
-            }
-            CommonService.removeFiles(params).then((res: any) => {
-                upload();
-            });
-            return;
         }
         upload();
     };
@@ -139,22 +127,8 @@ const UploadInput = forwardRef((props: IUploadProps, ref: any) => {
                                             fontWeight: "900",
                                         }}
                                         className="feather feather-x"
-                                        onClick={(event: React.MouseEvent<HTMLButtonElement>) => setDelAnchorEl(event.currentTarget)}
-                                        aria-controls={openDel ? 'basic-menu' : undefined}
-                                        aria-haspopup="true"
-                                        aria-expanded={openDel ? 'true' : undefined}
+                                        onClick={() => handleRemoveFile(fileName)}
                                     />
-                                    <Menu
-                                        anchorEl={delAnchorEl}
-                                        open={openDel}
-                                        onClose={() => setDelAnchorEl(null)}
-                                        MenuListProps={{
-                                            'aria-labelledby': 'basic-button',
-                                        }}
-                                    >
-                                        <MenuItem onClick={() => { handleRemoveFile(fileName); setDelAnchorEl(null); }}>Xác nhận xóa</MenuItem>
-                                        <MenuItem onClick={() => setDelAnchorEl(null)}>Hủy</MenuItem>
-                                    </Menu>
                                 </span>
                             </div>
                         </div>
