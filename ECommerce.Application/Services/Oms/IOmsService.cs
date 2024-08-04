@@ -16,6 +16,7 @@ namespace ECommerce.Application.Services.Oms
     {
         Task<Response<OrderResponseDto>> getById(Guid id);
         Task<Response<OrderResponseDto>> createOrder(OrderCreateRequest request);
+        Task<Response<Order>> approveOrder(Guid id);
         Task<Response<IEnumerable<OrderResponseDto>>> getOrderByStatus(string status);
         Task<Response<PagedResult<OrderResponseDto>>> getOrdersPaging(OrderPagingRequest request);
         Task<Response<PagedResult<OrderResponseDto>>> getUserOrdersPaging(OrderPagingRequest request);
