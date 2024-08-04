@@ -26,6 +26,14 @@ namespace ECommerce.Application.Services.Oms
             _uow = uow;
             _userService = userService;
         }
+        public async Task<Response<Order>> approveOrder(Guid id)
+        {
+            var ent = await _uow.Repository<Order>().GetByIdAsync(id);
+            ent.Status = OmsConstant.STATUS_ORDER_APPROVED;
+            _uow.Repository<Order>().Update(ent);
+            await _uow.SaveChangesAsync();
+            return new SuccessResponse<Order>(ent);
+        }
         public async Task<Response<OrderResponseDto>> getById(Guid id)
         {
             var ent = (OrderResponseDto)(await _uow.Repository<Order>().GetByIdAsync(id));

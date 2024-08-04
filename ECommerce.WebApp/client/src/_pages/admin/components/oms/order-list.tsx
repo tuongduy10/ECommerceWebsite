@@ -11,6 +11,7 @@ import { FormatHelper } from "src/_shares/_helpers/format-helper";
 import { ORDER_STATUSES, ORDER_STATUS_CODE } from "src/_cores/_constants/order-constants";
 import { IOrderPagedRequest } from "../../interfaces/oms-interface";
 import { StatusDisplay } from "src/_shares/_components";
+import { api } from "src/_cores/_api/api";
 
 const header: ITableHeader[] = [
     { field: 'createdDate', fieldName: 'Ngày tạo', align: 'left' },
@@ -29,10 +30,11 @@ type TableRowProps = {
     onDelete: (id: number) => void,
     onSelected: (id: number) => void,
     onViewDetail: (id: number) => void,
+    onApprove: (id: string) => void,
 }
 
 function Row(props: TableRowProps) {
-    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected, onViewDetail } = props;
+    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected, onViewDetail, onApprove } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
     const openDel = Boolean(delAnchorEl);
@@ -46,6 +48,10 @@ function Row(props: TableRowProps) {
     const deleteProduct = (id: number) => {
         onDelete(id);
         handleCloseDel();
+    }
+
+    const approve = (id: string) => {
+        onApprove(id);
     }
 
     const handleClickDel = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -86,6 +92,16 @@ function Row(props: TableRowProps) {
                     <StatusDisplay statusCode={rowData.status} />
                 </TableCell>
                 <TableCell align="center">
+                    {rowData.status === ORDER_STATUS_CODE.ORDER_PENDING && (
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            onClick={() => approve(rowData.id)}
+                        >
+                            Xác nhận
+                        </Button>
+                    )}
+
                     <Button
                         variant="outlined"
                         color="error"
@@ -134,7 +150,7 @@ function Row(props: TableRowProps) {
                                             {rowData.orderDetails?.map((item: any) => (
                                                 <TableRow key={item.productId}>
                                                     <TableCell component="th" scope="row">
-                                                        {item.productName} {item.options ? `(${item.options})`: ''}
+                                                        {item.productName} {item.options ? `(${item.options})` : ''}
                                                     </TableCell>
                                                     <TableCell>{getFormatedPrice(item.price)}</TableCell>
                                                     <TableCell align="right">{getFormatedPrice(item.priceOnSell)}</TableCell>
@@ -215,6 +231,13 @@ export default function OrderList() {
         }
     }
 
+    const approve = async (id: string) => {
+        const response = await api.post("/order/approve-order" + `/${id}`, {}) as any;
+        if (response?.isSucceed) {
+            search(params);
+        }
+    }
+
     const onChangeStatus = async (status?: string) => {
         const _params = { ...params, status: status || '' };
         setParams(_params);
@@ -271,6 +294,7 @@ export default function OrderList() {
                                     isSelected={selectedOrders.includes(item.id)}
                                     onUpdateStatus={(id, status) => temp(id, status)}
                                     onDelete={(id) => temp(id)}
+                                    onApprove={(id) => approve(id)}
                                     onSelected={(id) => temp(id)}
                                     onViewDetail={(id) => temp(id)}
                                 />
