@@ -84,6 +84,12 @@ namespace ECommerce.WebApp
                 app.UseHsts();
             }
 
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetService<ECommerceContext>();
+                context.Database.Migrate();
+            }
+
             // Serve default files and static files
             app.UseDefaultFiles();
             app.UseStaticFiles();

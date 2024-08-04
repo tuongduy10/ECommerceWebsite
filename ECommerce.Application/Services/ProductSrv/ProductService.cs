@@ -136,12 +136,11 @@ namespace ECommerce.Application.Services.ProductSrv
                     .ToList();
                 var imagePaths = _productImageRepo.Entity()
                     .Where(img => img.ProductId == id)
-                    .OrderByDescending(_ => _.ProductImageId)
+                    .OrderBy(_ => _.Order)
                     .Select(i => i.ProductImagePath)
                     .ToList();
                 var userImagePaths = _productUserImageRepo.Entity()
                     .Where(img => img.ProductId == id)
-                    .OrderByDescending(_ => _.ProductUserImageId)
                     .Select(i => i.ProductUserImagePath)
                     .ToList();
                 var review = new ReviewModel
@@ -284,7 +283,7 @@ namespace ECommerce.Application.Services.ProductSrv
 
                     imagePaths = _productImageRepo.Entity()
                             .Where(img => img.ProductId == i.ProductId)
-                            .OrderByDescending(_ => _.ProductImageId)
+                            .OrderBy(_ => _.Order)
                             .Select(i => i.ProductImagePath)
                             .ToList(),
                     brand = new BrandModel
@@ -384,7 +383,7 @@ namespace ECommerce.Application.Services.ProductSrv
                             name = i.Brand.BrandName,
                         },
                         imagePaths = i.ProductImages
-                            .OrderByDescending(_ => _.ProductImageId)
+                            .OrderBy(_ => _.Order)
                             .Select(i => i.ProductImagePath)
                             .ToList(),
 
@@ -602,8 +601,9 @@ namespace ECommerce.Application.Services.ProductSrv
                     // Images from request not in db
                     var sysImgAddReq = request.systemFileNames
                         .Where(img => !imagesFromDb.Contains(img))
-                        .Select(img => new ProductImage
+                        .Select((img, idx) => new ProductImage
                         {
+                            Order = idx,
                             ProductId = product.ProductId,
                             ProductImagePath = img
                         })
