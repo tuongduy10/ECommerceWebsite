@@ -136,10 +136,12 @@ namespace ECommerce.Application.Services.ProductSrv
                     .ToList();
                 var imagePaths = _productImageRepo.Entity()
                     .Where(img => img.ProductId == id)
+                    .OrderByDescending(_ => _.ProductImageId)
                     .Select(i => i.ProductImagePath)
                     .ToList();
                 var userImagePaths = _productUserImageRepo.Entity()
                     .Where(img => img.ProductId == id)
+                    .OrderByDescending(_ => _.ProductUserImageId)
                     .Select(i => i.ProductUserImagePath)
                     .ToList();
                 var review = new ReviewModel
@@ -282,6 +284,7 @@ namespace ECommerce.Application.Services.ProductSrv
 
                     imagePaths = _productImageRepo.Entity()
                             .Where(img => img.ProductId == i.ProductId)
+                            .OrderByDescending(_ => _.ProductImageId)
                             .Select(i => i.ProductImagePath)
                             .ToList(),
                     brand = new BrandModel
@@ -381,6 +384,7 @@ namespace ECommerce.Application.Services.ProductSrv
                             name = i.Brand.BrandName,
                         },
                         imagePaths = i.ProductImages
+                            .OrderByDescending(_ => _.ProductImageId)
                             .Select(i => i.ProductImagePath)
                             .ToList(),
 

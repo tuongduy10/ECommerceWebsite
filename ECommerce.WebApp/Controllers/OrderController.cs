@@ -39,6 +39,12 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [HttpPost("approve-order/{id}")]
+        public async Task<IActionResult> approveOrder(Guid id)
+        {
+            var result = await _omsService.approveOrder(id);
+            return Ok(result);
+        }
         [HttpGet("pending-orders")]
         public async Task<IActionResult> getPendingOrder()
         {
