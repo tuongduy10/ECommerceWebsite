@@ -3,8 +3,12 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/pagination";
 import { Autoplay, FreeMode, Pagination } from "swiper";
+import { useProductStore } from "src/_cores/_store/root-store";
+import { ENV } from "src/_configs/enviroment.config";
 
 const ProductDetailRealImages = () => {
+  const productStore = useProductStore();
+
   return (
     <div className="product__images-slider">
       <h1 className="detail-title mb-0">
@@ -25,66 +29,14 @@ const ProductDetailRealImages = () => {
         modules={[Autoplay, FreeMode, Pagination]}
         className="mySwiper cursor-grab"
       >
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <img
-            src="https://hihichi.com/images/products/product_be147d8e-feb3-4c0f-9a0b-c1a779568d52.jpeg"
-            alt=""
-          />
-        </SwiperSlide>
+        {productStore.productDetail?.userImagePaths.map((_) => (
+          <SwiperSlide key={_}>
+            <img
+              src={ENV.IMAGE_URL + '/products/' + _}
+              alt=""
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );
