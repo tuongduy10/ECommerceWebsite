@@ -19,18 +19,27 @@ const HeaderNavMobile = () => {
   const [config, setConfig] = useState<any>(null);
 
   useEffect(() => {
-    if (wrapperListRef.current && logoRef.current && footerRef.current) {
-      setMenuHeight(wrapperListRef.current.clientHeight - logoRef.current.clientHeight - footerRef.current.clientHeight);
-    }
+    const getConfig = async () => {
+      const res = await CmsService.getConfig() as any;
+      if (res?.isSucceed) {
+        setConfig(res.data);
+      }
+    };
     getConfig();
   }, []);
 
-  const getConfig = async () => {
-    const res = await CmsService.getConfig() as any;
-    if (res?.isSucceed) {
-      setConfig(res?.data);
-    }
-  }
+  useEffect(() => {
+    const updateMenuHeight = () => {
+      if (wrapperListRef.current && logoRef.current && footerRef.current) {
+        setMenuHeight(
+          window.innerHeight - 
+          logoRef.current.clientHeight - 
+          footerRef.current.clientHeight
+        );
+      }
+    };
+    updateMenuHeight();
+  }, [config]);
 
   const onToggleNav = () => {
     setIsOpenedNav((toggle) => !toggle);
@@ -81,7 +90,7 @@ const HeaderNavMobile = () => {
               ))}
             </div>
           </div>
-          <div ref={footerRef} className="nav__mobile-footer w-full mt-auto mb-0">
+          <div ref={footerRef} className="nav__mobile-footer w-full mb-0">
             <ul className="nav__mobile-account p-4">
               <li className="pb-4">
                 <button className="flex w-full">
