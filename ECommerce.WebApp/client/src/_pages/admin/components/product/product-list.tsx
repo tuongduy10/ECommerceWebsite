@@ -209,7 +209,7 @@ export default function ProductList() {
         subCategoryId: -1,
         categoryId: -1,
         pageIndex: 1,
-        pageSize: GlobalConfig.MAX_PAGE_SIZE,
+        pageSize: 10,
         totalPage: 1,
     });
     const [products, setProducts] = useState<any[]>([]);
