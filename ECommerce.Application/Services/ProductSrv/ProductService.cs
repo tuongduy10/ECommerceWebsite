@@ -24,6 +24,7 @@ using ECommerce.Data.Entities.OmsSchema;
 using ECommerce.Data.Abstractions;
 using ECommerce.Utilities.Shared.Responses;
 using ECommerce.Application.Services.UserSrv;
+using System.Globalization;
 
 namespace ECommerce.Application.Services.ProductSrv
 {
@@ -231,6 +232,9 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pagesize = request.PageSize;
                 string orderBy = request.orderBy;
                 string filterBy = request.filterBy;
+                string keyword = !string.IsNullOrEmpty(request.keyword) 
+                    ? RemoveDiacritics(request.keyword.ToLower().Trim()) 
+                    : string.Empty;
                 if (request.id > -1)
                     request.ids.Add(request.id);
                 List<int> ids = request.ids;
@@ -242,29 +246,39 @@ namespace ECommerce.Application.Services.ProductSrv
                     .Distinct()
                     .ToList();
 
-                Func<IQueryable<Product>, IOrderedQueryable<Product>> orderByReq = _ => _.OrderByDescending(i => i.ProductAddedDate);
-                if (orderBy == "asc")
-                    orderByReq = _ => _.OrderBy(i => i.ProductAddedDate);
+                var query = _DbContext.Products
+                    .Include(_ => _.Brand)
+                    .Where(delegate (Product _)
+                    {
+                        if (
+                            _.Status == (byte)ProductStatusEnum.Available
+                                && (string.IsNullOrEmpty(keyword)
+                                    || EF.Functions.Like(_.Ppc, $"%{keyword}%")
+                                    || EF.Functions.Like(_.Brand.BrandName, $"%{keyword}%")
+                                    || ConvertToUnSign(_.ProductName).IndexOf(keyword, StringComparison.CurrentCultureIgnoreCase) >= 0)
+                                && (ids.Count == 0 || ids.Contains(_.ProductId))
+                                && (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId))
+                                && (brandId == -1 || _.BrandId == brandId)
+                                && (subCategoryId == -1 || _.SubCategoryId == subCategoryId)
+                                && (request.isNew == false || _.New == true)
+                                && (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null)
+                                && (request.isAvailable == false || (_.PricePreOrder == null && _.DiscountPreOrder == null))
+                                && (request.isPreOrder == false || (_.PriceAvailable == null && _.DiscountAvailable == null)))
+                            return true;
+                        return false;
+                    })
+                    .AsQueryable();
+
                 if (orderBy == "asc" && filterBy == "price")
-                    orderByReq = _ => _.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
-                if (orderBy == "desc" && filterBy == "price")
-                    orderByReq = _ => _.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
+                    query = query.OrderBy(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
+                else if (orderBy == "desc" && filterBy == "price")
+                    query = query.OrderByDescending(i => i.DiscountPreOrder ?? i.DiscountAvailable ?? i.PricePreOrder ?? i.PriceAvailable);
+                else if (orderBy == "asc" && string.IsNullOrEmpty(filterBy))
+                    query = query.OrderBy(i => i.ProductAddedDate);
+                else
+                    query = query.OrderByDescending(i => i.ProductAddedDate);
 
-                var extQuery = _uow.Repository<Product>()
-                    .QueryableAsync(
-                        _ => _.Status == (byte)ProductStatusEnum.Available
-                            && (ids.Count == 0 || ids.Contains(_.ProductId))
-                            && (proIdsByOption.Count == 0 || proIdsByOption.Contains(_.ProductId))
-                            && (brandId == -1 || _.BrandId == brandId)
-                            && (subCategoryId == -1 || _.SubCategoryId == subCategoryId)
-                            && (request.isNew == false || _.New == true)
-                            && (request.isHotSale == false || _.DiscountAvailable != null || _.DiscountPreOrder != null)
-                            && (request.isAvailable == false || (_.PricePreOrder == null && _.DiscountPreOrder == null))
-                            && (request.isPreOrder == false || (_.PriceAvailable == null && _.DiscountAvailable == null))
-                        , orderByReq 
-                        , "Brand");
-
-                var list = extQuery.Select(i => new ProductModel()
+                var list = query.Select(i => new ProductModel()
                 {
                     id = i.ProductId,
                     name = i.ProductName,
@@ -296,8 +310,8 @@ namespace ECommerce.Application.Services.ProductSrv
                     },
                 });
 
-                var record = await extQuery.CountAsync();
-                var data = await PaginatedList<ProductModel>.CreateAsync(list, pageindex, pagesize);
+                var record = query.Count();
+                var data = PaginatedList<ProductModel>.Create(list, pageindex, pagesize);
                 foreach (var item in data)
                 {
                     item.options = _optionRepo.Entity()
@@ -340,7 +354,9 @@ namespace ECommerce.Application.Services.ProductSrv
             try
             {
                 var id = request.id;
-                var keyword = request.keyword.ToLower();
+                string keyword = !string.IsNullOrEmpty(request.keyword)
+                    ? RemoveDiacritics(request.keyword.ToLower().Trim())
+                    : string.Empty;
                 var brandId = request.brandId;
                 var shopId = request.shopId;
                 var subCategoryId = request.subCategoryId;
@@ -348,9 +364,14 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pageIndex = request.PageIndex;
                 int pageSize = request.PageSize;
 
-                var extQuery = _uow.Repository<Product>()
-                    .QueryableAsync(
-                        product =>
+                var extQuery = _DbContext.Products
+                    .Include(_ => _.Brand)
+                    .Include(_ => _.Shop)
+                    .Include(_ => _.SubCategory)
+                        .ThenInclude(_ => _.Category)
+                    .Where(delegate (Product product)
+                    {
+                        if (
                             (id == -1 || product.ProductId == id) &&
                             (shopId == -1 || product.ShopId == shopId) &&
                             (brandId == -1 || product.BrandId == brandId) &&
@@ -359,11 +380,16 @@ namespace ECommerce.Application.Services.ProductSrv
                                 (product.SubCategory != null &&
                                  product.SubCategory.Category != null &&
                                  product.SubCategory.Category.CategoryId == categoryId)) &&
-                            (EF.Functions.Like(product.ProductCode, $"%{keyword}%") ||
+                            (string.IsNullOrEmpty(keyword) ||
+                                EF.Functions.Like(product.ProductCode, $"%{keyword}%") ||
                                 EF.Functions.Like(product.Ppc, $"%{keyword}%") ||
-                                EF.Functions.Like(product.ProductName, $"%{keyword}%")),
-                        _ => _.OrderByDescending(_ => _.ProductId),
-                        "Brand,Shop,SubCategory");
+                                ConvertToUnSign(product.ProductName).IndexOf(keyword, StringComparison.CurrentCultureIgnoreCase) >= 0))
+                            return true;
+                        return false;
+                    })
+                    .AsQueryable()
+                    .OrderByDescending(i => i.ProductAddedDate);
+
                 var list = extQuery
                     .Select(i => new ProductModel()
                     {
@@ -403,8 +429,8 @@ namespace ECommerce.Application.Services.ProductSrv
                         link = i.Link
                     });
 
-                var record = await extQuery.CountAsync();
-                var data = await PaginatedList<ProductModel>.CreateAsync(list, pageIndex, pageSize); // execute the query here
+                var record = extQuery.Count();
+                var data = PaginatedList<ProductModel>.Create(list, pageIndex, pageSize); // execute the query here
                 var result = new PageResult<ProductModel>()
                 {
                     Items = data,
@@ -896,10 +922,38 @@ namespace ECommerce.Application.Services.ProductSrv
         }
         private string RemoveDiacritics(string text)
         {
-            string decomposed = text.Normalize(NormalizationForm.FormD);
-            Regex regex = new Regex("\\p{Mn}", RegexOptions.Compiled);
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
 
-            return regex.Replace(decomposed, string.Empty).Normalize(NormalizationForm.FormC);
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                char c = normalizedString[i];
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder
+                .ToString()
+                .Normalize(NormalizationForm.FormC);
+        }
+        private string ConvertToUnSign(string input)
+        {
+            input = input.Trim();
+            for (int i = 0x20; i < 0x30; i++)
+            {
+                input = input.Replace(((char)i).ToString(), " ");
+            }
+            Regex regex = new Regex(@"\p{IsCombiningDiacriticalMarks}+");
+            string str = input.Normalize(NormalizationForm.FormD);
+            string str2 = regex.Replace(str, string.Empty).Replace('đ', 'd').Replace('Đ', 'D');
+            while (str2.IndexOf("?") >= 0)
+            {
+                str2 = str2.Remove(str2.IndexOf("?"), 1);
+            }
+            return str2;
         }
     }
 }
