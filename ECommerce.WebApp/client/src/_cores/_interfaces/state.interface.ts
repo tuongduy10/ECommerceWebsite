@@ -18,7 +18,7 @@ export interface IAlertInitState {
   message: string;
   open: boolean;
   type: 'info' | 'success' | 'error' | 'warning';
-  duration: number;
+  duration: number | null;
   autoHide: boolean;
 }
 

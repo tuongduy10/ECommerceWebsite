@@ -1,5 +1,4 @@
 ﻿using ECommerce.Application.Common;
-using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -38,8 +37,8 @@ namespace ECommerce.Application.Services.Notifications
                     JsLink = item.JsLink,
                     CreateDate = (DateTime)item.CreateDate,
                     IsRead = (bool)item.IsRead,
-                    ReceiverIsAmin = item.Receiver == null ? false  : item.Receiver.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains(RoleName.Admin),
-                    SenderIsAdmin = item.Sender == null ? false : item.Sender.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains(RoleName.Admin),
+                    ReceiverIsAmin = item.Receiver == null ? false  : item.Receiver.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains("Admin"),
+                    SenderIsAdmin = item.Sender == null ? false : item.Sender.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains("Admin"),
                     SenderName = item.Sender == null ? "" : item.Sender.UserFullName,
                     TypeCode = item.TypeCode
                 })
@@ -64,8 +63,8 @@ namespace ECommerce.Application.Services.Notifications
                     JsLink = item.JsLink,
                     CreateDate = (DateTime)item.CreateDate,
                     IsRead = (bool)item.IsRead,
-                    ReceiverIsAmin = item.Receiver == null ? false : item.Receiver.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains(RoleName.Admin),
-                    SenderIsAdmin = item.Sender == null ? false : item.Sender.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains(RoleName.Admin),
+                    ReceiverIsAmin = item.Receiver == null ? false : item.Receiver.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains("Admin"),
+                    SenderIsAdmin = item.Sender == null ? false : item.Sender.UserRoles.Select(role => role.Role.RoleName).FirstOrDefault().Contains("Admin"),
                     SenderName = item.Sender == null ? "" : item.Sender.UserFullName,
                     TypeCode = item.TypeCode
                 };

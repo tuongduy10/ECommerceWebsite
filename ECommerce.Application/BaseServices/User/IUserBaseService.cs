@@ -9,9 +9,6 @@ namespace ECommerce.Application.BaseServices.User
     {
         Task<List<UserGetModel>> getAll();
         Task<List<UserGetModel>> getUsersByFiltered(UserGetRequest request);
-        Task<ApiResponse> SignIn(SignInRequest request);
-        Task<ApiResponse> SignUp(SignUpRequest request);
-        Task<ApiResponse> AddSeller(SignUpRequest request);
         Task<UserGetModel> UserProfile(int id);
         Task<ApiResponse> UpdateManageUserProfile(UserUpdateRequest request);
         Task<ApiResponse> CheckUserPhoneNumber(string PhoneNumber);

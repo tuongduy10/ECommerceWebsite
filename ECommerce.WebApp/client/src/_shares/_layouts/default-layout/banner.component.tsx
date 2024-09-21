@@ -25,6 +25,7 @@ const Banner = () => {
       '/product-detail',
       '/cart',
       '/login',
+      '/sign-up',
       '/brands',
     ];
     if (hiddenPath.includes(location.pathname)) {

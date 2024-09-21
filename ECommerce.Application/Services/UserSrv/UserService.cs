@@ -20,6 +20,11 @@ using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using ECommerce.Utilities.Shared.Responses;
+using ECommerce.Application.ExternalServices.Emails;
+using ECommerce.Application.ExternalServices.Emails.Dtos;
+using System.IO;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -28,13 +33,16 @@ namespace ECommerce.Application.Services.UserSrv
         private readonly IUnitOfWork _uow;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppSetting _appSetting;
+        private readonly IEmailService _emailService;
         public UserService(IUnitOfWork uow, 
             IHttpContextAccessor httpContextAccessor,
-            IOptionsMonitor<AppSetting> optionsMonitor)
+            IOptionsMonitor<AppSetting> optionsMonitor,
+            IEmailService emailService)
         {
             _uow = uow;
             _httpContextAccessor = httpContextAccessor;
             _appSetting = optionsMonitor.CurrentValue;
+            _emailService = emailService;
         }
         public async Task<Response<PageResult<UserGetModel>>> getUserPagingList(UserGetRequest request)
         {
@@ -249,8 +257,15 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<string>("Mật khẩu hoặc tài khoản không đúng");
             if (result.Status == false)
                 return new FailResponse<string>("Tài khoản đã bị khóa");
+            if (result.IsActived == false)
+            {
+                return new FailResponse<string>("Tài khoản chưa được kích hoạt");
+            }
 
-            var permissions = await _uow.Repository<RoleToPermission>().GetByAsync(_ => result.UserRoles.Select(r => r.Role.RoleId).Contains(_.RoleId), null, "Permission");
+            var permissions = await _uow.Repository<RoleToPermission>()
+                .GetByAsync(
+                    _ => result.UserRoles.Select(r => r.Role.RoleId).Contains(_.RoleId), null, 
+                    "Permission");
 
             var user = new UserModel();
             user.id = result.UserId;
@@ -262,6 +277,120 @@ namespace ECommerce.Application.Services.UserSrv
             string token = GenerateToken(user);
 
             return new SuccessResponse<string>("Đăng nhập thành công", token);
+        }
+        public async Task<Response<string>> SignUp(SignUpRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.UserPhone)) return new FailResponse<string>("Số điện thoại không được để trống");
+                if (request.UserPhone.Contains("+84"))
+                {
+                    request.UserPhone = request.UserPhone.Replace("+84", "");
+                    if (!request.UserPhone.StartsWith("0"))
+                    {
+                        request.UserPhone = "0" + request.UserPhone;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(request.UserFullName)) return new FailResponse<string>("Vui lòng nhập họ tên");
+                if (string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.RePassword)) return new FailResponse<string>("Vui lòng nhập mật khẩu");
+                if (request.Password != request.RePassword) return new FailResponse<string>("Mật khẩu không trùng");
+
+                if (!IsValidEmail(request.UserMail)) return new FailResponse<string>("Mail không hợp lệ");
+                var checkMail = (await _uow.Repository<User>().GetByAsync(i => i.UserMail == request.UserMail)).FirstOrDefault();
+                if (checkMail != null) return new FailResponse<string>("Mail đã tồn tại");
+
+                var checkPhone = (await _uow.Repository<User>().GetByAsync(i => i.UserPhone == request.UserPhone)).FirstOrDefault();
+                if (checkPhone != null) return new FailResponse<string>("Số điện thoại đã tồn tại");
+
+                User user = new User();
+                user.UserMail = !string.IsNullOrEmpty(request.UserMail) ? request.UserMail.Trim() : null;
+                //user.UserJoinDate = DateTime.Now;
+                user.UserFullName = !string.IsNullOrEmpty(request.UserFullName) ? request.UserFullName.Trim() : null;
+                user.UserPhone = !string.IsNullOrEmpty(request.UserPhone) ? request.UserPhone.Trim() : null;
+                user.UserAddress = !string.IsNullOrEmpty(request.UserAddress) ? request.UserAddress.Trim() : null;
+                user.UserDistrictCode = !string.IsNullOrEmpty(request.UserDistrictCode) ? request.UserDistrictCode.Trim() : null;
+                user.UserCityCode = !string.IsNullOrEmpty(request.UserCityCode) ? request.UserCityCode.Trim() : null;
+                user.UserWardCode = !string.IsNullOrEmpty(request.UserWardCode) ? request.UserWardCode.Trim() : null;
+                user.Password = !string.IsNullOrEmpty(request.RePassword) ? request.RePassword.Trim() : null;
+                user.UserName = generateUserName(user.UserFullName.Trim(), user.UserPhone);
+                user.Status = true;
+                user.IsActived = false;
+                user.IsSystemAccount = request.isSystemAccount;
+                await _uow.Repository<User>().AddAsync(user);
+                await _uow.SaveChangesAsync();
+
+                // UserRole
+                UserRole role = new UserRole();
+                role.RoleId = request.RoleId != 0 ? request.RoleId : (int)RoleEnum.Buyer;
+                role.UserId = user.UserId;
+                await _uow.Repository<UserRole>().AddAsync(role);
+                await _uow.SaveChangesAsync();
+
+                // Send mail to confirm
+                string token = GenerateConfirmToken(user);
+                await SendConfirmEmail(user.UserMail, token);
+
+                string maskEmail = MaskEmail(user.UserMail);
+                return new SuccessResponse<string>(
+                    $"Tạo tài khoản thành công!\n\n" +
+                    $"Vui lòng kiểm tra mail {maskEmail} để kích hoạt tài khoản và đăng nhập.\n" +
+                    $"Nếu không thấy email trong hộp thư đến, hãy xem trong mục Spam hoặc Thư rác.");
+            }
+            catch (Exception error)
+            {
+                return new FailResponse<string>("Tạo tài khoản không thành công, lỗi: " + error.Message);
+            }
+        }
+        public async Task<Response<string>> ConfirmRegister(string token)
+        {
+            try
+            {
+                var claims = ValidateConfirmToken(token);
+                string email = claims.FirstOrDefault(_ => _.Type == "email")?.Value;
+                string userId = claims.FirstOrDefault(_ => _.Type == "id")?.Value;
+                var user = (await _uow.Repository<User>()
+                    .GetByAsync(_ => _.UserId == int.Parse(userId)))
+                    .FirstOrDefault();
+                if (user != null)
+                {
+                    user.IsActived = true;
+                    _uow.Repository<User>().Update(user);
+                    await _uow.SaveChangesAsync();
+                    return new SuccessResponse<string>("Xác thực thành công");
+                }
+                return new FailResponse<string>("Xác thực thất bại");
+            }
+            catch
+            {
+                return new FailResponse<string>("Xác thực thất bại");
+            }
+        }
+        public async Task<Response<string>> ResetPassword(ResetPasswordRequest dto)
+        {
+            try
+            {
+                var claims = TokenPrincipal(getAccessToken());
+                string userId = claims.FirstOrDefault(_ => _.Type == "id")?.Value;
+                var user = (await _uow.Repository<User>()
+                    .GetByAsync(
+                        _ => _.UserId == int.Parse(userId)
+                            && _.Password == dto.Password))
+                    .FirstOrDefault();
+                if (user == null)
+                    return new FailResponse<string>("Mật khẩu không hợp lệ");
+                if (dto.ReNewPassword != dto.NewPassword || string.IsNullOrEmpty(dto.NewPassword) || string.IsNullOrEmpty(dto.ReNewPassword))
+                    return new FailResponse<string>("Mật khẩu mới không trùng hoặc không chính xác");
+
+                user.Password = dto.ReNewPassword;
+                _uow.Repository<User>().Update(user);
+                await _uow.SaveChangesAsync();
+                return new SuccessResponse<string>("Đổi mật khẩu thành công");
+            }
+            catch
+            {
+                return new FailResponse<string>("Đổi mật khẩu thất bại");
+            }
         }
         public async Task<Response<List<ShopModel>>> GetShops()
         {
@@ -507,7 +636,46 @@ namespace ECommerce.Application.Services.UserSrv
                 return null;
             }
         }
-    
+        private string GenerateConfirmToken(User user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
+
+            var claims = new List<Claim>
+            {
+                new Claim("id", user.UserId.ToString()),
+                new Claim("tokenId", Guid.NewGuid().ToString()),
+                new Claim("email", user.UserMail),
+            };
+            var description = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(3),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKeyBytes), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var createToken = jwtTokenHandler.CreateToken(description);
+            var writeToken = jwtTokenHandler.WriteToken(createToken);
+
+            return writeToken;
+        }
+        private IEnumerable<Claim> ValidateConfirmToken(string token)
+        {
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_appSetting.SecretKey);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            // Define token validation parameters
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ValidateIssuer = false, // You may want to set this to true if issuer validation is required
+                ValidateAudience = false, // You may want to set this to true if audience validation is required
+                RequireExpirationTime = true,
+                ValidateLifetime = true
+            };
+            SecurityToken validatedToken;
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+            return principal.Claims;
+        }
         private string generateUserName(string fullName, string phoneNumber)
         {
             string lowercaseAlphabets = string.Join("", Enumerable.Range('a', 'z' - 'a' + 1).Select(c => (char)c));
@@ -521,5 +689,54 @@ namespace ECommerce.Application.Services.UserSrv
             }
             return string.Join("", distinctConsonants) + phoneNumber.Substring(phoneNumber.Length - 4, 4);
         }
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+            // Regular expression for validating an email
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+        private string MaskEmail(string email)
+        {
+            // Split the email address into the local part and domain part
+            var atIndex = email.IndexOf('@');
+            if (atIndex < 0)
+            {
+                throw new ArgumentException("Invalid email address");
+            }
+
+            string localPart = email.Substring(0, atIndex);
+            string domainPart = email.Substring(atIndex);
+
+            // Ensure we leave the first 3 characters and the last 2 characters of the local part visible
+            if (localPart.Length <= 5)
+            {
+                // For short local parts, show only the first character
+                return localPart.Substring(0, 1) + "****" + domainPart;
+            }
+
+            // For longer local parts, hide everything except the first 3 and last 2 characters
+            return localPart.Substring(0, 3) + new string('*', localPart.Length - 5) + localPart.Substring(localPart.Length - 2) + domainPart;
+        }
+        private async Task SendConfirmEmail(string email, string token)
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "verify", "verify-account.html");
+            string template = File.ReadAllText(filePath);
+            string url = "https://www.hihichi.com/verify-account?token=";
+#if DEBUG
+            url = "https://localhost:44330/verify-account?token=";
+#endif
+            url += token;
+            template = template.Replace("{{action_url}}", url);
+            await _emailService.SendEmailAsync(
+                new SendMailDto
+                {
+                    Subject = "Xác thực tài khoản của bạn",
+                    Message = template,
+                    Tos = new List<string> { email }
+                });
+        }
+        
     }
 }

@@ -59,6 +59,32 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [AllowAnonymous]
+        [HttpPost("sign-up")]
+        public async Task<IActionResult> SignUp(SignUpRequest request)
+        {
+            var result = await _userService.SignUp(request);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [AllowAnonymous]
+        [HttpGet("confirm-register")]
+        public async Task<IActionResult> ConfirmRegister([FromQuery] string token)
+        {
+            var result = await _userService.ConfirmRegister(token);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest dto)
+        {
+            var result = await _userService.ResetPassword(dto);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
         [HttpPost("info")]
         public async Task<IActionResult> UserInfo()
         {

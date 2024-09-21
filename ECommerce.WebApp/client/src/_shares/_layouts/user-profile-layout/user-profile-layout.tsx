@@ -48,7 +48,7 @@ const UserProfileLayout = () => {
             name: 'Đổi mật khẩu',
             icon: ICON_NAME.FEATHER.EDIT_3,
             command: () => {
-
+                navigate(ROUTE_NAME.USER_PROFILE_RESET_PASSWORD);
             }
         },
         {
