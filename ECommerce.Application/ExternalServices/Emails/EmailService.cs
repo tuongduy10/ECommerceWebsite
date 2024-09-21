@@ -1,4 +1,5 @@
 ﻿using ECommerce.Application.ExternalServices.Emails.Dtos;
+using ECommerce.Utilities.Helpers;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
@@ -21,10 +22,10 @@ namespace ECommerce.Application.ExternalServices.Emails
 
         public async Task SendEmailAsync(SendMailDto dto)
         {
-            string host = _configuration.GetValue<string>("Smtp:Host");
+            string host = HashHelper.Decrypt(_configuration.GetValue<string>("Smtp:Host"));
             int port = _configuration.GetValue<int>("Smtp:Port");
-            string emailFrom = _configuration.GetValue<string>("Smtp:Username");
-            string password = _configuration.GetValue<string>("Smtp:Password");
+            string emailFrom = HashHelper.Decrypt(_configuration.GetValue<string>("Smtp:Username"));
+            string password = HashHelper.Decrypt(_configuration.GetValue<string>("Smtp:Password"));
             bool enableSsl = _configuration.GetValue<bool>("Smtp:EnableSsl");
 
             // Create a new email message
