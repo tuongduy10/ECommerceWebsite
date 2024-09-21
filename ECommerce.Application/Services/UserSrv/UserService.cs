@@ -280,6 +280,7 @@ namespace ECommerce.Application.Services.UserSrv
         }
         public async Task<Response<string>> SignUp(SignUpRequest request)
         {
+            var transaction = await _uow.BeginTransactionAsync();
             try
             {
                 if (string.IsNullOrEmpty(request.UserPhone)) return new FailResponse<string>("Số điện thoại không được để trống");
@@ -332,6 +333,7 @@ namespace ECommerce.Application.Services.UserSrv
                 await SendConfirmEmail(user.UserMail, token);
 
                 string maskEmail = MaskEmail(user.UserMail);
+                await _uow.CommitTransactionAsync(transaction);
                 return new SuccessResponse<string>(
                     $"Tạo tài khoản thành công!\n\n" +
                     $"Vui lòng kiểm tra mail {maskEmail} để kích hoạt tài khoản và đăng nhập.\n" +
@@ -339,6 +341,7 @@ namespace ECommerce.Application.Services.UserSrv
             }
             catch (Exception error)
             {
+                await _uow.RollbackTransactionAsync(transaction);
                 return new FailResponse<string>("Tạo tài khoản không thành công, lỗi: " + error.Message);
             }
         }
