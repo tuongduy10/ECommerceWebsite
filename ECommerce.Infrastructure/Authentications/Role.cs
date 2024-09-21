@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace ECommerce.Application.BaseServices.User.Enums
+namespace ECommerce.Infrastructure.Authentications
 {
-    public enum enumRole
+    public enum RoleEnum
     {
         Admin = 1,
         Seller = 2,

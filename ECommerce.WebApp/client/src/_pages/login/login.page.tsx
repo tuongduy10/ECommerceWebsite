@@ -86,7 +86,7 @@ const LoginPage = () => {
                     />
                   </div>
                   <div className="flex w-full flex-nowrap flex-1 items-center justify-between">
-                    <a href="/" className="text-base hover:text-blue-600">
+                    <a href="/sign-up" className="text-base hover:text-blue-600">
                       Tạo tài khoản mới
                     </a>
                     <a href="/" className="text-base hover:text-blue-600">

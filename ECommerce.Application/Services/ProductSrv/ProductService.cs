@@ -25,6 +25,7 @@ using ECommerce.Data.Abstractions;
 using ECommerce.Utilities.Shared.Responses;
 using ECommerce.Application.Services.UserSrv;
 using System.Globalization;
+using ECommerce.Application.ExternalServices.Emails;
 
 namespace ECommerce.Application.Services.ProductSrv
 {
@@ -47,10 +48,12 @@ namespace ECommerce.Application.Services.ProductSrv
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IUnitOfWork _uow;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
         public ProductService(ECommerceContext DbContext,
             IRateService rateService,
             ICommonService commonService,
             IUserService userService,
+            IEmailService emailService,
             IWebHostEnvironment webHostEnvironment,
             IUnitOfWork uow)
         {
@@ -58,6 +61,7 @@ namespace ECommerce.Application.Services.ProductSrv
             _rateService = rateService;
             _commonService = commonService;
             _userService = userService;
+            _emailService = emailService;
             _webHostEnvironment = webHostEnvironment;
             if (_brandCategoryRepo == null)
                 _brandCategoryRepo = new RepositoryBase<BrandCategory>(_DbContext);
@@ -311,7 +315,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 });
 
                 var record = query.Count();
-                var data = PaginatedList<ProductModel>.Create(list, pageindex, pagesize);
+               var data = PaginatedList<ProductModel>.Create(list, pageindex, pagesize);
                 foreach (var item in data)
                 {
                     item.options = _optionRepo.Entity()
@@ -365,6 +369,8 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pageSize = request.PageSize;
 
                 var extQuery = _DbContext.Products
+                    .Include(_ => _.ProductImages)
+                    .Include(_ => _.ProductUserImages)
                     .Include(_ => _.Brand)
                     .Include(_ => _.Shop)
                     .Include(_ => _.SubCategory)

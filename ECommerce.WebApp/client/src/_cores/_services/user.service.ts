@@ -11,6 +11,18 @@ export default class UserService {
     return api.post("/user/login", param);
   }
 
+  public static signUp(param: any) { 
+    return api.post("/user/sign-up", param);
+  }
+
+  public static resetPassword(param: any) { 
+    return api.post("/user/reset-password", param);
+  }
+
+  public static verifyAccount(token: string) { 
+    return api.get("/user/confirm-register?token=" + token);
+  }
+
   public static addUser(param: any) {
     return api.post("/add-user", param);
   }

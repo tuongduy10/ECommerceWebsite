@@ -16,7 +16,7 @@ const alertSlice = createSlice({
   reducers: {
     show: (state, action: PayloadAction<string>) => {
       state.open = true;
-      state.duration = 6000;
+      state.duration = null;
       state.message = action.payload;
       state.type = "info";
     },

@@ -3,7 +3,6 @@ using ECommerce.Application.Common;
 using ECommerce.Utilities.Constants;
 using ECommerce.Application.BaseServices.Rate.Dtos;
 using ECommerce.Application.BaseServices.Rate.Models;
-using ECommerce.Application.BaseServices.User.Enums;
 using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -138,11 +137,12 @@ namespace ECommerce.Application.BaseServices.Rate
                         })
                         .ToList(),
                     CanAction = rate.UserId == _userId,
-                    IsAdmin = _DbContext.UserRoles
-                            .Where(isa => isa.UserId == rate.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Admin),
+                    //IsAdmin = _DbContext.UserRoles
+                    //    .Where(isa => isa.UserId == reply.User.UserId)
+                    //    .Select(isa => isa.Role.RoleName)
+                    //    .ToList()
+                    //    .Contains(RoleName.Admin),
+                    IsAdmin = false,
                     Liked = _DbContext.Interests
                             .Where(itr => itr.RateId == rate.RateId && itr.Liked == true)
                             .Select(itr => itr.UserId)
@@ -163,16 +163,18 @@ namespace ECommerce.Application.BaseServices.Rate
                         UserName = reply.User.UserFullName,
                         UserRepliedId = reply.UserReplied.UserId,
                         UserRepliedName = reply.UserReplied.UserFullName,
-                        IsAdmin = _DbContext.UserRoles
-                            .Where(isa => isa.UserId == reply.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Admin),
-                        IsSeller =  _DbContext.UserRoles
-                            .Where(isa => isa.UserId == reply.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Seller),
+                        //IsAdmin = _DbContext.UserRoles
+                        //    .Where(isa => isa.UserId == reply.User.UserId)
+                        //    .Select(isa => isa.Role.RoleName)
+                        //    .ToList()
+                        //    .Contains(RoleName.Admin),
+                        IsAdmin = false,
+                        //IsSeller =  _DbContext.UserRoles
+                        //    .Where(isa => isa.UserId == reply.User.UserId)
+                        //    .Select(isa => isa.Role.RoleName)
+                        //    .ToList()
+                        //    .Contains(RoleName.Seller),
+                        IsSeller = false,
                         IsShopOwner = _DbContext.Products
                             .Where(iso => iso.ProductId == id)
                             .Select(iso => iso.Shop.UserId)
@@ -228,11 +230,12 @@ namespace ECommerce.Application.BaseServices.Rate
                         })
                         .ToList(),
                     CanAction = rate.UserId == _userId,
-                    IsAdmin = _DbContext.UserRoles
-                            .Where(isa => isa.UserId == rate.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Admin),
+                    //IsAdmin = _DbContext.UserRoles
+                    //    .Where(isa => isa.UserId == reply.User.UserId)
+                    //    .Select(isa => isa.Role.RoleName)
+                    //    .ToList()
+                    //    .Contains(RoleName.Admin),
+                    IsAdmin = false,
                     Replies = _DbContext.Rates
                     .Where(reply => reply.ParentId == rate.RateId)
                     .Select(reply => new RateGetModel()
@@ -242,16 +245,18 @@ namespace ECommerce.Application.BaseServices.Rate
                         UserName = reply.User.UserFullName,
                         UserRepliedId = reply.UserReplied.UserId,
                         UserRepliedName = reply.UserReplied.UserFullName,
-                        IsAdmin = _DbContext.UserRoles
-                            .Where(isa => isa.UserId == reply.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Admin),
-                        IsSeller = _DbContext.UserRoles
-                            .Where(isa => isa.UserId == reply.User.UserId)
-                            .Select(isa => isa.Role.RoleName)
-                            .ToList()
-                            .Contains(RoleName.Seller),
+                        //IsAdmin = _DbContext.UserRoles
+                        //    .Where(isa => isa.UserId == reply.User.UserId)
+                        //    .Select(isa => isa.Role.RoleName)
+                        //    .ToList()
+                        //    .Contains(RoleName.Admin),
+                        IsAdmin = false,
+                        //IsSeller =  _DbContext.UserRoles
+                        //    .Where(isa => isa.UserId == reply.User.UserId)
+                        //    .Select(isa => isa.Role.RoleName)
+                        //    .ToList()
+                        //    .Contains(RoleName.Seller),
+                        IsSeller = false,
                         Comment = reply.Comment,
                         Liked = _DbContext.Interests
                             .Where(itr => itr.RateId == reply.RateId && itr.Liked == true)

@@ -103,6 +103,4 @@ const SearchForm = (props: any) => {
     )
 }
 
-const options = ['Option 1', 'Option 2'];
-
 export default SearchForm;

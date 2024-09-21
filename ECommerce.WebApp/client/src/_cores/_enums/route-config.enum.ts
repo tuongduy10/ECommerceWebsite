@@ -2,6 +2,8 @@ export const ROUTE_PREFIX = '';
 export const ROUTE_NAME = {
     HOME: ROUTE_PREFIX + '/',
     LOGIN: ROUTE_PREFIX + '/login',
+    SIGN_UP: ROUTE_PREFIX + '/sign-up',
+    VERIFY_ACCOUNT: ROUTE_PREFIX + '/verify-account',
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
     AVAILABLE_PRODUCTS: ROUTE_PREFIX + '/available-products',
     PREORDER_PRODUCTS: ROUTE_PREFIX + '/preorder-products',
@@ -13,6 +15,7 @@ export const ROUTE_NAME = {
     
     USER_PROFILE: ROUTE_PREFIX + '/user-profile',
     USER_PROFILE_INFO: ROUTE_PREFIX + '/user-profile/info',
+    USER_PROFILE_RESET_PASSWORD: ROUTE_PREFIX + '/user-profile/reset-passowrd',
     USER_PROFILE_ORDER_LIST: ROUTE_PREFIX + '/user-profile/order-list',
 
     CART: ROUTE_PREFIX + '/cart',

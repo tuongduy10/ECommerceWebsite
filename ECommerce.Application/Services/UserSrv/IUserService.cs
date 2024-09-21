@@ -21,6 +21,9 @@ namespace ECommerce.Application.Services.UserSrv
         Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline);
         Task<Response<UserGetModel>> UpdateOnlineHistory(int _userId);
         Task<Response<string>> ValidateUser(SignInRequest request);
+        Task<Response<string>> SignUp(SignUpRequest request);
+        Task<Response<string>> ConfirmRegister(string token);
+        Task<Response<string>> ResetPassword(ResetPasswordRequest dto);
         Task<Response<List<ShopModel>>> GetShops();
         Task<Response<UserShopModel>> UpdateUser(UserShopModel request);
         Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request);
