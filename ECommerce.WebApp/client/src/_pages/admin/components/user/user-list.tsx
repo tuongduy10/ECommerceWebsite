@@ -37,7 +37,7 @@ function Row(props: TableRowProps) {
         setDelAnchorEl(null);
     };
 
-    const getUserStatus = (status: boolean) => UserHelper.getUserStatus(status);
+    const userIsActived = (isActived: boolean) => UserHelper.userIsActived(isActived);
 
     const deleteUser = (id: number) => {
 
@@ -78,8 +78,8 @@ function Row(props: TableRowProps) {
             <TableCell>{userAddress(rowData)}</TableCell>
             <TableCell>{rowData.userMail}</TableCell>
             <TableCell>{rowData.userPhone}</TableCell>
-            <TableCell align="center" sx={{ color: getUserStatus(rowData.status).color }}>
-                {getUserStatus(rowData.status).label}
+            <TableCell align="center" sx={{ color: userIsActived(rowData.isActived).color }}>
+                {userIsActived(rowData.isActived).label}
             </TableCell>
             <TableCell align="center">
                 <Button
@@ -143,10 +143,10 @@ export default function UserList() {
         })
     }
 
-    const updateStatus = async (id: number, status: boolean) => {
+    const updateStatus = async (id: number, isActived: boolean) => {
         const params = {
             id: id,
-            status: status
+            isActived: isActived
         }
         const res = await UserService.updateUserStatus(params);
         if (res) {

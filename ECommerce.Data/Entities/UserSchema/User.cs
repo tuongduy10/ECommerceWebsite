@@ -35,7 +35,6 @@ namespace ECommerce.Data.Entities.UserSchema
         public string UserPhone { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public bool? Status { get; set; }
         public bool IsActived { get; set; }
         public bool? IsSystemAccount { get; set; }
         public bool? IsOnline { get; set; }

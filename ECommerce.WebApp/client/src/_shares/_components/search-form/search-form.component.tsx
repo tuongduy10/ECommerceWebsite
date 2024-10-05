@@ -44,7 +44,7 @@ export const SearchFormMobile = (props: any) => {
                 <div className={`searchform__wrapper py-2 px-[20px] md:hidden`}>
                     <div className="searchform input-group rounded w-full" style={{ padding: '0.375rem 0.75rem' }}>
                         <input {...params.inputProps} onChange={onChangeKeyword} value={searchKey} type="text" id="search-input" className="form-control w-full"
-                            placeholder="Sản phẩm cần tìm" />
+                            placeholder="Sản phẩm cần tìm" autoComplete="off" />
                     </div>
                     <div className="searchresult">
                         <div ref={params.InputProps.ref}></div>
@@ -91,7 +91,7 @@ const SearchForm = (props: any) => {
             renderInput={(params) => (
                 <span className="header-searchform header__top-link">
                     <span className="text">
-                        <input {...params.inputProps} onChange={onChangeKeyword} value={searchKey} type="text" placeholder="Sản phẩm cần tìm" />
+                        <input {...params.inputProps} onChange={onChangeKeyword} value={searchKey} type="text" placeholder="Sản phẩm cần tìm" autoComplete="off" />
                     </span>
                     <span className="icon">
                         <MuiIcon name={ICON_NAME.FEATHER.SEARCH} />

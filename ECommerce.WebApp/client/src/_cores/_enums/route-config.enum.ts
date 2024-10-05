@@ -4,6 +4,7 @@ export const ROUTE_NAME = {
     LOGIN: ROUTE_PREFIX + '/login',
     SIGN_UP: ROUTE_PREFIX + '/sign-up',
     VERIFY_ACCOUNT: ROUTE_PREFIX + '/verify-account',
+    FORGET_PASSWORD: ROUTE_PREFIX + '/forget-password',
     PRODUCT_LIST: ROUTE_PREFIX + '/product-list',
     AVAILABLE_PRODUCTS: ROUTE_PREFIX + '/available-products',
     PREORDER_PRODUCTS: ROUTE_PREFIX + '/preorder-products',

@@ -29,7 +29,7 @@ namespace ECommerce.Application.BaseServices.User
                 UserDistrictCode = i.UserDistrictCode,
                 UserCityCode = i.UserCityCode,
                 UserPhone = i.UserPhone,
-                Status = (bool)i.Status,
+                //Status = (bool)i.Status,
             }).ToListAsync();
             var result = list.OrderByDescending(i => i.UserJoinDate).ToList();
             return result;
@@ -49,7 +49,7 @@ namespace ECommerce.Application.BaseServices.User
                     UserCityCode = i.UserCityCode,
                     UserPhone = i.UserPhone,
                     isSystemAccount = i.IsSystemAccount == null ? false : (bool)i.IsSystemAccount,
-                    Status = i.Status == null ? false : (bool)i.Status,
+                    //Status = i.Status == null ? false : (bool)i.Status,
                     IsOnline = i.IsOnline == null ? false : (bool)i.IsOnline,
                     LastOnline = (DateTime)i.LastOnline
                 })
@@ -179,7 +179,7 @@ namespace ECommerce.Application.BaseServices.User
                                     UserRoles = i.UserRoles
                                         .Select(ur => ur.Role.RoleName)
                                         .ToList(),
-                                    Status = (bool)i.Status,
+                                    //Status = (bool)i.Status,
                                     IsOnline = (bool)i.IsOnline,
                                 }).FirstOrDefaultAsync();
 
@@ -344,7 +344,7 @@ namespace ECommerce.Application.BaseServices.User
                                 .FirstOrDefaultAsync();
             if (user != null)
             {
-                user.Status = request.Status;
+                //user.Status = request.Status;
                 _DbContext.SaveChangesAsync().Wait();
                 return new ApiSuccessResponse("Cập nhật thành công");
             }
@@ -411,7 +411,7 @@ namespace ECommerce.Application.BaseServices.User
                     UserDistrictCode = i.UserDistrictCode,
                     UserCityCode = i.UserCityCode,
                     UserPhone = i.UserPhone,
-                    Status = i.Status == null ? false : (bool)i.Status,
+                    //Status = i.Status == null ? false : (bool)i.Status,
                     IsOnline = i.IsOnline == null ? false : (bool)i.IsOnline,
                 })
                 .FirstOrDefaultAsync();

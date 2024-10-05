@@ -77,6 +77,15 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [AllowAnonymous]
+        [HttpGet("forget-password")]
+        public async Task<IActionResult> ForgetPassowrd([FromQuery] string userName)
+        {
+            var result = await _userService.ForgetPassword(userName);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest dto)
         {
