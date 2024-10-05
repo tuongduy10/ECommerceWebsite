@@ -19,6 +19,10 @@ export default class UserService {
     return api.post("/user/reset-password", param);
   }
 
+  public static forgetPassword(userName: any) { 
+    return api.get("/user/forget-password?userName=" + userName);
+  }
+
   public static verifyAccount(token: string) { 
     return api.get("/user/confirm-register?token=" + token);
   }

@@ -19,7 +19,8 @@ namespace ECommerce.Application.BaseServices.User.Dtos
         public string UserCityName { get; set; }
         public string UserPhone { get; set; }
         public List<string> UserRoles { get; set; }
-        public bool Status { get; set; }
+        //public bool Status { get; set; }
+        public bool IsActived { get; set; }
         public bool isSystemAccount { get; set; }
         public bool IsOnline { get; set; }
         public DateTime LastOnline { get; set; }
@@ -43,7 +44,8 @@ namespace ECommerce.Application.BaseServices.User.Dtos
                 UserWardName = data.UserWardName,
                 IsOnline = data.IsOnline != null ? (bool)data.IsOnline : false,
                 isSystemAccount = data.IsSystemAccount != null ? (bool)data.IsSystemAccount : false,
-                Status = data.Status != null ? (bool)data.Status : false,
+                //Status = data.Status != null ? (bool)data.Status : false,
+                IsActived = data.IsActived,
                 Shops = data.Shops.Select(_ => new Data.Entities.ProductSchema.Shop
                 {
                     ShopId = _.ShopId,

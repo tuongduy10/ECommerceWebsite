@@ -24,6 +24,7 @@ namespace ECommerce.Application.Services.UserSrv
         Task<Response<string>> SignUp(SignUpRequest request);
         Task<Response<string>> ConfirmRegister(string token);
         Task<Response<string>> ResetPassword(ResetPasswordRequest dto);
+        Task<Response<string>> ForgetPassword(string userName);
         Task<Response<List<ShopModel>>> GetShops();
         Task<Response<UserShopModel>> UpdateUser(UserShopModel request);
         Task<Response<User>> UpdateUserStatus(Dtos.UserUpdateRequest request);

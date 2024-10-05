@@ -11,7 +11,8 @@ import {
   UserProfileOrderList,
   SignUpPage,
   VerifyAccountPage,
-  ResetPasswordPage,
+  UserProfileResetPasswordPage,
+  ForgetPasswordPage,
 } from "src/_pages";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import DefaultLayout from "src/_shares/_layouts/default-layout/default-layout.component";
@@ -50,6 +51,7 @@ const Router = () => {
         { path: ROUTE_NAME.LOGIN, element: <LoginPage /> },
         { path: ROUTE_NAME.SIGN_UP, element: <SignUpPage /> },
         { path: ROUTE_NAME.VERIFY_ACCOUNT, element: <VerifyAccountPage /> },
+        { path: ROUTE_NAME.FORGET_PASSWORD, element: <ForgetPasswordPage /> },
         {
           path: ROUTE_NAME.USER_PROFILE,
           element:
@@ -58,7 +60,7 @@ const Router = () => {
             </PrivateRoute>,
           children: [
             { path: ROUTE_NAME.USER_PROFILE_INFO, element: <UserProfilePage /> },
-            { path: ROUTE_NAME.USER_PROFILE_RESET_PASSWORD, element: <ResetPasswordPage /> },
+            { path: ROUTE_NAME.USER_PROFILE_RESET_PASSWORD, element: <UserProfileResetPasswordPage /> },
             { path: ROUTE_NAME.USER_PROFILE_ORDER_LIST, element: <UserProfileOrderList /> }
           ]
         },

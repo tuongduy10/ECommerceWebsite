@@ -7,6 +7,6 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
     public class UserUpdateRequest
     {
         public int id { get; set; }
-        public bool status { get; set; } // true: enable, false: disable
+        public bool IsActived { get; set; } // true: enable, false: disable
     }
 }

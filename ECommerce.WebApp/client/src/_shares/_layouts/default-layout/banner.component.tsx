@@ -25,6 +25,7 @@ const Banner = () => {
       '/product-detail',
       '/cart',
       '/login',
+      '/forget-password',
       '/sign-up',
       '/brands',
     ];

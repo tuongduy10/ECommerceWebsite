@@ -24,7 +24,7 @@ using ECommerce.Application.ExternalServices.Emails;
 using ECommerce.Application.ExternalServices.Emails.Dtos;
 using System.IO;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -88,7 +88,7 @@ namespace ECommerce.Application.Services.UserSrv
                         UserCityCode = i.UserCityCode,
                         UserPhone = i.UserPhone,
                         isSystemAccount = i.IsSystemAccount == null ? false : (bool)i.IsSystemAccount,
-                        Status = i.Status == null ? false : (bool)i.Status,
+                        //Status = i.Status == null ? false : (bool)i.Status,
                         IsOnline = i.IsOnline == null ? false : (bool)i.IsOnline,
                         LastOnline = (DateTime)i.LastOnline
                     })
@@ -157,7 +157,7 @@ namespace ECommerce.Application.Services.UserSrv
                 var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == request.id);
                 if (user == null)
                     return new FailResponse<User>("Không tìm thấy người dùng");
-                user.Status = request.status;
+                user.IsActived = request.IsActived;
                 _uow.Repository<User>().Update(user);
                 await _uow.SaveChangesAsync();
                 return new SuccessResponse<User>(user);
@@ -251,16 +251,14 @@ namespace ECommerce.Application.Services.UserSrv
             }
 
             var result = await _uow.Repository<User>()
-                .FindByAsync(i => i.UserPhone == phonenumber && i.Password == request.Password, "UserRoles.Role");
+                .FindByAsync(i => i.UserPhone == phonenumber, "UserRoles.Role");
 
             if (result == null)
-                return new FailResponse<string>("Mật khẩu hoặc tài khoản không đúng");
-            if (result.Status == false)
-                return new FailResponse<string>("Tài khoản đã bị khóa");
+                return new FailResponse<string>("Không tìm thấy tài khoản");
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, result.Password))
+                return new FailResponse<string>("Mật khẩu không đúng");
             if (result.IsActived == false)
-            {
                 return new FailResponse<string>("Tài khoản chưa được kích hoạt");
-            }
 
             var permissions = await _uow.Repository<RoleToPermission>()
                 .GetByAsync(
@@ -306,16 +304,15 @@ namespace ECommerce.Application.Services.UserSrv
 
                 User user = new User();
                 user.UserMail = !string.IsNullOrEmpty(request.UserMail) ? request.UserMail.Trim() : null;
-                //user.UserJoinDate = DateTime.Now;
+                user.UserJoinDate = DateTime.Now;
                 user.UserFullName = !string.IsNullOrEmpty(request.UserFullName) ? request.UserFullName.Trim() : null;
                 user.UserPhone = !string.IsNullOrEmpty(request.UserPhone) ? request.UserPhone.Trim() : null;
                 user.UserAddress = !string.IsNullOrEmpty(request.UserAddress) ? request.UserAddress.Trim() : null;
                 user.UserDistrictCode = !string.IsNullOrEmpty(request.UserDistrictCode) ? request.UserDistrictCode.Trim() : null;
                 user.UserCityCode = !string.IsNullOrEmpty(request.UserCityCode) ? request.UserCityCode.Trim() : null;
                 user.UserWardCode = !string.IsNullOrEmpty(request.UserWardCode) ? request.UserWardCode.Trim() : null;
-                user.Password = !string.IsNullOrEmpty(request.RePassword) ? request.RePassword.Trim() : null;
+                user.Password = BCrypt.Net.BCrypt.HashPassword(request.RePassword.Trim());
                 user.UserName = generateUserName(user.UserFullName.Trim(), user.UserPhone);
-                user.Status = true;
                 user.IsActived = false;
                 user.IsSystemAccount = request.isSystemAccount;
                 await _uow.Repository<User>().AddAsync(user);
@@ -371,21 +368,19 @@ namespace ECommerce.Application.Services.UserSrv
         }
         public async Task<Response<string>> ResetPassword(ResetPasswordRequest dto)
         {
+            if (string.IsNullOrEmpty(dto.NewPassword) || string.IsNullOrEmpty(dto.ReNewPassword) || dto.ReNewPassword != dto.NewPassword)
+                return new FailResponse<string>("Mật khẩu mới không trùng hoặc không hợp lệ");
             try
             {
                 var claims = TokenPrincipal(getAccessToken());
                 string userId = claims.FirstOrDefault(_ => _.Type == "id")?.Value;
                 var user = (await _uow.Repository<User>()
-                    .GetByAsync(
-                        _ => _.UserId == int.Parse(userId)
-                            && _.Password == dto.Password))
+                    .GetByAsync(_ => _.UserId == int.Parse(userId)))
                     .FirstOrDefault();
-                if (user == null)
+                if (user == null || BCrypt.Net.BCrypt.Verify(dto.ReNewPassword.Trim(), user.Password))
                     return new FailResponse<string>("Mật khẩu không hợp lệ");
-                if (dto.ReNewPassword != dto.NewPassword || string.IsNullOrEmpty(dto.NewPassword) || string.IsNullOrEmpty(dto.ReNewPassword))
-                    return new FailResponse<string>("Mật khẩu mới không trùng hoặc không chính xác");
 
-                user.Password = dto.ReNewPassword;
+                user.Password = BCrypt.Net.BCrypt.HashPassword(dto.ReNewPassword.Trim());
                 _uow.Repository<User>().Update(user);
                 await _uow.SaveChangesAsync();
                 return new SuccessResponse<string>("Đổi mật khẩu thành công");
@@ -394,6 +389,34 @@ namespace ECommerce.Application.Services.UserSrv
             {
                 return new FailResponse<string>("Đổi mật khẩu thất bại");
             }
+        }
+        public async Task<Response<string>> ForgetPassword(string userName)
+        {
+            var phonenumber = userName;
+            if (phonenumber.Contains("+84"))
+            {
+                phonenumber = phonenumber.Replace("+84", "");
+                if (!phonenumber.StartsWith("0"))
+                {
+                    phonenumber = "0" + phonenumber;
+                }
+            }
+
+            var result = await _uow.Repository<User>()
+                .FindByAsync(i => i.UserPhone == phonenumber, "UserRoles.Role");
+            if (result == null)
+                return new FailResponse<string>("Không tìm thấy tài khoản");
+
+            string radomPassword = GenerateRandomPassword(8);
+            result.Password = BCrypt.Net.BCrypt.HashPassword(radomPassword);
+            _uow.Repository<User>().Update(result);
+            await _uow.SaveChangesAsync();
+
+            await SendResetPasswordEmail(result.UserMail, radomPassword);
+            string maskEmail = MaskEmail(result.UserMail);
+            return new SuccessResponse<string>(
+                $"Vui lòng kiểm tra mail {maskEmail} để lấy mật khẩu mới và đăng nhập.\n" +
+                $"Nếu không thấy email trong hộp thư đến, hãy xem trong mục Spam hoặc Thư rác.");
         }
         public async Task<Response<List<ShopModel>>> GetShops()
         {
@@ -722,6 +745,23 @@ namespace ECommerce.Application.Services.UserSrv
             // For longer local parts, hide everything except the first 3 and last 2 characters
             return localPart.Substring(0, 3) + new string('*', localPart.Length - 5) + localPart.Substring(localPart.Length - 2) + domainPart;
         }
+        private string GenerateRandomPassword(int length)
+        {
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*";
+            StringBuilder result = new StringBuilder();
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                byte[] uintBuffer = new byte[sizeof(uint)];
+                while (length-- > 0)
+                {
+                    rng.GetBytes(uintBuffer);
+                    uint num = BitConverter.ToUInt32(uintBuffer, 0);
+                    result.Append(validChars[(int)(num % (uint)validChars.Length)]);
+                }
+            }
+            return result.ToString();
+        }
+
         private async Task SendConfirmEmail(string email, string token)
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "verify", "verify-account.html");
@@ -740,6 +780,21 @@ namespace ECommerce.Application.Services.UserSrv
                     Tos = new List<string> { email }
                 });
         }
-        
+        private async Task SendResetPasswordEmail(string email, string newRandomPassword)
+        {
+#if DEBUG
+            email = "tuongduy.vo10@gmail.com";
+#endif
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "verify", "reset-password.html");
+            string template = File.ReadAllText(filePath);
+            template = template.Replace("{{password}}", newRandomPassword);
+            await _emailService.SendEmailAsync(
+                new SendMailDto
+                {
+                    Subject = "Mật khẩu mới cho tài khoản của bạn",
+                    Message = template,
+                    Tos = new List<string> { email }
+                });
+        }
     }
 }

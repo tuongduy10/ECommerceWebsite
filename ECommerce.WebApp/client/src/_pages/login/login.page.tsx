@@ -83,17 +83,17 @@ const LoginPage = () => {
                       id="clientPassword"
                       className="w-full form-input form-input-lg"
                       placeholder="Nhập mật khẩu"
+                      autoComplete="off"
                     />
                   </div>
                   <div className="flex w-full flex-nowrap flex-1 items-center justify-between">
                     <a href="/sign-up" className="text-base hover:text-blue-600">
                       Tạo tài khoản mới
                     </a>
-                    <a href="/" className="text-base hover:text-blue-600">
+                    <a href="/forget-password" className="text-base hover:text-blue-600">
                       Quên mật khẩu?
                     </a>
                   </div>
-
                   <div className="login text-center text-lg-start mt-4 pt-2">
                     <button disabled={loading} className="signin btn-black" onClick={submit}>Đăng nhập</button>
                   </div>

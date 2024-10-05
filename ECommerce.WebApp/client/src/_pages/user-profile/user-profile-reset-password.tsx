@@ -12,7 +12,7 @@ import { logout, setAccessToken, setUser } from "src/_cores/_reducers/auth.reduc
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import { show, showError, showSuccess } from "src/_cores/_reducers/alert.reducer";
 
-export default function ResetPasswordPage() {
+export default function UserProfileResetPasswordPage() {
     const [loading, setLoading] = useState(false);
     const authStore = useAuthStore();
     const dispatch = useDispatch();

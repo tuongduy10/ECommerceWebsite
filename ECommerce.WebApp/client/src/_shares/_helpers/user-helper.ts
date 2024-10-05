@@ -1,9 +1,9 @@
 export class UserHelper {
-  public static getUserStatus(_status: boolean) {
-    if (_status === true) {
-      return { label: "Đang xác thực", color: "#1cc88a" };
+  public static userIsActived(isActived: boolean) {
+    if (isActived === true) {
+      return { label: "Đã xác thực", color: "#1cc88a" };
     }
-    return { label: "Đã khóa", color: "" };
+    return { label: "Đang xác thực", color: "yellow" };
   }
   public static getUserAddress(user: any) {
     let address = user.userAddress ?? "";
