@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20231223103656_Update_User_Address.Designer.cs" />
     <Compile Remove="Migrations\20231223103854_InitialCreate.cs" />
     <Compile Remove="Migrations\20231223103854_InitialCreate.Designer.cs" />
+    <Compile Remove="Migrations\20241005053950_UpdateRole.cs" />
+    <Compile Remove="Migrations\20241005053950_UpdateRole.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -56,7 +56,6 @@ namespace ECommerce.Data.Context
         public virtual DbSet<ProductUserImage> ProductUserImages { get; set; }
         public virtual DbSet<Rate> Rates { get; set; }
         public virtual DbSet<RatingImage> RatingImages { get; set; }
-        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Shop> Shops { get; set; }
         public virtual DbSet<ShopBank> ShopBanks { get; set; }
         public virtual DbSet<ShopBrand> ShopBrands { get; set; }
@@ -66,9 +65,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<SubCategoryAttribute> SubCategoryAttributes { get; set; }
         public virtual DbSet<SubCategoryOption> SubCategoryOptions { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<RoleToPermission> RoleToPermissions { get; set; }
-        public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<Ward> Wards { get; set; }
@@ -477,16 +474,6 @@ namespace ECommerce.Data.Context
                     .HasConstraintName("FK_RatingImage_Rate");
             });
 
-            modelBuilder.Entity<Role>(entity =>
-            {
-                entity.ToTable("Role");
-
-                entity.Property(e => e.RoleName)
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-            });
-
             modelBuilder.Entity<Shop>(entity =>
             {
                 entity.ToTable("Shop");
@@ -641,25 +628,6 @@ namespace ECommerce.Data.Context
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new RoleToPermissionConfiguration());
 
-            modelBuilder.Entity<UserRole>(entity =>
-            {
-                entity.HasKey(e => new { e.UserId, e.RoleId });
-
-                entity.ToTable("UserRole");
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.UserRoles)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRole_Role");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserRoles)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRole_User");
-            });
-
             modelBuilder.Entity<MessageHistory>(entity =>
             {
                 entity.ToTable("MessageHistory");
@@ -693,7 +661,6 @@ namespace ECommerce.Data.Context
 
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new OrderDetailConfiguration());
-            modelBuilder.ApplyConfiguration(new PermissionConfiguration());
 
 
             OnModelCreatingPartial(modelBuilder);

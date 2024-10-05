@@ -285,7 +285,7 @@ namespace ECommerce.Application.BaseServices.Brand
         }
         public async Task<List<BrandModel>> getAllBrandInShop(int userId)
         {
-            var roleName = await _DbContext.UserRoles.Where(i => i.UserId == userId).Select(i => i.Role.RoleName).FirstOrDefaultAsync();
+            var roleName = "Admin";
             var list = new List<BrandModel>();
             if (roleName == "Admin")
             {

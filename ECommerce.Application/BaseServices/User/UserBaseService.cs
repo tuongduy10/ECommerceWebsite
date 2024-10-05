@@ -83,82 +83,7 @@ namespace ECommerce.Application.BaseServices.User
 
             return new ApiSuccessResponse("Có thể tạo tài khoản với số điện thoại này");
         }
-        //public async Task<ApiResponse> AddSeller(SignUpRequest request)
-        //{
-        //    try
-        //    {
-        //        string phonenumber = null;
-        //        // Phone validate
-        //        if (!string.IsNullOrEmpty(request.UserPhone))
-        //        {
-        //            phonenumber = request.UserPhone.Trim();
-        //            if (phonenumber.Contains("+84"))
-        //            {
-        //                phonenumber = phonenumber.Replace("+84", "");
-        //                if (!phonenumber.StartsWith("0"))
-        //                    phonenumber = "0" + phonenumber;
-        //            }
-        //        }
-
-        //        if (string.IsNullOrEmpty(request.UserFullName)) 
-        //            return new ApiFailResponse("Vui lòng nhập họ tên");
-        //        if (string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.RePassword)) 
-        //            return new ApiFailResponse("Vui lòng nhập mật khẩu");
-        //        if (request.Password != request.RePassword) 
-        //            return new ApiFailResponse("Mật khẩu không trùng");
-
-        //        var checkMail = await _DbContext.Users
-        //            .Where(i => request.UserMail != null && i.UserMail == request.UserMail)
-        //            .FirstOrDefaultAsync();
-        //        if (checkMail != null) 
-        //            return new ApiFailResponse("Mail đã tồn tại");
-
-        //        var checkPhone = await _DbContext.Users.Where(i => i.UserPhone == request.UserPhone).FirstOrDefaultAsync();
-        //        if (checkPhone != null) 
-        //            return new ApiFailResponse("Số điện thoại đã tồn tại");
-
-        //        Data.Entities.UserSchema.User user = new Data.Entities.UserSchema.User();
-        //        user.UserMail = request.UserMail != null ? request.UserMail.Trim() : null;
-        //        user.UserJoinDate = DateTime.Now;
-        //        user.UserFullName = request.UserFullName != null ? request.UserFullName.Trim() : null;
-        //        user.UserPhone = phonenumber;
-
-        //        user.UserPhone = request.UserPhone != null ? request.UserPhone.Trim() : null;
-        //        user.UserAddress = request.UserAddress != null ? request.UserAddress.Trim() : null;
-        //        user.UserDistrictCode = request.UserDistrictCode;
-        //        user.UserCityCode = request.UserCityCode;
-        //        user.UserWardCode = request.UserWardCode;
-        //        user.Password = request.RePassword != null ? request.RePassword.Trim() : null;
-        //        user.Status = true;
-        //        user.IsSystemAccount = request.isSystemAccount;
-        //        await _DbContext.Users.AddAsync(user);
-        //        await _DbContext.SaveChangesAsync();
-
-        //        // UserRole
-        //        //UserRole role = new Data.Entities.UserSchema.UserRole();
-        //        //role.RoleId = (int)enumRole.Seller;
-        //        //role.UserId = user.UserId;
-        //        //await _DbContext.UserRoles.AddAsync(role);
-        //        await _DbContext.SaveChangesAsync();
-
-        //        // Shop
-        //        if (request.shopIds != null)
-        //        {
-        //            foreach (var id in request.shopIds)
-        //            {
-        //                var shop = await _DbContext.Shops.Where(i => i.ShopId == id).FirstOrDefaultAsync();
-        //                shop.UserId = user.UserId;
-        //                await _DbContext.SaveChangesAsync();
-        //            }
-        //        }
-
-        //        return new ApiSuccessResponse("Tạo tài khoản thành công");
-        //    }
-        //    catch (Exception error)
-        //    {
-        //        return new ApiFailResponse("Tạo tài khoản không thành công, lỗi: " + error.Message);
-        //    }
-        //}
+       
         public async Task<UserGetModel> UserProfile(int id)
         {
             try
@@ -176,9 +101,9 @@ namespace ECommerce.Application.BaseServices.User
                                     UserDistrictCode = i.UserDistrictCode,
                                     UserCityCode = i.UserCityCode,
                                     UserPhone = i.UserPhone,
-                                    UserRoles = i.UserRoles
-                                        .Select(ur => ur.Role.RoleName)
-                                        .ToList(),
+                                    //UserRoles = i.UserRoles
+                                    //    .Select(ur => ur.Role.RoleName)
+                                    //    .ToList(),
                                     //Status = (bool)i.Status,
                                     IsOnline = (bool)i.IsOnline,
                                 }).FirstOrDefaultAsync();
@@ -190,40 +115,7 @@ namespace ECommerce.Application.BaseServices.User
                 return null;
             }
         }
-        public async Task<ApiResponse> UpdateUserProfile(UserUpdateRequest request)
-        {
-            if (string.IsNullOrEmpty(request.UserFullName)) return new ApiFailResponse("Họ tên không thể để trống");
 
-            var user = await _DbContext.Users
-                                .Where(i => i.UserId == request.UserId)
-                                .FirstOrDefaultAsync();
-            if (user != null)
-            {
-                user.UserFullName = request.UserFullName;
-                user.UserMail = request.UserMail;
-                user.UserAddress = request.UserAddress;
-                user.UserWardCode = request.UserWardCode;
-                user.UserDistrictCode = request.UserDistrictCode;
-                user.UserCityCode = request.UserCityCode;
-                await _DbContext.SaveChangesAsync();
-
-                var roles = (
-                    from role in _DbContext.Roles
-                    from userrole in _DbContext.UserRoles
-                    where role.RoleId == userrole.RoleId && userrole.UserId == request.UserId
-                    select role.RoleName
-                ).Distinct().ToList();
-
-                UserGetModel result = new UserGetModel();
-                result.UserId = user.UserId;
-                result.UserFullName = user.UserFullName;
-                result.UserRoles = roles;
-
-                return new ApiSuccessResponse("Cập nhật thành công", result);
-            }
-
-            return new ApiFailResponse("Cập nhật không thành công");
-        }
         public async Task<ApiResponse> UpdateManageUserProfile(UserUpdateRequest request)
         {
             try
@@ -380,11 +272,11 @@ namespace ECommerce.Application.BaseServices.User
         }
         public async Task<string> getUserRole(int userId)
         {
-            var role = await _DbContext.UserRoles
-                .Where(i => i.UserId == userId)
-                .Select(i => i.Role.RoleName)
-                .FirstOrDefaultAsync();
-            return role;
+            //var role = await _DbContext.UserRoles
+            //    .Where(i => i.UserId == userId)
+            //    .Select(i => i.Role.RoleName)
+            //    .FirstOrDefaultAsync();
+            return "";
         }
         public async Task<UserGetModel> getUserByShop(int shopId)
         {

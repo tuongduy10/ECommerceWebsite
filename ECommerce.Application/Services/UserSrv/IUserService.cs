@@ -17,6 +17,7 @@ namespace ECommerce.Application.Services.UserSrv
         Task<Response<PageResult<UserGetModel>>> getUserPagingList(UserGetRequest request);
         Task<Response<List<UserGetModel>>> GetUsers(UserGetRequest request = null);
         Task<Response<UserGetModel>> GetUser(int userId);
+        Task<Response<string>> DeleteUser(int userId);
         Task<ApiResponse> SetOnline(int userId = 0, bool isOnline = true);
         Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline);
         Task<Response<UserGetModel>> UpdateOnlineHistory(int _userId);

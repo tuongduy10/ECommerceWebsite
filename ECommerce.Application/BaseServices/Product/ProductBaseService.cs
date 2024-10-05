@@ -559,8 +559,6 @@ namespace ECommerce.Application.BaseServices.Product
                 if (hasCode)
                     return new ApiFailResponse("Mã này đã tồn tại !");
 
-                var isAdmin = await _userService.getUserRole(request.userId) == "Admin";
-
                 /*
                  * None relationship data
                  */
@@ -585,7 +583,7 @@ namespace ECommerce.Application.BaseServices.Product
                     BrandId = request.brandId,
                     ProductAddedDate = DateTime.Now, // default
                     SubCategoryId = request.subCategoryId,
-                    Status = isAdmin ? (byte?)ProductStatusEnum.Available : (byte?)ProductStatusEnum.Pending,
+                    Status = (byte?)ProductStatusEnum.Available,
 
                     //Price
                     PriceAvailable = request.priceAvailable ?? null,

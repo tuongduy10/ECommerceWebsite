@@ -16,6 +16,7 @@ import { Button, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { ITableHeader } from "src/_shares/_components/data-table/data-table";
+import { api } from "src/_cores/_api/api";
 
 type TableRowProps = {
     rowData: any,
@@ -39,8 +40,11 @@ function Row(props: TableRowProps) {
 
     const userIsActived = (isActived: boolean) => UserHelper.userIsActived(isActived);
 
-    const deleteUser = (id: number) => {
-
+    const deleteUser = async (id: number) => {
+        if (window.confirm("Xác nhận xóa ?")) {
+            const res = await api.delete(`/user/delete-user/${id}`) as any;
+            if (res.isSucceed) window.location.reload();
+        }
     }
 
     const viewDetail = (id: number) => {
@@ -100,21 +104,10 @@ function Row(props: TableRowProps) {
                     aria-controls={openDel ? 'basic-menu' : undefined}
                     aria-haspopup="true"
                     aria-expanded={openDel ? 'true' : undefined}
-                    onClick={handleClickDel}
+                    onClick={() => deleteUser(rowData.userId)}
                 >
                     Xóa
                 </Button>
-                <Menu
-                    anchorEl={delAnchorEl}
-                    open={openDel}
-                    onClose={handleCloseDel}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem onClick={() => deleteUser(rowData.id)}>Xác nhận xóa</MenuItem>
-                    <MenuItem onClick={handleCloseDel}>Hủy</MenuItem>
-                </Menu>
             </TableCell>
         </TableRow>
     );
