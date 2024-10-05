@@ -138,6 +138,14 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [HttpDelete("delete-user/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var result = await _userService.DeleteUser(id);
+            if (!result.isSucceed)
+                return BadRequest(result);
+            return Ok(result);
+        }
         [HttpPost("update-status")]
         public async Task<IActionResult> UpdateStatus(UserUpdateRequest request)
         {

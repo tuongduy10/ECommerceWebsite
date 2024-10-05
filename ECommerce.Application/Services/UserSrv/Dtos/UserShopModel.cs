@@ -17,6 +17,7 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
         public string phone { get; set; }
         public string password { get; set; }
         public string rePassword { get; set; }
+        public string roleKey { get; set; }
         public List<int> shopIds { get; set; }
         public UserShopModel()
         {

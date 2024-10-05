@@ -7,8 +7,8 @@ namespace ECommerce.Utilities.Constants
 {
     public class RoleConstant
     {
-        public const string ROLE_ADMIN = "Admin";
-        public const string ROLE_SELLER = "Seller";
-        public const string ROLE_BUYER = "Buyer";
+        public const string ROLE_ADMIN = "ADMIN";
+        public const string ROLE_SELLER = "SELLER";
+        public const string ROLE_BUYER = "BUYER";
     }
 }

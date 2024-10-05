@@ -4,14 +4,16 @@ using ECommerce.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ECommerce.Data.Migrations
 {
     [DbContext(typeof(ECommerceContext))]
-    partial class ECommerceContextModelSnapshot : ModelSnapshot
+    [Migration("20241005055306_UpdateRole")]
+    partial class UpdateRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1368,13 +1370,10 @@ namespace ECommerce.Data.Migrations
                     b.Property<bool>("IsActived")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("IsOnline")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsSystemAccount")
+                    b.Property<bool?>("IsSystemAccount")
                         .HasColumnName("isSystemAccount")
                         .HasColumnType("bit");
 

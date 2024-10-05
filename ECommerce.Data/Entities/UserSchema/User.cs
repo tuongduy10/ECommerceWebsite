@@ -18,7 +18,6 @@ namespace ECommerce.Data.Entities.UserSchema
             RateUserReplieds = new HashSet<Rate>();
             RateUsers = new HashSet<Rate>();
             Shops = new HashSet<Shop>();
-            UserRoles = new HashSet<UserRole>();
         }
 
         public int UserId { get; set; }
@@ -36,9 +35,11 @@ namespace ECommerce.Data.Entities.UserSchema
         public string UserName { get; set; }
         public string Password { get; set; }
         public bool IsActived { get; set; }
-        public bool? IsSystemAccount { get; set; }
+        public bool IsSystemAccount { get; set; }
         public bool? IsOnline { get; set; }
+        public bool IsDeleted { get; set; }
         public DateTime? LastOnline { get; set; }
+        public string RoleKey { get; set; }
 
         public virtual ICollection<Interest> Interests { get; set; }
         public virtual ICollection<Notification> NotificationReceivers { get; set; }
@@ -46,6 +47,5 @@ namespace ECommerce.Data.Entities.UserSchema
         public virtual ICollection<Rate> RateUserReplieds { get; set; }
         public virtual ICollection<Rate> RateUsers { get; set; }
         public virtual ICollection<Shop> Shops { get; set; }
-        public virtual ICollection<UserRole> UserRoles { get; set; }
     }
 }

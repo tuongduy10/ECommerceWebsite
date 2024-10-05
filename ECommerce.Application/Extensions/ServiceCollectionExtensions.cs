@@ -6,7 +6,6 @@ using ECommerce.Application.BaseServices.Discount;
 using ECommerce.Application.BaseServices.FilterProduct;
 using ECommerce.Application.BaseServices.Product;
 using ECommerce.Application.BaseServices.Rate;
-using ECommerce.Application.BaseServices.Role;
 using ECommerce.Application.BaseServices.Shop;
 using ECommerce.Application.BaseServices.SubCategory;
 using ECommerce.Application.BaseServices.User;
@@ -49,7 +48,6 @@ namespace ECommerce.Application.Extensions
             services.AddTransient<IRateService, RateService>();
             services.AddTransient<IDiscountService, DiscountService>();
             services.AddTransient<IUserBaseService, UserBaseService>();
-            services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IShopService, ShopService>();
             services.AddTransient<IOmsService, OmsService>();
             services.AddTransient<ISalesService, SalesService>();

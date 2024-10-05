@@ -23,7 +23,7 @@ export interface IUser {
   districtCode: string | null;
   cityCode: string | null;
   phone: string | null;
-  roles: string[] | null;
+  role: string | null;
   status: boolean;
   isSystemAccount: boolean;
   isOnline: boolean;

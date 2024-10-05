@@ -48,9 +48,18 @@ namespace ECommerce.Application.Services.UserSrv
         {
             try
             {
+                string searchKey = !string.IsNullOrEmpty(request.Keyword) ? request.Keyword.Trim().ToLower() : string.Empty;
                 string userName = getCurrentUserName();
                 var query = _uow.Repository<User>()
-                    .QueryableAsync(x => request.userId == -1 || x.UserId == request.userId)
+                    .QueryableAsync(
+                        x => x.IsDeleted == false 
+                            && (string.IsNullOrEmpty(searchKey) 
+                                || x.UserMail.Trim().ToLower().Contains(searchKey)
+                                || x.UserFullName.Trim().ToLower().Contains(searchKey)
+                                || x.UserPhone.Trim().ToLower().Contains(searchKey))
+                            && (string.IsNullOrEmpty(request.RoleKey) || x.RoleKey == request.RoleKey)
+                            && x.UserId != getCurrentUserId()
+                            && (request.userId == -1 || x.UserId == request.userId))
                     .Select(i => (UserGetModel)i);
 
                 var record = await query.CountAsync();
@@ -75,7 +84,7 @@ namespace ECommerce.Application.Services.UserSrv
             try
             {
                 var list = (await _uow.Repository<User>()
-                    .GetAllAsync())
+                    .GetByAsync(_ => _.IsDeleted == false))
                     .Select(i => new UserGetModel()
                     {
                         UserId = i.UserId,
@@ -115,7 +124,7 @@ namespace ECommerce.Application.Services.UserSrv
         {
             try
             {
-                var user = await _uow.Repository<User>().FindByAsync(i => i.UserId == userId, "Shops");
+                var user = await _uow.Repository<User>().FindByAsync(i => i.UserId == userId && i.IsDeleted == false, "Shops");
                 if (user == null) 
                     return new FailResponse<UserGetModel>("Không tìm thấy người dùng");
 
@@ -126,6 +135,14 @@ namespace ECommerce.Application.Services.UserSrv
             {
                 return new FailResponse<UserGetModel>(error.ToString());
             }
+        }
+        public async Task<Response<string>> DeleteUser(int userId)
+        {
+            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == userId && _.IsDeleted == false);
+            user.IsDeleted = true;
+            _uow.Repository<User>().Update(user);
+            await _uow.SaveChangesAsync();
+            return new SuccessResponse<string>();
         }
         public async Task<ApiResponse> SetOnline(int _userId = 0, bool _isOnline = true)
         {
@@ -251,7 +268,7 @@ namespace ECommerce.Application.Services.UserSrv
             }
 
             var result = await _uow.Repository<User>()
-                .FindByAsync(i => i.UserPhone == phonenumber, "UserRoles.Role");
+                .FindByAsync(i => i.UserPhone == phonenumber && i.IsDeleted == false);
 
             if (result == null)
                 return new FailResponse<string>("Không tìm thấy tài khoản");
@@ -261,17 +278,15 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<string>("Tài khoản chưa được kích hoạt");
 
             var permissions = await _uow.Repository<RoleToPermission>()
-                .GetByAsync(
-                    _ => result.UserRoles.Select(r => r.Role.RoleId).Contains(_.RoleId), null, 
-                    "Permission");
+                .GetByAsync(_ => result.RoleKey == _.RoleKey);
 
             var user = new UserModel();
             user.id = result.UserId;
             user.fullName = result.UserFullName;
             user.phone = result.UserPhone;
             user.userName = result.UserName;
-            user.roles = result.UserRoles.Select(_ => _.Role.RoleName).ToList();
-            user.permissions = permissions.Select(_ => _.Permission.Name).ToList();
+            user.role = result.RoleKey;
+            user.permissions = permissions.Select(_ => _.PermissionKey).ToList();
             string token = GenerateToken(user);
 
             return new SuccessResponse<string>("Đăng nhập thành công", token);
@@ -296,10 +311,10 @@ namespace ECommerce.Application.Services.UserSrv
                 if (request.Password != request.RePassword) return new FailResponse<string>("Mật khẩu không trùng");
 
                 if (!IsValidEmail(request.UserMail)) return new FailResponse<string>("Mail không hợp lệ");
-                var checkMail = (await _uow.Repository<User>().GetByAsync(i => i.UserMail == request.UserMail)).FirstOrDefault();
+                var checkMail = (await _uow.Repository<User>().GetByAsync(i => i.UserMail == request.UserMail && i.IsDeleted == false)).FirstOrDefault();
                 if (checkMail != null) return new FailResponse<string>("Mail đã tồn tại");
 
-                var checkPhone = (await _uow.Repository<User>().GetByAsync(i => i.UserPhone == request.UserPhone)).FirstOrDefault();
+                var checkPhone = (await _uow.Repository<User>().GetByAsync(i => i.UserPhone == request.UserPhone && i.IsDeleted == false)).FirstOrDefault();
                 if (checkPhone != null) return new FailResponse<string>("Số điện thoại đã tồn tại");
 
                 User user = new User();
@@ -315,14 +330,8 @@ namespace ECommerce.Application.Services.UserSrv
                 user.UserName = generateUserName(user.UserFullName.Trim(), user.UserPhone);
                 user.IsActived = false;
                 user.IsSystemAccount = request.isSystemAccount;
+                user.RoleKey = RoleConstant.ROLE_BUYER;
                 await _uow.Repository<User>().AddAsync(user);
-                await _uow.SaveChangesAsync();
-
-                // UserRole
-                UserRole role = new UserRole();
-                role.RoleId = request.RoleId != 0 ? request.RoleId : (int)RoleEnum.Buyer;
-                role.UserId = user.UserId;
-                await _uow.Repository<UserRole>().AddAsync(role);
                 await _uow.SaveChangesAsync();
 
                 // Send mail to confirm
@@ -350,7 +359,7 @@ namespace ECommerce.Application.Services.UserSrv
                 string email = claims.FirstOrDefault(_ => _.Type == "email")?.Value;
                 string userId = claims.FirstOrDefault(_ => _.Type == "id")?.Value;
                 var user = (await _uow.Repository<User>()
-                    .GetByAsync(_ => _.UserId == int.Parse(userId)))
+                    .GetByAsync(_ => _.UserId == int.Parse(userId) && _.IsDeleted == false))
                     .FirstOrDefault();
                 if (user != null)
                 {
@@ -375,7 +384,7 @@ namespace ECommerce.Application.Services.UserSrv
                 var claims = TokenPrincipal(getAccessToken());
                 string userId = claims.FirstOrDefault(_ => _.Type == "id")?.Value;
                 var user = (await _uow.Repository<User>()
-                    .GetByAsync(_ => _.UserId == int.Parse(userId)))
+                    .GetByAsync(_ => _.UserId == int.Parse(userId) && _.IsDeleted == false))
                     .FirstOrDefault();
                 if (user == null || BCrypt.Net.BCrypt.Verify(dto.ReNewPassword.Trim(), user.Password))
                     return new FailResponse<string>("Mật khẩu không hợp lệ");
@@ -403,7 +412,7 @@ namespace ECommerce.Application.Services.UserSrv
             }
 
             var result = await _uow.Repository<User>()
-                .FindByAsync(i => i.UserPhone == phonenumber, "UserRoles.Role");
+                .FindByAsync(i => i.UserPhone == phonenumber && i.IsDeleted == false, "");
             if (result == null)
                 return new FailResponse<string>("Không tìm thấy tài khoản");
 
@@ -475,8 +484,9 @@ namespace ECommerce.Application.Services.UserSrv
                     return new FailResponse<UserShopModel>("Mật khẩu không trùng");
 
                 var hasSeller = await _uow.Repository<User>().AnyAsync(_ => 
+                    _.IsDeleted == false && (
                     _.UserPhone == phonenumber ||
-                    _.UserMail == request.email.Trim());
+                    _.UserMail == request.email.Trim()));
                 if (hasSeller && request.id == -1)
                     return new FailResponse<UserShopModel>("Số điện thoại hoặc Email đã tồn tại");
 
@@ -496,7 +506,8 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.UserPhone = phonenumber;
                 seller.IsOnline = false;
                 seller.LastOnline = DateTime.Now;
-                seller.IsSystemAccount = true;
+                seller.IsSystemAccount = new [] { RoleConstant.ROLE_ADMIN, RoleConstant.ROLE_SELLER }.Contains(request.roleKey);
+                seller.RoleKey = request.roleKey;
 
                 if (!string.IsNullOrEmpty(request.password) && !string.IsNullOrEmpty(request.rePassword))
                     seller.Password = request.password.Trim();
@@ -509,24 +520,6 @@ namespace ECommerce.Application.Services.UserSrv
                 if (request.id > -1) // Update
                     _uow.Repository<User>().Update(seller);
                 _uow.SaveChangesAsync().Wait();
-
-                /** Role
-                 * Remove all user roles then
-                 * add new role from user id in request
-                 **/
-                var userRoles = await _uow.Repository<UserRole>().GetByAsync(_ => _.UserId == seller.UserId);
-                if (userRoles.Count() > 0)
-                {
-                    _uow.Repository<UserRole>().Delete(userRoles);
-                    _uow.SaveChangesAsync().Wait();
-                }
-                var newRole = new UserRole
-                {
-                    RoleId = (int)RoleEnum.Seller,
-                    UserId = seller.UserId,
-                };
-                await _uow.Repository<UserRole>().AddAsync(newRole);
-                await _uow.SaveChangesAsync();
 
                 /**
                  * Shop
@@ -567,12 +560,12 @@ namespace ECommerce.Application.Services.UserSrv
         public async Task<Response<User>> getCurrentUser()
         {
             int id = getCurrentUserId();
-            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id);
+            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id && _.IsDeleted == false);
             return new SuccessResponse<User>(user);
         }
         public async Task updateUserName()
         {
-            var users = await _uow.Repository<User>().GetByAsync(_ => _.UserName == null);
+            var users = await _uow.Repository<User>().GetByAsync(_ => _.UserName == null && _.IsDeleted == false);
             foreach (var user in users)
             {
                 user.UserName = generateUserName(user.UserFullName, user.UserPhone);
@@ -587,6 +580,7 @@ namespace ECommerce.Application.Services.UserSrv
         }
         public string getCurrentUserFullName() => getUserValue("fullName");
         public string getCurrentUserName() => getUserValue("userName");
+        public string getCurrentUserRole() => getUserValue("role");
         private string getUserValue(string key)
         {
             string accessToken = getAccessToken();
@@ -615,11 +609,8 @@ namespace ECommerce.Application.Services.UserSrv
                 new Claim("fullName", user.fullName),
                 new Claim("phone", user.phone),
                 new Claim("userName", user.userName),
+                new Claim("role", user.role)
             };
-            foreach (var item in user.roles)
-            {
-                claims.Add(new Claim("roles", item));
-            }
             foreach (var item in user.permissions)
             {
                 claims.Add(new Claim("permissions", item));

@@ -11,7 +11,7 @@ namespace ECommerce.Data.Configurations.UserSchema
     {
         public void Configure(EntityTypeBuilder<RoleToPermission> builder)
         {
-            builder.HasKey(e => new { e.RoleId, e.PermissionId });
+            builder.HasKey(e => new { e.Id });
 
             builder.ToTable("RoleToPermissions");
         }

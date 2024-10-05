@@ -12,7 +12,6 @@ namespace ECommerce.Application.BaseServices.User
         Task<UserGetModel> UserProfile(int id);
         Task<ApiResponse> UpdateManageUserProfile(UserUpdateRequest request);
         Task<ApiResponse> CheckUserPhoneNumber(string PhoneNumber);
-        Task<ApiResponse> UpdateUserProfile(UserUpdateRequest request);
         Task<ApiResponse> UpdateUserPhoneNumber(int UserId, string PhoneNumber);
         Task<ApiResponse> UpdateUserPassword(UpdatePasswordRequest request);
         Task<ApiResponse> UpdateUserStatus(UserUpdateRequest request);

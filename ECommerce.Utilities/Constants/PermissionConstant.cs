@@ -9,6 +9,7 @@ namespace ECommerce.Utilities.Constants
     public static class PermissionConstant
     {
         public const string ACCESS_ALL = "ACCESS_ALL";
+        public const string DEFAULT = "DEFAULT";
         public static class Common
         {
             public const string COMMON_CREATE = "COMMON_CREATE";
