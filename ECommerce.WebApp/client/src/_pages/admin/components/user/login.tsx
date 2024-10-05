@@ -18,6 +18,7 @@ import DataUsageRoundedIcon from '@mui/icons-material/DataUsageRounded';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { setUser } from 'src/_cores/_reducers/auth.reducer';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -45,6 +46,12 @@ const Login = () => {
     UserService.login(params).then(resp => {
       if (resp.data) {
         SessionService.setAccessToken(resp.data);
+        const userSync = async () => {
+          const user = await UserService.getUserInfo() as any;
+          if (user)
+            dispatch(setUser(user));
+        } 
+        userSync();
         navigate(ADMIN_ROUTE_NAME.DASHBOARD)
       }
       setLoading(false);

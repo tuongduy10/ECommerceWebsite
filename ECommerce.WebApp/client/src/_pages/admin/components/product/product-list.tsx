@@ -27,6 +27,7 @@ import { ENV } from "src/_configs/enviroment.config";
 import { PRODUCT_STATUS } from "src/_cores/_enums/product.enum";
 import { ADMIN_ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { Link as RouterLink } from "react-router-dom";
+import { useAuthStore } from "src/_cores/_store/root-store";
 
 const header: ITableHeader[] = [
     { field: 'createdDate', fieldName: 'Ngày tạo', align: 'left' },
@@ -50,6 +51,7 @@ type TableRowProps = {
 }
 
 function Row(props: TableRowProps) {
+    const authStore = useAuthStore();
     const { rowData, isSelected, onUpdateStatus, onDelete, onSelected } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);

@@ -11,13 +11,17 @@ import { IShop } from "src/_cores/_interfaces/user.interface";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
+const roles = [
+    { code: 'BUYER', name: 'Buyer' },
+    { code: 'SELLER', name: 'Seller' },
+    { code: 'ADMIN', name: 'Admin' },
+]
 
 const defaultTheme = createTheme();
 
 export default function UserDetail() {
     const searchParams = new URLSearchParams(window.location.search);
     const userId = Number(searchParams.get('id')) || -1;
-
     const [dataDetail, setDataDetail] = useState<{ [key: string]: any }>({});
     const [shops, setShops] = useState<IShop[]>([]);
     const [cities, setCitites] = useState<ICity[]>([]);
@@ -123,6 +127,11 @@ export default function UserDetail() {
         setDataDetail({ ...dataDetail, userWardCode: wardCode });
     }
 
+    const onChangeRole = (role: any) => {
+        const roleKey = role?.code ?? "";
+        setDataDetail({ ...dataDetail, roleKey: roleKey });
+    }
+
     const onChangeFieldValue = (field: string, value: any) => {
         if (dataDetail[field]) {
             setDataDetail({ ...dataDetail, [field]: value });
@@ -148,6 +157,7 @@ export default function UserDetail() {
             phone: form.get('userPhone'),
             password: form.get('password'),
             rePassword: form.get('rePassword'),
+            roleKey: dataDetail['roleKey'],
             shopIds: dataDetail.shopIds ?? [],
         }
         UserService.updateUser(_param).then(res => {
@@ -300,6 +310,18 @@ export default function UserDetail() {
                                         size="small"
                                         label={`Nhập lại mật khẩu ${dataDetail['userId'] ? "mới" : ""}`}
                                         autoFocus
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={8}>
+                                    <Autocomplete
+                                        size="small"
+                                        disablePortal
+                                        options={roles}
+                                        value={dataDetail['roleKey'] ? roles.find(_ => _.code === dataDetail['roleKey']) : null}
+                                        onChange={(event, role) => onChangeRole(role)}
+                                        getOptionLabel={(role) => `${role.name}`}
+                                        renderOption={(props, role) => <li {...props}>{role.name}</li>}
+                                        renderInput={(params) => <TextField {...params} name="role" label="Vai trò" autoComplete="off" />}
                                     />
                                 </Grid>
                             </Grid>

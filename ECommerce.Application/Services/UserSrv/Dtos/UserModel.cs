@@ -18,7 +18,6 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
         public string districtCode { get; set; }
         public string cityCode { get; set; }
         public string phone { get; set; }
-        public List<string> roles { get; set; }
         public string role { get; set; }
         public List<string> permissions { get; set; }
         public bool status { get; set; }
@@ -38,7 +37,8 @@ namespace ECommerce.Application.Services.UserSrv.Dtos
                 phone = data.UserPhone,
                 address = data.UserAddress,
                 mail = data.UserMail,
-                shops = data.Shops
+                shops = data.Shops,
+                role = data.RoleKey,
             };
         }
     }

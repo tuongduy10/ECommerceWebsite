@@ -16,6 +16,7 @@ namespace ECommerce.Application.BaseServices.User.Dtos
         public bool isAdmin { get; set; }
         public bool isOnline { get; set; }
         public bool isOffline { get; set; }
+        public string? RoleKey { get; set; }
         public UserGetRequest()
         {
             userId = -1;

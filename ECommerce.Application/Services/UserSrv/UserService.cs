@@ -48,10 +48,16 @@ namespace ECommerce.Application.Services.UserSrv
         {
             try
             {
+                string searchKey = !string.IsNullOrEmpty(request.Keyword) ? request.Keyword.Trim().ToLower() : string.Empty;
                 string userName = getCurrentUserName();
                 var query = _uow.Repository<User>()
                     .QueryableAsync(
                         x => x.IsDeleted == false 
+                            && (string.IsNullOrEmpty(searchKey) 
+                                || x.UserMail.Trim().ToLower().Contains(searchKey)
+                                || x.UserFullName.Trim().ToLower().Contains(searchKey)
+                                || x.UserPhone.Trim().ToLower().Contains(searchKey))
+                            && (string.IsNullOrEmpty(request.RoleKey) || x.RoleKey == request.RoleKey)
                             && x.UserId != getCurrentUserId()
                             && (request.userId == -1 || x.UserId == request.userId))
                     .Select(i => (UserGetModel)i);
@@ -500,7 +506,8 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.UserPhone = phonenumber;
                 seller.IsOnline = false;
                 seller.LastOnline = DateTime.Now;
-                seller.IsSystemAccount = true;
+                seller.IsSystemAccount = new [] { RoleConstant.ROLE_ADMIN, RoleConstant.ROLE_SELLER }.Contains(request.roleKey);
+                seller.RoleKey = request.roleKey;
 
                 if (!string.IsNullOrEmpty(request.password) && !string.IsNullOrEmpty(request.rePassword))
                     seller.Password = request.password.Trim();

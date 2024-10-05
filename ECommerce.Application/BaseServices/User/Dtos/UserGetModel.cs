@@ -18,7 +18,7 @@ namespace ECommerce.Application.BaseServices.User.Dtos
         public string UserDistrictName { get; set; }
         public string UserCityName { get; set; }
         public string UserPhone { get; set; }
-        public List<string> UserRoles { get; set; }
+        public string RoleKey { get; set; }
         //public bool Status { get; set; }
         public bool IsActived { get; set; }
         public bool isSystemAccount { get; set; }
@@ -42,6 +42,7 @@ namespace ECommerce.Application.BaseServices.User.Dtos
                 UserCityName = data.UserCityName,
                 UserDistrictName = data.UserDistrictName,
                 UserWardName = data.UserWardName,
+                RoleKey = data.RoleKey,
                 IsOnline = data.IsOnline != null ? (bool)data.IsOnline : false,
                 isSystemAccount = data.IsSystemAccount != null ? (bool)data.IsSystemAccount : false,
                 //Status = data.Status != null ? (bool)data.Status : false,
