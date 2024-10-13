@@ -45,14 +45,14 @@ const header: ITableHeader[] = [
 type TableRowProps = {
     rowData: IProduct,
     isSelected: boolean,
+    roleKey: string,
     onUpdateStatus: (id: number, status: number) => void,
     onDelete: (id: number) => void,
     onSelected: (id: number) => void,
 }
 
 function Row(props: TableRowProps) {
-    const authStore = useAuthStore();
-    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected } = props;
+    const { rowData, isSelected, roleKey, onUpdateStatus, onDelete, onSelected } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
     const openDel = Boolean(delAnchorEl);
@@ -204,6 +204,7 @@ function Row(props: TableRowProps) {
 }
 
 export default function ProductList() {
+    const authStore = useAuthStore();
     const [params, setParams] = useState<any>({
         keyword: "",
         shopId: -1,
@@ -503,6 +504,7 @@ export default function ProductList() {
                                 onUpdateStatus={(id, status) => updateStatus(id, status)}
                                 onDelete={(id) => deleteProduct(id)}
                                 onSelected={(id) => selectProduct(id)}
+                                roleKey={authStore.user.role}
                             />
                         ))}
                     </TableBody>

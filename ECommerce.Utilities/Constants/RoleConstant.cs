@@ -10,5 +10,6 @@ namespace ECommerce.Utilities.Constants
         public const string ROLE_ADMIN = "ADMIN";
         public const string ROLE_SELLER = "SELLER";
         public const string ROLE_BUYER = "BUYER";
+        public const string ROLE_DISTRIBUTOR = "DISTRIBUTOR";
     }
 }
