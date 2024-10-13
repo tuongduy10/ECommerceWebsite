@@ -144,79 +144,74 @@ const BrandList = () => {
 
     return (
         <Fragment>
-            <Box>
-                <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-                    <Grid item xs={12} sm={12}>
-                        <Button variant="contained" sx={{ marginRight: 2 }} onClick={handleClickOpen}>Thêm</Button>
+            {!open && (<>
+                <Box>
+                    <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+                        <Grid item xs={12} sm={12}>
+                            <Button variant="contained" sx={{ marginRight: 2 }} onClick={handleClickOpen}>Thêm</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Box>
-            <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
-                <Table aria-label="collapsible table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Ảnh</TableCell>
-                            <TableCell>Thương hiệu</TableCell>
-                            <TableCell>Danh mục</TableCell>
-                            <TableCell></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {brands.map((_: any) => (
-                            <TableRow key={_.id} sx={{ '& > *': { borderBottom: 'unset' } }}>
-                                <TableCell>
-                                    <Box className="flex">
-                                        <Box className="mr-2 items-center justify-between h-[100px] w-[100px]">
-                                            <img
-                                                src={`${ENV.IMAGE_URL}/brand/${_.imagePath}`}
-                                                alt={_.name}
-                                                loading="lazy"
-                                            />
-                                        </Box>
-                                    </Box>
-                                </TableCell>
-                                <TableCell>{_.name}</TableCell>
-                                <TableCell>{_.categoryNames.join(', ')}</TableCell>
-                                <TableCell>
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => viewDetail(_.id)}
-                                    >
-                                        <ModeEditIcon />
-                                    </IconButton>
-                                    <IconButton
-                                        size="small"
-                                        aria-haspopup="true"
-                                        aria-controls={openDel ? 'basic-menu' : undefined}
-                                        aria-expanded={openDel ? 'true' : undefined}
-                                        onClick={() => deleteData(_.id)}
-                                        //onClick={(event) => setDelAnchorEl(event.currentTarget)}
-                                    >
-                                        <DeleteOutlineIcon />
-                                    </IconButton>
-                                    <Menu
-                                        anchorEl={delAnchorEl}
-                                        open={openDel}
-                                        onClose={() => setDelAnchorEl(null)}
-                                        MenuListProps={{ 'aria-labelledby': 'basic-button' }}
-                                    >
-                                        <MenuItem onClick={() => deleteData(_.id)}>Xác nhận xóa</MenuItem>
-                                        <MenuItem onClick={() => setDelAnchorEl(null)}>Hủy</MenuItem>
-                                    </Menu>
-                                </TableCell>
+                </Box>
+                <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
+                    <Table aria-label="collapsible table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Ảnh</TableCell>
+                                <TableCell>Thương hiệu</TableCell>
+                                <TableCell>Danh mục</TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-
-            <Dialog
-                fullWidth={true}
-                maxWidth={'xl'}
-                open={open}
-                onClose={closeDialogAndRemoveFiles}
-                PaperProps={{ style: { height: '80vh' } }}
-            >
+                        </TableHead>
+                        <TableBody>
+                            {brands.map((_: any) => (
+                                <TableRow key={_.id} sx={{ '& > *': { borderBottom: 'unset' } }}>
+                                    <TableCell>
+                                        <Box className="flex">
+                                            <Box className="mr-2 items-center justify-between h-[100px] w-[100px]">
+                                                <img
+                                                    src={`${ENV.IMAGE_URL}/brand/${_.imagePath}`}
+                                                    alt={_.name}
+                                                    loading="lazy"
+                                                />
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+                                    <TableCell>{_.name}</TableCell>
+                                    <TableCell>{_.categoryNames.join(', ')}</TableCell>
+                                    <TableCell>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => viewDetail(_.id)}
+                                        >
+                                            <ModeEditIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            aria-haspopup="true"
+                                            aria-controls={openDel ? 'basic-menu' : undefined}
+                                            aria-expanded={openDel ? 'true' : undefined}
+                                            onClick={() => deleteData(_.id)}
+                                        //onClick={(event) => setDelAnchorEl(event.currentTarget)}
+                                        >
+                                            <DeleteOutlineIcon />
+                                        </IconButton>
+                                        <Menu
+                                            anchorEl={delAnchorEl}
+                                            open={openDel}
+                                            onClose={() => setDelAnchorEl(null)}
+                                            MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+                                        >
+                                            <MenuItem onClick={() => deleteData(_.id)}>Xác nhận xóa</MenuItem>
+                                            <MenuItem onClick={() => setDelAnchorEl(null)}>Hủy</MenuItem>
+                                        </Menu>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </>)}
+            {open && (
                 <Box component={'form'} onSubmit={handleSubmit}>
                     <DialogTitle>Chi tiết</DialogTitle>
                     <DialogContent>
@@ -313,7 +308,7 @@ const BrandList = () => {
                         <Button type="submit">Xác nhận</Button>
                     </DialogActions>
                 </Box>
-            </Dialog>
+            )}
         </Fragment>
     )
 }

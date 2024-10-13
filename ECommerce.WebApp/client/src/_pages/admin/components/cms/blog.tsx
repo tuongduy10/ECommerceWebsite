@@ -120,171 +120,168 @@ const Blog = () => {
 
     return (
         <Fragment>
-            <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
-                <Table aria-label="collapsible table">
-                    <TableBody>
-                        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="phoneNumber"
-                                    label="Số điện thoại"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.phoneNumber || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="mail"
-                                    label="Email"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.mail || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="facebookUrl"
-                                    label="Facebook"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.facebookUrl || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="address"
-                                    label="Địa chỉ"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.address || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="addressUrl"
-                                    label="Google address url"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.addressUrl || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                        </TableRow>
-                        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="instagramUrl"
-                                    label="Instagram"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.instagramUrl || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    name="youtubeUrl"
-                                    label="Youtube"
-                                    type="text"
-                                    fullWidth
-                                    variant="standard"
-                                    sx={{ marginBottom: 2 }}
-                                    value={config?.youtubeUrl || ''}
-                                    onChange={handleChangeConfig}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <TimePicker
-                                        label="From"
-                                        value={fromTime}
-                                        onChange={(newValue) => setFromTime(newValue)}
+            {!openDialog && (
+                <TableContainer component={Paper} sx={{ marginBottom: 2 }}>
+                    <Table aria-label="collapsible table">
+                        <TableBody>
+                            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="phoneNumber"
+                                        label="Số điện thoại"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.phoneNumber || ''}
+                                        onChange={handleChangeConfig}
                                     />
-                                    <TimePicker
-                                        label="To"
-                                        value={toTime}
-                                        onChange={(newValue) => setToTime(newValue)}
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="mail"
+                                        label="Email"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.mail || ''}
+                                        onChange={handleChangeConfig}
                                     />
-                                </LocalizationProvider>
-                            </TableCell>
-                            <TableCell>
-                                <IconButton
-                                    size="small"
-                                    onClick={() => handleSaveConfig()}
-                                >
-                                    <CheckIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-                <Table aria-label="collapsible table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Cột</TableCell>
-                            <TableCell>Tiêu đề</TableCell>
-                            <TableCell>Trạng thái</TableCell>
-                            <TableCell></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    {loading
-                        ? <CircularProgress />
-                        : <TableBody>
-                            {blogs.length > 0 && blogs.map((item, idx) => (
-                                <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                                    <TableCell>{item.blogPosition}</TableCell>
-                                    <TableCell>{item.blogTitle}</TableCell>
-                                    <TableCell>{item.status === 1 ? 'Đang hoạt động' : 'Tạm ẩn'}</TableCell>
-                                    <TableCell>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => onOpenDialog(item.blogId)}
-                                        >
-                                            <ModeEditIcon />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>}
-                </Table>
-            </TableContainer>
-
-            <Dialog
-                fullScreen
-                open={openDialog}
-                onClose={handleCloseDialog}
-            >
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="facebookUrl"
+                                        label="Facebook"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.facebookUrl || ''}
+                                        onChange={handleChangeConfig}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="address"
+                                        label="Địa chỉ"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.address || ''}
+                                        onChange={handleChangeConfig}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="addressUrl"
+                                        label="Google address url"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.addressUrl || ''}
+                                        onChange={handleChangeConfig}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="instagramUrl"
+                                        label="Instagram"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.instagramUrl || ''}
+                                        onChange={handleChangeConfig}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        name="youtubeUrl"
+                                        label="Youtube"
+                                        type="text"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{ marginBottom: 2 }}
+                                        value={config?.youtubeUrl || ''}
+                                        onChange={handleChangeConfig}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <TimePicker
+                                            label="From"
+                                            value={fromTime}
+                                            onChange={(newValue) => setFromTime(newValue)}
+                                        />
+                                        <TimePicker
+                                            label="To"
+                                            value={toTime}
+                                            onChange={(newValue) => setToTime(newValue)}
+                                        />
+                                    </LocalizationProvider>
+                                </TableCell>
+                                <TableCell>
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => handleSaveConfig()}
+                                    >
+                                        <CheckIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                    <Table aria-label="collapsible table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Cột</TableCell>
+                                <TableCell>Tiêu đề</TableCell>
+                                <TableCell>Trạng thái</TableCell>
+                                <TableCell></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        {loading
+                            ? <CircularProgress />
+                            : <TableBody>
+                                {blogs.length > 0 && blogs.map((item, idx) => (
+                                    <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                                        <TableCell>{item.blogPosition}</TableCell>
+                                        <TableCell>{item.blogTitle}</TableCell>
+                                        <TableCell>{item.status === 1 ? 'Đang hoạt động' : 'Tạm ẩn'}</TableCell>
+                                        <TableCell>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => onOpenDialog(item.blogId)}
+                                            >
+                                                <ModeEditIcon />
+                                            </IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>}
+                    </Table>
+                </TableContainer>
+            )}
+            {openDialog && (
                 <Box component={'form'} onSubmit={handleSubmit}>
                     <DialogContent>
                         <TextField
@@ -317,7 +314,7 @@ const Blog = () => {
                         <Button type="submit">Xác nhận</Button>
                     </DialogActions>
                 </Box>
-            </Dialog>
+            )}
         </Fragment>
     );
 };

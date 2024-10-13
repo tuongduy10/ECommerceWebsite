@@ -8,18 +8,17 @@ import CommonService from "src/_cores/_services/common.service";
 import { ICity, IDistrict, IWard } from "src/_cores/_interfaces/common.interface";
 import UserService from "src/_cores/_services/user.service";
 import { IShop } from "src/_cores/_interfaces/user.interface";
+import { ROLES } from "src/_cores/_constants/role-constants";
+import { useAuthStore } from "src/_cores/_store/root-store";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-const roles = [
-    { code: 'BUYER', name: 'Buyer' },
-    { code: 'SELLER', name: 'Seller' },
-    { code: 'ADMIN', name: 'Admin' },
-]
+const roles = ROLES;
 
 const defaultTheme = createTheme();
 
 export default function UserDetail() {
+    const authStore = useAuthStore();
     const searchParams = new URLSearchParams(window.location.search);
     const userId = Number(searchParams.get('id')) || -1;
     const [dataDetail, setDataDetail] = useState<{ [key: string]: any }>({});
@@ -31,6 +30,7 @@ export default function UserDetail() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        console.log(authStore.user);
         getCities();
         getShops();
         if (userId > -1) {

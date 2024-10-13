@@ -463,6 +463,8 @@ namespace ECommerce.Application.Services.ProductSrv
                 return new FailResponse<bool>("Vui lòng chọn thương hiệu");
             if (request.subCategoryId == -1)
                 return new FailResponse<bool>("Vui lòng chọn loại sản phẩm");
+            if (request.stock == null)
+                return new FailResponse<bool>("Vui lòng nhập số lượng kho");
             // price
             if (request.priceAvailable == null && request.discountAvailable == null && request.pricePreOrder == null && request.discountPreOrder == null)
                 return new FailResponse<bool>("Vui lòng nhập giá sản phẩm");
