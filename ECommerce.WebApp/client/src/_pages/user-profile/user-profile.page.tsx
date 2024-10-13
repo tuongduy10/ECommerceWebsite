@@ -115,8 +115,7 @@ const UserProfilePage = () => {
                 <div className="form-basic">
                     <label>Số điện thoại</label>
                     <div className="flex items-center">
-                        <input type="tel" className="mr-2 w-full" value={dataDetail ? dataDetail['phone'] : ""} disabled />
-                        <a href="/" className="" style={{ whiteSpace: 'nowrap', cursor: 'pointer' }}><u>Thay đổi</u></a>
+                        <input type="tel" className="mr-2 w-full" value={dataDetail ? dataDetail['phone'] : ""} onChange={(e) => onChangeFieldValue('phone', e.target.value)} />
                     </div>
                 </div>
                 <div className="form-basic">
@@ -125,7 +124,7 @@ const UserProfilePage = () => {
                 </div>
                 <div className="form-basic">
                     <label>Địa chỉ</label>
-                    <input type="text" className="w-full mb-2" value={dataDetail ? dataDetail['address'] : ""} />
+                    <input type="text" className="w-full mb-2" value={dataDetail ? dataDetail['address'] : ""} onChange={(e) => onChangeFieldValue('address', e.target.value)}/>
                     <div className="flex flex-wrap">
                         <div className="select-form w-full mb-2">
                             <select className="w-full" onChange={e => onChangeCity(e.target.value)}>

@@ -21,7 +21,7 @@ namespace ECommerce.Application.Services.UserSrv
         Task<ApiResponse> SetOnline(int userId = 0, bool isOnline = true);
         Task<Response<UserGetModel>> UpdateOnlineStatus(int _userId, bool _isOnline);
         Task<Response<UserGetModel>> UpdateOnlineHistory(int _userId);
-        Task<Response<string>> ValidateUser(SignInRequest request);
+        Task<Response<string>> Login(SignInRequest request);
         Task<Response<string>> SignUp(SignUpRequest request);
         Task<Response<string>> ConfirmRegister(string token);
         Task<Response<string>> ResetPassword(ResetPasswordRequest dto);
