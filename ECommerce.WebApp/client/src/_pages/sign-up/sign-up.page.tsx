@@ -32,8 +32,8 @@ export default function SignUpPage() {
             userFullName: fullNameRef.current.value,
             userPhone: userNameRef.current.value,
             userMail: emailRef.current.value,
-            password: passwordRef.current.value,
-            rePassword: rePasswordRef.current.value,
+            // password: passwordRef.current.value,
+            // rePassword: rePasswordRef.current.value,
         }
         const response = await UserService.signUp(param) as any;
         if (response) {
@@ -100,7 +100,7 @@ export default function SignUpPage() {
                                             />
                                         </div>
                                         {/* Password input */}
-                                        <div className="flex mb-3 items-center form-input">
+                                        {/* <div className="flex mb-3 items-center form-input">
                                             <input
                                                 ref={passwordRef}
                                                 type="password"
@@ -108,9 +108,9 @@ export default function SignUpPage() {
                                                 className="w-full form-input form-input-lg"
                                                 placeholder="Nhập mật khẩu"
                                             />
-                                        </div>
+                                        </div> */}
                                         {/* Re password input */}
-                                        <div className="flex mb-3 items-center form-input">
+                                        {/* <div className="flex mb-3 items-center form-input">
                                             <input
                                                 ref={rePasswordRef}
                                                 type="password"
@@ -118,7 +118,7 @@ export default function SignUpPage() {
                                                 className="w-full form-input form-input-lg"
                                                 placeholder="Nhập lại mật khẩu"
                                             />
-                                        </div>
+                                        </div> */}
                                         <div className="login text-center text-lg-start mt-4 pt-2">
                                             <button disabled={loading} className="signin btn-black" onClick={submit}>Đăng ký</button>
                                         </div>

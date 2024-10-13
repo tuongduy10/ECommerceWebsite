@@ -62,6 +62,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\rates\" />
+    <Folder Include="wwwroot\logs\" />
   </ItemGroup>
 
   <ItemGroup>

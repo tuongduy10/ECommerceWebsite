@@ -51,6 +51,8 @@ const BrandList = () => {
             name: '',
             categoryIds: [] as any[],
             imagePath: '',
+            description: '',
+            descriptionTitle: '',
         });
         setOpen(false);
     };
@@ -64,7 +66,6 @@ const BrandList = () => {
     };
 
     const onChangeFiles = (files: string[]) => {
-        console.log(files);
         setFormData({ ...formData, imagePath: files[0] ?? '' });
     }
 
@@ -211,6 +212,7 @@ const BrandList = () => {
 
             <Dialog
                 fullWidth={true}
+                maxWidth={'xl'}
                 open={open}
                 onClose={closeDialogAndRemoveFiles}
                 PaperProps={{ style: { height: '80vh' } }}

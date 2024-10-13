@@ -25,6 +25,7 @@ using ECommerce.Application.ExternalServices.Emails.Dtos;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Application.Services.UserSrv
 {
@@ -252,7 +253,7 @@ namespace ECommerce.Application.Services.UserSrv
                 return new FailResponse<UserGetModel>(error.ToString());
             }
         }
-        public async Task<Response<string>> ValidateUser(SignInRequest request)
+        public async Task<Response<string>> Login(SignInRequest request)
         {
             if (string.IsNullOrEmpty(request.UserPhone) || string.IsNullOrEmpty(request.Password))
                 return new FailResponse<string>("Thông tin không được để trống");
@@ -307,15 +308,12 @@ namespace ECommerce.Application.Services.UserSrv
                 }
 
                 if (string.IsNullOrEmpty(request.UserFullName)) return new FailResponse<string>("Vui lòng nhập họ tên");
-                if (string.IsNullOrEmpty(request.Password) || string.IsNullOrEmpty(request.RePassword)) return new FailResponse<string>("Vui lòng nhập mật khẩu");
-                if (request.Password != request.RePassword) return new FailResponse<string>("Mật khẩu không trùng");
-
                 if (!IsValidEmail(request.UserMail)) return new FailResponse<string>("Mail không hợp lệ");
-                var checkMail = (await _uow.Repository<User>().GetByAsync(i => i.UserMail == request.UserMail && i.IsDeleted == false)).FirstOrDefault();
-                if (checkMail != null) return new FailResponse<string>("Mail đã tồn tại");
+                var checkMail = await _uow.Repository<User>().AnyAsync(i => i.UserMail == request.UserMail && i.IsDeleted == false);
+                if (checkMail) return new FailResponse<string>("Mail đã tồn tại");
 
-                var checkPhone = (await _uow.Repository<User>().GetByAsync(i => i.UserPhone == request.UserPhone && i.IsDeleted == false)).FirstOrDefault();
-                if (checkPhone != null) return new FailResponse<string>("Số điện thoại đã tồn tại");
+                var checkPhone = await _uow.Repository<User>().AnyAsync(i => i.UserPhone == request.UserPhone && i.IsDeleted == false);
+                if (checkPhone) return new FailResponse<string>("Số điện thoại đã tồn tại");
 
                 User user = new User();
                 user.UserMail = !string.IsNullOrEmpty(request.UserMail) ? request.UserMail.Trim() : null;
@@ -326,23 +324,23 @@ namespace ECommerce.Application.Services.UserSrv
                 user.UserDistrictCode = !string.IsNullOrEmpty(request.UserDistrictCode) ? request.UserDistrictCode.Trim() : null;
                 user.UserCityCode = !string.IsNullOrEmpty(request.UserCityCode) ? request.UserCityCode.Trim() : null;
                 user.UserWardCode = !string.IsNullOrEmpty(request.UserWardCode) ? request.UserWardCode.Trim() : null;
-                user.Password = BCrypt.Net.BCrypt.HashPassword(request.RePassword.Trim());
+
+                string radomPassword = GenerateRandomPassword(8);
+                user.Password = BCrypt.Net.BCrypt.HashPassword(radomPassword);
                 user.UserName = generateUserName(user.UserFullName.Trim(), user.UserPhone);
-                user.IsActived = false;
+                user.IsActived = true;
                 user.IsSystemAccount = request.isSystemAccount;
                 user.RoleKey = RoleConstant.ROLE_BUYER;
                 await _uow.Repository<User>().AddAsync(user);
                 await _uow.SaveChangesAsync();
 
-                // Send mail to confirm
-                string token = GenerateConfirmToken(user);
-                await SendConfirmEmail(user.UserMail, token);
+                await SendConfirmEmail(user.UserMail, radomPassword);
 
                 string maskEmail = MaskEmail(user.UserMail);
                 await _uow.CommitTransactionAsync(transaction);
                 return new SuccessResponse<string>(
                     $"Tạo tài khoản thành công!\n\n" +
-                    $"Vui lòng kiểm tra mail {maskEmail} để kích hoạt tài khoản và đăng nhập.\n" +
+                    $"Vui lòng kiểm tra mail {maskEmail} để nhận mật khẩu và đăng nhập.\n" +
                     $"Nếu không thấy email trong hộp thư đến, hãy xem trong mục Spam hoặc Thư rác.");
             }
             catch (Exception error)
@@ -461,6 +459,7 @@ namespace ECommerce.Application.Services.UserSrv
         }
         public async Task<Response<UserShopModel>> UpdateUser(UserShopModel request)
         {
+            var transaction = await _uow.BeginTransactionAsync();
             try
             {
                 string phonenumber = null;
@@ -507,10 +506,8 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.IsOnline = false;
                 seller.LastOnline = DateTime.Now;
                 seller.IsSystemAccount = new [] { RoleConstant.ROLE_ADMIN, RoleConstant.ROLE_SELLER }.Contains(request.roleKey);
-                seller.RoleKey = request.roleKey;
-
-                if (!string.IsNullOrEmpty(request.password) && !string.IsNullOrEmpty(request.rePassword))
-                    seller.Password = request.password.Trim();
+                if (!string.IsNullOrEmpty(request.roleKey))
+                    seller.RoleKey = request.roleKey;
 
                 if (request.id == -1) // Add
                 {
@@ -549,11 +546,12 @@ namespace ECommerce.Application.Services.UserSrv
                         _uow.SaveChangesAsync().Wait();
                     }
                 }
-
+                await transaction.CommitAsync();
                 return new SuccessResponse<UserShopModel>();
             }
             catch (Exception exc)
             {
+                await transaction.RollbackAsync();
                 return new FailResponse<UserShopModel>(exc.Message);
             }
         }
@@ -753,16 +751,11 @@ namespace ECommerce.Application.Services.UserSrv
             return result.ToString();
         }
 
-        private async Task SendConfirmEmail(string email, string token)
+        private async Task SendConfirmEmail(string email, string tempPassword)
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "templates", "verify", "verify-account.html");
             string template = File.ReadAllText(filePath);
-            string url = "https://www.hihichi.com/verify-account?token=";
-#if DEBUG
-            url = "https://localhost:44330/verify-account?token=";
-#endif
-            url += token;
-            template = template.Replace("{{action_url}}", url);
+            template = template.Replace("{{temp_password}}", tempPassword);
             await _emailService.SendEmailAsync(
                 new SendMailDto
                 {

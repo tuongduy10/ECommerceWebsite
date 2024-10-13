@@ -54,7 +54,7 @@ namespace ECommerce.WebApp.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(SignInRequest request)
         {
-            var result = await _userService.ValidateUser(request);
+            var result = await _userService.Login(request);
             if (!result.isSucceed)
                 return BadRequest(result);
             return Ok(result);
