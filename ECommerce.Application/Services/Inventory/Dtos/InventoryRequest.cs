@@ -12,6 +12,7 @@ namespace ECommerce.Application.Services.Inventory.Dtos
         public int productId { get; set; }
         public int subCategoryId { get; set; }
         public int brandId { get; set; }
+        public bool checkSubProducts { get; set; }
         public bool isBase { get; set; }
         public InventoryRequest()
         {

@@ -50,7 +50,7 @@ const ProductListPage = () => {
   }, [_pageIndex, _orderBy, _subCategoryId, _optionValueIds, location]);
 
   useEffect(() => {
-    getSubCategories({ brandId: _brandId });
+    getSubCategories({ brandId: _brandId, checkSubProducts: true });
     checkAndGetBrands();
   }, [_brandId])
 
@@ -112,7 +112,7 @@ const ProductListPage = () => {
     });
   }
 
-  const getSubCategories = (params: { brandId: number }) => {
+  const getSubCategories = (params: { brandId: number, checkSubProducts: boolean }) => {
     InventoryService.getSubCategories(params).then((res: any) => {
       if (res.data) {
         const list = res.data.map((item: ISubCategory) => {

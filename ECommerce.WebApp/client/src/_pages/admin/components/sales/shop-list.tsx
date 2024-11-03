@@ -217,7 +217,7 @@ const ShopList = () => {
                                 </li>
                             )}
                             renderInput={(params) => (
-                                <TextField {...params} label="Danh mục" placeholder="Chọn danh mục" size="small" />
+                                <TextField {...params} label="Thương hiêu" placeholder="Chọn thương hiệu" size="small" />
                             )}
                             onChange={(event, items: any) => onChangeBrands(items)}
                             size="small"

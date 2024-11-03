@@ -251,13 +251,13 @@ const ProductDetail = () => {
             code: form.get('code'),
             name: form.get('name'),
             stock: getNumber(form.get('stock')),
-            priceImport: getNumber(form.get('priceImport')?.toString()),
-            priceForSeller: getNumber(form.get('priceForSeller')?.toString()),
-            priceAvailable: getNumber(form.get('priceAvailable')?.toString()),
-            pricePreOrder: getNumber(form.get('pricePreOrder')?.toString()),
-            discountPreOrder: !dataDetail['isDiscountPercent'] ? getNumber(form.get('discountPreOrder')?.toString()) : null,
-            discountAvailable: !dataDetail['isDiscountPercent'] ? getNumber(form.get('discountAvailable')?.toString()) : null,
-            discountPercent: dataDetail['isDiscountPercent'] ? getNumber(form.get('discountPercent')?.toString()) : null,
+            priceImport: getNumber(form.get('priceImport')?.toString()) || null,
+            priceForSeller: getNumber(form.get('priceForSeller')?.toString()) || null,
+            priceAvailable: getNumber(form.get('priceAvailable')?.toString()) || null,
+            pricePreOrder: getNumber(form.get('pricePreOrder')?.toString()) || null,
+            discountPreOrder: !dataDetail['isDiscountPercent'] ? (getNumber(form.get('discountPreOrder')?.toString()) || null) : null,
+            discountAvailable: !dataDetail['isDiscountPercent'] ? (getNumber(form.get('discountAvailable')?.toString()) || null) : null,
+            discountPercent: dataDetail['isDiscountPercent'] ? (getNumber(form.get('discountPercent')?.toString()) || null) : null,
             isNew: form.get('isNew')?.toString() === 'on',
             isHighlight: form.get('isHighlight')?.toString() === 'on',
             isLegit: form.get('isLegit')?.toString() === 'on',
@@ -586,7 +586,7 @@ const ProductDetail = () => {
                                                         autoComplete='off'
                                                         onBlur={(event) => onBlurOption(idx, event.target.value)}
                                                     />
-                                                    <Stack spacing={{ xs: 1, sm: 1 }} direction="row" useFlexGap flexWrap="wrap">
+                                                    <Stack spacing={{ xs: 1, sm: 1 }} sx={{ marginBottom: 1 }} direction="row" useFlexGap flexWrap="wrap">
                                                         {option.values && option.values?.length > 0 && (
                                                             option.values.map((value, childIdx) => (
                                                                 <Chip

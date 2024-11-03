@@ -31,24 +31,30 @@ const HeaderNavMobile = () => {
   useEffect(() => {
     const updateMenuHeight = () => {
       if (wrapperListRef.current && logoRef.current && footerRef.current) {
-        setMenuHeight(
-          window.innerHeight - 
-          logoRef.current.clientHeight - 
-          footerRef.current.clientHeight
-        );
+        requestAnimationFrame(() => {
+          setMenuHeight(
+            window.innerHeight -
+            logoRef.current.clientHeight -
+            footerRef.current.clientHeight
+          );
+        });
       }
     };
     updateMenuHeight();
+    window.addEventListener("resize", updateMenuHeight); // Update on resize
+    return () => window.removeEventListener("resize", updateMenuHeight);
   }, [config]);
 
   const onToggleNav = () => {
     setIsOpenedNav((toggle) => !toggle);
     document.body.style.overflow = !isOpenedNav ? "hidden" : "";
+    document.body.style.position = !isOpenedNav ? "fixed" : "";
   };
 
   const onToggleSearch = () => {
     setIsOpenedSearch((toggle) => !toggle);
     document.body.style.overflow = !isOpenedSearch ? "hidden" : "";
+    document.body.style.position = !isOpenedSearch ? "fixed" : "";
   };
 
   return (

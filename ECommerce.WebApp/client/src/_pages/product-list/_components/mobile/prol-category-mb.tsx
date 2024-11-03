@@ -2,9 +2,11 @@ import { useState } from "react";
 import { MuiIcon } from "src/_shares/_components";
 import ProlCategory from "../prol-category";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
+import { useHomeStore } from "src/_cores/_store/root-store";
 
 const ProlCategoryMb = () => {
     const [isOpenFilter, setOpenFilter] = useState("");
+    const homeStore = useHomeStore();
     return (
         <div className="product__filter-wrapper">
             <label
@@ -32,11 +34,11 @@ const ProlCategoryMb = () => {
                     <div className="w-100 px-4">
                         <img
                             className="max-w-full max-h-[55px] mx-auto"
-                            src="https://hihichi.com/images/brand/brand_d5d8fb28-c399-4259-8a60-3deb4511a810.png"
+                            src={`https://hihichi.com/images/brand/${homeStore.selectedBrand?.imagePath}`}
                             alt=""
                         />
                     </div>
-                    <p className="mb-0 mt-5">Bear</p>
+                    <p className="mb-0 mt-5">{homeStore.selectedBrand?.name}</p>
                     <MuiIcon
                         name={ICON_NAME.FEATHER.X}
                         className="filter-close feather feather-x"
