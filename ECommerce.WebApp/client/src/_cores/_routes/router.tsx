@@ -13,6 +13,7 @@ import {
   VerifyAccountPage,
   UserProfileResetPasswordPage,
   ForgetPasswordPage,
+  LookUpOrdersPage,
 } from "src/_pages";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import DefaultLayout from "src/_shares/_layouts/default-layout/default-layout.component";
@@ -65,6 +66,7 @@ const Router = () => {
           ]
         },
         { path: ROUTE_NAME.CART, element: <CartPage /> },
+        { path: ROUTE_NAME.LOOK_UP_ORDERS, element: <LookUpOrdersPage /> },
         { path: ROUTE_NAME.PAYMENT, element: <PaymentPage /> },
         { path: ROUTE_NAME.BLOG, element: <BlogPage /> },
         { path: ROUTE_NAME.PRODUCT_LIST, element: <ProductListPage /> },

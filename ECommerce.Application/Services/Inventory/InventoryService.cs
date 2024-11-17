@@ -289,7 +289,7 @@ namespace ECommerce.Application.Services.Inventory
                         .ToListAsync();
                 }
                 var list = await _subCategoryRepo.Queryable(_ =>
-                    (productSubs.Count == 0 || productSubs.Contains(_.SubCategoryId)) &&
+                    (request.checkSubProducts == false || productSubs.Contains(_.SubCategoryId)) &&
                     (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
                     (brandId == -1 || _brandCategoryRepo
                         .Entity()

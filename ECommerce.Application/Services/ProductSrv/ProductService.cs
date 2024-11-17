@@ -315,7 +315,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 });
 
                 var record = query.Count();
-               var data = PaginatedList<ProductModel>.Create(list, pageindex, pagesize);
+                var data = PaginatedList<ProductModel>.Create(list, pageindex, pagesize);
                 foreach (var item in data)
                 {
                     item.options = _optionRepo.Entity()

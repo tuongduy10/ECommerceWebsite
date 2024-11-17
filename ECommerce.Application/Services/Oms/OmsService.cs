@@ -73,9 +73,9 @@ namespace ECommerce.Application.Services.Oms
             var pagedResult = await _uow.Repository<Order>()
                 .GetPagedMappingByAsync<OrderResponseDto>(request.PageIndex, request.PageSize,
                     _ => _.IsDeleted == false
-                        && logedInUser.isSucceed
-                        && (_.CreatedBy == logedInUser.Data.UserPhone 
-                            || _.CreatedBy == logedInUser.Data.UserName)
+                        && ((logedInUser.Data == null && _.PhoneNumber == request.phoneNumber)
+                            || (logedInUser.Data != null && (_.CreatedBy == logedInUser.Data.UserPhone || _.CreatedBy == logedInUser.Data.UserName)))
+                        && (string.IsNullOrEmpty(request.phoneNumber) || _.PhoneNumber.Trim() == request.phoneNumber)    
                         && (string.IsNullOrEmpty(request.status) || request.status == _.Status)
                         && (string.IsNullOrEmpty(searchKey)
                             || searchKey.Contains(_.Remark.ToLower().Trim())

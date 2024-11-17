@@ -12,3 +12,4 @@ export { default as ProductListPage } from "./product-list/product-list.page";
 export { default as CartPage } from "./cart/cart.page";
 export { default as PaymentPage } from "./payment/payment.page";
 export { default as BlogPage } from "./blog/blog.page";
+export { default as LookUpOrdersPage } from './look-up-orders/look-up-orders.page';

@@ -14,6 +14,7 @@ import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 
 const ProductListPage = () => {
   const location = useLocation();
+  //const [searchParams, setSearchParams] = useSearchParams();
   const searchParams = new URLSearchParams(window.location.search);
   const _pageIndex = Number(searchParams.get('pageIndex')) || 1;
   const _brandId = Number(searchParams.get('brandId')) || -1;

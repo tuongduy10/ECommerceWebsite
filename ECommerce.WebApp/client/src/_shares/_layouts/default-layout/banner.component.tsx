@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { Autoplay, Pagination, Navigation } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { PaginationOptions } from "swiper/types/modules/pagination";
@@ -22,6 +23,7 @@ const Banner = () => {
 
   useEffect(() => {
     const hiddenPath = [
+      ROUTE_NAME.LOOK_UP_ORDERS,
       '/product-detail',
       '/cart',
       '/login',
