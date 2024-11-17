@@ -508,6 +508,8 @@ namespace ECommerce.Application.Services.UserSrv
                 seller.IsSystemAccount = new [] { RoleConstant.ROLE_ADMIN, RoleConstant.ROLE_SELLER }.Contains(request.roleKey);
                 if (!string.IsNullOrEmpty(request.roleKey))
                     seller.RoleKey = request.roleKey;
+                if (!string.IsNullOrEmpty(request.rePassword))
+                    seller.Password = BCrypt.Net.BCrypt.HashPassword(request.rePassword);
 
                 if (request.id == -1) // Add
                 {

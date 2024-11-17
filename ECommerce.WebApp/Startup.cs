@@ -84,10 +84,17 @@ namespace ECommerce.WebApp
                 app.UseHsts();
             }
 
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            try
             {
-                var context = serviceScope.ServiceProvider.GetService<ECommerceContext>();
-                context.Database.Migrate();
+                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    var context = serviceScope.ServiceProvider.GetService<ECommerceContext>();
+                    context.Database.Migrate();
+                }
+            }
+            catch
+            {
+                throw;
             }
 
             // Serve default files and static files
@@ -111,13 +118,6 @@ namespace ECommerce.WebApp
 
             // Authorization
             app.UseAuthorization();
-
-            //app.UseEndpoints(routes =>
-            //{
-            //    routes.MapHub<ChatHub>("/chatHub");
-            //    routes.MapHub<ClientHub>("/client-hub");
-            //    routes.MapHub<CommonHub>("/common-hub");
-            //});
 
             // Map controllers
             app.UseEndpoints(endpoints =>

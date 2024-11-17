@@ -143,7 +143,7 @@ export default function UserDetail() {
         setDataDetail({ ...dataDetail, shopIds: _shopIds });
     }
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         const _param = {
@@ -160,11 +160,9 @@ export default function UserDetail() {
             roleKey: dataDetail['roleKey'],
             shopIds: dataDetail.shopIds ?? [],
         }
-        UserService.updateUser(_param).then(res => {
+        const res = await UserService.updateUser(_param) as any;
+        if (res?.isSucceed)
             backToList();
-        }).catch(error => {
-            console.log(error);
-        });
     }
 
     return (

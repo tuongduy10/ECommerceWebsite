@@ -20,6 +20,7 @@ export const ROUTE_NAME = {
     USER_PROFILE_ORDER_LIST: ROUTE_PREFIX + '/user-profile/order-list',
 
     CART: ROUTE_PREFIX + '/cart',
+    LOOK_UP_ORDERS: ROUTE_PREFIX + '/look-up-orders',
     PAYMENT: ROUTE_PREFIX + '/payment',
     BLOG: ROUTE_PREFIX + '/blog',
 }

@@ -280,8 +280,16 @@ namespace ECommerce.Application.Services.Inventory
             {
                 var subCategoryId = request.subCategoryId;
                 var brandId = request.brandId;
-
+                var productSubs = new List<int>();
+                if (request.checkSubProducts)
+                {
+                    productSubs = await _uow.Repository<Product>()
+                        .QueryableAsync(_ => _.BrandId == brandId)
+                        .Select(_ => _.SubCategoryId)
+                        .ToListAsync();
+                }
                 var list = await _subCategoryRepo.Queryable(_ =>
+                    (request.checkSubProducts == false || productSubs.Contains(_.SubCategoryId)) &&
                     (subCategoryId == -1 || _.SubCategoryId == subCategoryId) &&
                     (brandId == -1 || _brandCategoryRepo
                         .Entity()

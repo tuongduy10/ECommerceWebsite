@@ -214,7 +214,8 @@ export default function OrderList() {
         pageIndex: 1,
         pageSize: 10,
         searchKey: '',
-        status: ORDER_STATUS_CODE.ORDER_PENDING
+        status: ORDER_STATUS_CODE.ORDER_PENDING,
+        phoneNumber: '',
     });
 
     useEffect(() => {

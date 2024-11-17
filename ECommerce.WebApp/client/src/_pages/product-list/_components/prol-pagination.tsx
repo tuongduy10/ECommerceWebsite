@@ -3,9 +3,13 @@ import { useDispatch } from "react-redux";
 import { setPageIndex, setParam } from "src/_cores/_reducers/product.reducer";
 import { useProductStore } from "src/_cores/_store/root-store";
 import { MuiIcon } from "src/_shares/_components";
+import { useSearchParams } from "react-router-dom";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 
 const ProlPagination = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const updatedSearchParams = new URLSearchParams(searchParams.toString());
+
   const dispatch = useDispatch();
   const productStore = useProductStore();
 
@@ -15,13 +19,15 @@ const ProlPagination = () => {
   const [isLastIndexes, setIsLastIndexes] = useState(false);
 
   useEffect(() => {
-    setShowPrev(productStore.param.pageIndex > 2);
+    setShowPrev(productStore.param.pageIndex > 2); // false
     setShowNext(productStore.param.pageIndex < productStore.param.totalPage - 1);
     setIsFirstIndexes(productStore.param.pageIndex < 3);
     setIsLastIndexes(productStore.param.totalPage - productStore.param.pageIndex < 3);
   }, [productStore.param.pageIndex]);
 
   const changePage = (pageIndex: number) => {
+    updatedSearchParams.set('pageIndex', pageIndex+'');
+    setSearchParams(updatedSearchParams);
     dispatch(setPageIndex(pageIndex));
   }
 
@@ -30,7 +36,7 @@ const ProlPagination = () => {
     for (let i = start; i <= end; i++) {
       items.push(
         <li key={i} className={`pagination-item pagination-item__page ${productStore.param.pageIndex === i && 'active'}`}>
-          <button className="pagination-link" onClick={() => changePage(i)}>
+          <button className="pagination-link h-full w-full" onClick={() => changePage(i)}>
             {i}
           </button>
         </li>
@@ -43,7 +49,7 @@ const ProlPagination = () => {
     if (!isFirstIndexes && !isLastIndexes) {
       return generatePaginationItems(productStore.param.pageIndex - 1, productStore.param.pageIndex + 1);
     } else if (isFirstIndexes) {
-      return generatePaginationItems(1, 3);
+      return generatePaginationItems(1, productStore.param.totalPage < 3 ? productStore.param.totalPage : 3);
     } else {
       const start = productStore.param.totalPage - 2;
       const end = productStore.param.totalPage;

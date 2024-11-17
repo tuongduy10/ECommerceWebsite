@@ -14,6 +14,7 @@ import { ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 
 const ProductListPage = () => {
   const location = useLocation();
+  //const [searchParams, setSearchParams] = useSearchParams();
   const searchParams = new URLSearchParams(window.location.search);
   const _pageIndex = Number(searchParams.get('pageIndex')) || 1;
   const _brandId = Number(searchParams.get('brandId')) || -1;
@@ -50,7 +51,7 @@ const ProductListPage = () => {
   }, [_pageIndex, _orderBy, _subCategoryId, _optionValueIds, location]);
 
   useEffect(() => {
-    getSubCategories({ brandId: _brandId });
+    getSubCategories({ brandId: _brandId, checkSubProducts: true });
     checkAndGetBrands();
   }, [_brandId])
 
@@ -112,7 +113,7 @@ const ProductListPage = () => {
     });
   }
 
-  const getSubCategories = (params: { brandId: number }) => {
+  const getSubCategories = (params: { brandId: number, checkSubProducts: boolean }) => {
     InventoryService.getSubCategories(params).then((res: any) => {
       if (res.data) {
         const list = res.data.map((item: ISubCategory) => {

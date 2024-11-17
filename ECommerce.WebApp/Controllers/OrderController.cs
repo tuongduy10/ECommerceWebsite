@@ -61,6 +61,7 @@ namespace ECommerce.WebApp.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
+        [AllowAnonymous]
         [HttpPost("user-orders-paging")]
         public async Task<IActionResult> getUserOrdersPaging(OrderPagingRequest request)
         {

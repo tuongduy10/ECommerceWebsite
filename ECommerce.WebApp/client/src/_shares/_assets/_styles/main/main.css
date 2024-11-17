@@ -636,7 +636,7 @@
 
   .pagination {
     width: 100%;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
 
   .pagination-item {
@@ -2746,6 +2746,10 @@ textarea.chat-box-input {
 
 .emoji-list li {
   cursor: pointer;
+}
+
+iframe {
+  max-width: 100%
 }
 
 @import "tailwindcss/base";

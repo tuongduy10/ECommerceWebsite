@@ -41,6 +41,7 @@ export default class InventoryService {
   public static getSubCategories(params?: {
     brandId?: number;
     subCategoryId?: number;
+    checkSubProducts?: boolean;
   }) {
     const _params = params ?? {};
     return api.post(INVENTORY_API_URL.SUB_CATEGORIES, _params);
