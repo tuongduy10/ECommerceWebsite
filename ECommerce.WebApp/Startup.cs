@@ -5,22 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using ECommerce.WebApp.Utils;
 using ECommerce.Application.Extensions;
 using Microsoft.AspNetCore.Http;
 using ECommerce.Utilities.AppSettings;
 using ECommerce.ECommerce.Infrastructure.Middlewares;
 using ECommerce.Utilities.Helpers;
-using Microsoft.AspNetCore.Authorization;
-using ECommerce.Infrastructure.Authentications;
 using ECommerce.Infrastructure.Extensions;
-using System.Threading.Tasks;
 using ECommerce.Utilities.Constants;
 
 namespace ECommerce.WebApp

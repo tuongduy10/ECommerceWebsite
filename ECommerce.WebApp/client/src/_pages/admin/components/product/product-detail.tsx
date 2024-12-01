@@ -12,6 +12,8 @@ import InventoryService from "src/_cores/_services/inventory.service";
 import ProductService from "src/_cores/_services/product.service";
 import { Form, useNavigate } from "react-router-dom";
 import { ADMIN_ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
+import { ROLE_KEY } from "src/_cores/_constants/role-constants";
+import { useAuthStore } from "src/_cores/_store/root-store";
 
 const defaultTheme = createTheme();
 interface IDataDetail {
@@ -19,6 +21,7 @@ interface IDataDetail {
 }
 
 const ProductDetail = () => {
+    const authStore = useAuthStore();
     const navigate = useNavigate();
     const descriptionRef = useRef<any>(null);
     const sizeGuideRef = useRef<any>(null);
@@ -344,7 +347,7 @@ const ProductDetail = () => {
                                         fullWidth
                                     />
                                 </Grid>
-                                <Grid item xs={12} sm={12}>
+                                {authStore.user?.role !== ROLE_KEY.SELLER && <Grid item xs={12} sm={12}>
                                     <PriceInput
                                         value={dataDetail['priceImport']}
                                         onChange={(event) => onChangeFieldValue('priceImport', event)}
@@ -352,7 +355,7 @@ const ProductDetail = () => {
                                         label="Giá nhập hàng"
                                         name='priceImport'
                                     />
-                                </Grid>
+                                </Grid>}
                                 <Grid item xs={12} sm={12}>
                                     <PriceInput
                                         value={dataDetail['priceForSeller']}
