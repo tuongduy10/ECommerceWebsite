@@ -27,7 +27,9 @@ import { ENV } from "src/_configs/enviroment.config";
 import { PRODUCT_STATUS } from "src/_cores/_enums/product.enum";
 import { ADMIN_ROUTE_NAME } from "src/_cores/_enums/route-config.enum";
 import { Link as RouterLink } from "react-router-dom";
-import { useAuthStore } from "src/_cores/_store/root-store";
+import { useAuthStore, useUserStore } from "src/_cores/_store/root-store";
+import { ICodeName } from "src/_cores/_interfaces";
+import { ROLE_KEY } from "src/_cores/_constants/role-constants";
 
 const header: ITableHeader[] = [
     { field: 'createdDate', fieldName: 'Ngày tạo', align: 'left' },
@@ -42,17 +44,29 @@ const header: ITableHeader[] = [
     { field: 'action', fieldName: '', align: 'center' }
 ];
 
+const subFields = [
+    { code: 'pricePreOrder', name: 'Giá đặt trước', allowRoles: '*' },
+    { code: 'discountPreOrder', name: 'Giảm giá đặt trước', allowRoles: '*' },
+    { code: 'priceAvailable', name: 'Giá có sẵn', allowRoles: '*' },
+    { code: 'discountAvailable', name: 'Giảm giá có sẵn', allowRoles: '*' },
+    { code: 'priceImport', name: 'Giá nhập hàng', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'priceForSeller', name: 'Giá cho Seller', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'profitPreOrder', name: 'Lợi nhuận đặt trước', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}, ${ROLE_KEY.SELLER}` },
+    { code: 'profitAvailable', name: 'Lợi nhuận có sẵn', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}, ${ROLE_KEY.SELLER}` },
+    { code: 'profitForSeller', name: 'Lợi nhuận cho Seller', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+]
+
 type TableRowProps = {
     rowData: IProduct,
     isSelected: boolean,
-    roleKey: string,
     onUpdateStatus: (id: number, status: number) => void,
     onDelete: (id: number) => void,
     onSelected: (id: number) => void,
 }
 
 function Row(props: TableRowProps) {
-    const { rowData, isSelected, roleKey, onUpdateStatus, onDelete, onSelected } = props;
+    const authStore = useAuthStore();
+    const { rowData, isSelected, onUpdateStatus, onDelete, onSelected } = props;
     const [delAnchorEl, setDelAnchorEl] = useState<null | HTMLElement>(null);
     const [open, setOpen] = useState(false);
     const openDel = Boolean(delAnchorEl);
@@ -76,6 +90,9 @@ function Row(props: TableRowProps) {
     const handleCloseDel = () => {
         setDelAnchorEl(null);
     };
+
+    const subFieldsByRole = [...subFields]
+        .filter((item) => item.allowRoles === '*' || item.allowRoles.includes(authStore.user?.role));
 
     return (
         <Fragment>
@@ -170,28 +187,19 @@ function Row(props: TableRowProps) {
                             <Table size="small" aria-label="purchases">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Giá đặt trước</TableCell>
-                                        <TableCell>Giảm giá đặt trước</TableCell>
-                                        <TableCell>Giá có sẵn</TableCell>
-                                        <TableCell>Giảm giá có sẵn</TableCell>
-                                        <TableCell>Giá nhập</TableCell>
-                                        <TableCell>Giá cho Seller</TableCell>
-                                        <TableCell>Lợi nhuận đặt trước</TableCell>
-                                        <TableCell>Lợi nhuận có sẵn</TableCell>
-                                        <TableCell>Lợi nhuận cho Seller</TableCell>
+                                        {subFieldsByRole.map((item) => (
+                                            <TableCell key={item.code}>{item.name}</TableCell>
+                                        ))}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     <TableRow>
-                                        <TableCell>{getFormatedPrice(rowData.pricePreOrder)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.discountPreOrder)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.priceAvailable)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.discountAvailable)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.priceImport)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.priceForSeller)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.profitPreOrder)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.profitAvailable)}</TableCell>
-                                        <TableCell>{getFormatedPrice(rowData.profitForSeller)}</TableCell>
+                                        {subFieldsByRole
+                                            .map((item) => (
+                                                <TableCell key={item.code}>
+                                                    {rowData[item.code] ? getFormatedPrice(rowData[item.code]) : ''}
+                                                </TableCell>
+                                            ))}
                                     </TableRow>
                                 </TableBody>
                             </Table>
@@ -504,7 +512,6 @@ export default function ProductList() {
                                 onUpdateStatus={(id, status) => updateStatus(id, status)}
                                 onDelete={(id) => deleteProduct(id)}
                                 onSelected={(id) => selectProduct(id)}
-                                roleKey={authStore.user.role}
                             />
                         ))}
                     </TableBody>

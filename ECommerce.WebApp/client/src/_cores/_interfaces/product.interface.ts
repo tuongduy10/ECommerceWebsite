@@ -75,6 +75,7 @@ export interface IProduct {
     rates: IComment[];
   };
   status: number;
+  [key: string]: any;
 }
 
 export interface INewProductInCart {
