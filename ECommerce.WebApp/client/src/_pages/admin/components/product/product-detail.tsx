@@ -706,14 +706,16 @@ const ProductDetail = () => {
                                     autoComplete='off'
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={12}>
-                                <Button sx={{ marginRight: 2 }} variant="outlined" onClick={backToList}>
-                                    Quay lại
-                                </Button>
-                                <Button type="submit" variant="contained">
-                                    {dataDetail.id ? 'Cập nhật' : 'Thêm mới'}
-                                </Button>
-                            </Grid>
+                            {authStore.user?.role !== ROLE_KEY.SELLER && (
+                                <Grid item xs={12} sm={12}>
+                                    <Button sx={{ marginRight: 2 }} variant="outlined" onClick={backToList}>
+                                        Quay lại
+                                    </Button>
+                                    <Button type="submit" variant="contained">
+                                        {dataDetail.id ? 'Cập nhật' : 'Thêm mới'}
+                                    </Button>
+                                </Grid>
+                            )}
                         </Grid>
                     </Grid>
                 </Grid>

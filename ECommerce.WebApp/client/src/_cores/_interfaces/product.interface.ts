@@ -65,6 +65,8 @@ export interface IProduct {
   profitAvailable: number;
   profitPreOrder: number;
   profitForSeller: number;
+  profitPreOrderForSeller: number;
+  profitAvailableForSeller: number;
   // images
   imagePaths: string[];
   userImagePaths: string[];

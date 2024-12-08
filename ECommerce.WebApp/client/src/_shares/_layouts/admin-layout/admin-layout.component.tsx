@@ -30,11 +30,12 @@ import StorageIcon from '@mui/icons-material/Storage';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { Outlet, useNavigate } from 'react-router-dom';
 import SessionService from 'src/_cores/_services/session.service';
-import { ADMIN_ROUTE_NAME } from 'src/_cores/_enums/route-config.enum';
+import { ADMIN_ROUTE_NAME, ROUTE_NAME } from 'src/_cores/_enums/route-config.enum';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { useAuthStore } from 'src/_cores/_store/root-store';
 import { useDispatch } from 'react-redux';
 import { logout } from 'src/_cores/_reducers/auth.reducer';
+import { ROLE_KEY } from 'src/_cores/_constants/role-constants';
 
 const mainListItems = [
     { name: "dashboard", icon: <HomeRoundedIcon />, label: "Trang chủ", path: "/" },
@@ -201,6 +202,13 @@ export default function AdminLayout() {
     const [selectedItem, setSelectedItem] = React.useState('');
     const authStore = useAuthStore();
     const dispatch = useDispatch();
+
+    React.useEffect(() => {
+        if (authStore.user?.role === ROLE_KEY.BUYER) {
+            dispatch(logout());
+            navigate(ROUTE_NAME.LOGIN);
+        }
+    }, []);
 
     const toggleDrawer = () => {
         setOpen(!open);

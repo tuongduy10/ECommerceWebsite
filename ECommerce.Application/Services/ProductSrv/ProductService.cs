@@ -368,6 +368,11 @@ namespace ECommerce.Application.Services.ProductSrv
                 int pageIndex = request.PageIndex;
                 int pageSize = request.PageSize;
 
+                var userShops = (await _uow.Repository<Shop>()
+                    .GetByAsync(_ => _.UserId == _userService.getCurrentUserId()))
+                    .Select(_ => _.ShopId)
+                    .ToList();
+                var userRole = _userService.getCurrentUserRole();
                 var extQuery = _DbContext.Products
                     .Include(_ => _.ProductImages)
                     .Include(_ => _.ProductUserImages)
@@ -386,6 +391,7 @@ namespace ECommerce.Application.Services.ProductSrv
                                 (product.SubCategory != null &&
                                  product.SubCategory.Category != null &&
                                  product.SubCategory.Category.CategoryId == categoryId)) &&
+                            (userRole.Contains("ADMIN") || userShops.Contains(product.ShopId)) &&
                             (string.IsNullOrEmpty(keyword) ||
                                 EF.Functions.Like(product.ProductCode, $"%{keyword}%") ||
                                 EF.Functions.Like(product.Ppc, $"%{keyword}%") ||
@@ -430,6 +436,16 @@ namespace ECommerce.Application.Services.ProductSrv
                         profitPreOrder = i.ProfitPreOrder,
                         profitForSeller = i.ProfitForSeller,
 
+                        profitPreOrderForSeller = i.DiscountPercent != null
+                            ? getDiscountPrice(i.PricePreOrder, i.DiscountPercent) - i.PriceForSeller
+                            : i.DiscountPreOrder != null
+                                ? (i.DiscountPreOrder - i.PriceForSeller)
+                                : (i.PricePreOrder - i.PriceForSeller),
+                        profitAvailableForSeller = i.DiscountPercent != null
+                            ? getDiscountPrice(i.PriceAvailable, i.DiscountPercent) - i.PriceForSeller
+                            : i.DiscountAvailable != null
+                                ? (i.DiscountAvailable - i.PriceForSeller)
+                                : (i.PriceAvailable - i.PriceForSeller),
                         shop = new ShopModel(i.ShopId, i.Shop.ShopName),
                         note = i.Note,
                         link = i.Link
@@ -522,7 +538,7 @@ namespace ECommerce.Application.Services.ProductSrv
                 product.DiscountPreOrder = request.discountPercent != null
                     ? getDiscountPrice(request.pricePreOrder, request.discountPercent)
                     : (request.discountPreOrder ?? null);
-                product.ProfitForSeller = request.priceForSeller - request.priceImport;
+                product.ProfitForSeller = request.priceForSeller - request.priceImport; // Admin + Distributor viewonly
                 product.ProfitAvailable = request.discountPercent != null
                     ? getDiscountPrice(request.priceAvailable, request.discountPercent) - request.priceImport
                     : request.discountAvailable != null
