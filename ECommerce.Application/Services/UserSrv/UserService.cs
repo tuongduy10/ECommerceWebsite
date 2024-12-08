@@ -587,7 +587,9 @@ namespace ECommerce.Application.Services.UserSrv
             if (string.IsNullOrEmpty(accessToken))
                 return null;
             var userClaims = TokenPrincipal(accessToken);
-            return userClaims?.FirstOrDefault(claim => claim.Type == key)?.Value;
+            string type = key;
+            if (key == "role") type = ClaimTypes.Role;
+            return userClaims?.FirstOrDefault(claim => claim.Type == type)?.Value;
         }
         public string getAccessToken()
         {

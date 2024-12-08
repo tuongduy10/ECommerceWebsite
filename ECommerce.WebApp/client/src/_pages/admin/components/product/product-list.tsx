@@ -50,10 +50,12 @@ const subFields = [
     { code: 'priceAvailable', name: 'Giá có sẵn', allowRoles: '*' },
     { code: 'discountAvailable', name: 'Giảm giá có sẵn', allowRoles: '*' },
     { code: 'priceImport', name: 'Giá nhập hàng', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
-    { code: 'priceForSeller', name: 'Giá cho Seller', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
-    { code: 'profitPreOrder', name: 'Lợi nhuận đặt trước', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}, ${ROLE_KEY.SELLER}` },
-    { code: 'profitAvailable', name: 'Lợi nhuận có sẵn', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}, ${ROLE_KEY.SELLER}` },
-    { code: 'profitForSeller', name: 'Lợi nhuận cho Seller', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'priceForSeller', name: 'Giá cho Seller', allowRoles: `*` },
+    { code: 'profitPreOrder', name: 'Lợi nhuận đặt trước', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'profitAvailable', name: 'Lợi nhuận có sẵn', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'profitForSeller', name: 'Lợi nhuận từ Seller', allowRoles: `${ROLE_KEY.ADMIN}, ${ROLE_KEY.DISTRIBUTOR}` },
+    { code: 'profitPreOrderForSeller', name: 'Lợi nhuận đặt trước cho Seller', allowRoles: `*` },
+    { code: 'profitAvailableForSeller', name: 'Lợi nhuận có sẵn cho Seller', allowRoles: `*` },
 ]
 
 type TableRowProps = {

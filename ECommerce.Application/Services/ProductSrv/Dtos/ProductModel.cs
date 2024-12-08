@@ -54,6 +54,9 @@ namespace ECommerce.Application.Services.ProductSrv.Dtos
         public decimal? profitAvailable { get; set; }
         public decimal? profitPreOrder { get; set; }
         public decimal? profitForSeller { get; set; }
+
+        public decimal? profitPreOrderForSeller { get; set; }
+        public decimal? profitAvailableForSeller { get; set; }
         // Relationship data
         public List<OptionModel>? options { get; set; }
         public List<AttributeModel>? attributes { get; set; }

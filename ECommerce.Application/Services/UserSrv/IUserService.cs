@@ -34,6 +34,7 @@ namespace ECommerce.Application.Services.UserSrv
         string getAccessToken();
         int getCurrentUserId();
         string getCurrentUserName();
+        string getCurrentUserRole();
         string getCurrentUserFullName();
         string GenerateToken(UserModel user);
         IEnumerable<Claim> TokenPrincipal(string token);
