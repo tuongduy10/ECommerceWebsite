@@ -88,7 +88,7 @@ const BrandList = () => {
         <div className="bran__list-items mb-4">
             <BrandListResult />
             {!isBrandPage && (
-                <div className="w-100 text-center d-block">
+                <div className="w-100 text-center d-block mt-2">
                     <button 
                         className="bran__viewmore d-inline-block" 
                         style={{ cursor: 'pointer' }}

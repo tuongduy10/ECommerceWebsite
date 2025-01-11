@@ -36,13 +36,21 @@ import { useAuthStore } from 'src/_cores/_store/root-store';
 import { useDispatch } from 'react-redux';
 import { logout } from 'src/_cores/_reducers/auth.reducer';
 import { ROLE_KEY } from 'src/_cores/_constants/role-constants';
+import { USER_ROLE } from 'src/_cores/_enums/user.enum';
 
 const mainListItems = [
-    { name: "dashboard", icon: <HomeRoundedIcon />, label: "Trang chủ", path: "/" },
+    { 
+        name: "dashboard", 
+        icon: <HomeRoundedIcon />, 
+        label: "Trang chủ", 
+        requiredRoles: [],
+        path: "/admin" 
+    },
     {
         name: "product",
         icon: <StorageIcon />,
         label: "Sản phẩm",
+        requiredRoles: [ROLE_KEY.ADMIN, ROLE_KEY.DISTRIBUTOR],
         path: "",
         childs: [
             {
@@ -66,6 +74,7 @@ const mainListItems = [
         name: "inventory",
         icon: <InventoryIcon />,
         label: "Kho",
+        requiredRoles: [ROLE_KEY.ADMIN],
         path: "",
         childs: [
             {
@@ -94,6 +103,7 @@ const mainListItems = [
         name: "store",
         icon: <StorefrontIcon />,
         label: "Bán hàng",
+        requiredRoles: [ROLE_KEY.ADMIN],
         path: "",
         childs: [
             { name: 'paymentMethods', label: 'Phương thức thanh toán', path: ADMIN_ROUTE_NAME.MANAGE_SALES_PAYMENT_METHODS },
@@ -106,6 +116,7 @@ const mainListItems = [
         icon: <ShoppingCartIcon />,
         label: "Đơn hàng",
         path: "",
+        requiredRoles: [ROLE_KEY.ADMIN, ROLE_KEY.DISTRIBUTOR],
         childs: [
             {
                 name: 'order-list',
@@ -119,6 +130,7 @@ const mainListItems = [
         icon: <PeopleIcon />,
         label: "Người dùng",
         path: "",
+        requiredRoles: [ROLE_KEY.ADMIN],
         childs: [
             {
                 name: 'list',
@@ -132,14 +144,44 @@ const mainListItems = [
             }
         ]
     },
-    { name: 'blogs', icon: <ArticleIcon />, label: 'Nội dung', path: ADMIN_ROUTE_NAME.MANAGE_BLOGS },
-    { name: "statistical", icon: <BarChartIcon />, label: "Thống kê", path: "" },
+    {
+        name: 'blogs',
+        icon: <ArticleIcon />,
+        label: 'Nội dung',
+        requiredRoles: [ROLE_KEY.ADMIN],
+        path: ADMIN_ROUTE_NAME.MANAGE_BLOGS,
+    },
+    {
+        name: "statistical",
+        icon: <BarChartIcon />,
+        label: "Thống kê",
+        requiredRoles: [ROLE_KEY.ADMIN],
+        path: ""
+    },
 ];
 
 const secondListItems = [
-    { name: "statistical", icon: <AssignmentIcon />, label: "Tháng hiện tại", path: ADMIN_ROUTE_NAME.DASHBOARD },
-    { name: "statisticalLastQuarter", icon: <AssignmentIcon />, label: "Quý trước", path: ADMIN_ROUTE_NAME.DASHBOARD },
-    { name: "statisticalYearEnd", icon: <AssignmentIcon />, label: "Tổng kết năm", path: ADMIN_ROUTE_NAME.DASHBOARD },
+    {
+        name: "statistical",
+        icon: <AssignmentIcon />,
+        label: "Tháng hiện tại",
+        requiredRoles: [ROLE_KEY.ADMIN],
+        path: ADMIN_ROUTE_NAME.DASHBOARD
+    },
+    {
+        name: "statisticalLastQuarter",
+        icon: <AssignmentIcon />,
+        label: "Quý trước",
+        requiredRoles: [ROLE_KEY.ADMIN],
+        path: ADMIN_ROUTE_NAME.DASHBOARD
+    },
+    {
+        name: "statisticalYearEnd",
+        icon: <AssignmentIcon />,
+        label: "Tổng kết năm",
+        requiredRoles: [ROLE_KEY.ADMIN],
+        path: ADMIN_ROUTE_NAME.DASHBOARD
+    },
 ];
 
 const drawerWidth: number = 240;
@@ -232,8 +274,8 @@ export default function AdminLayout() {
         }
     }
 
-    const renderListItem = (listItem: any) => {
-        return listItem.map((item: any) => (
+    const renderListItem = (listItems: any[]) => {
+        return listItems.filter((item: any) => item.requiredRoles.length === 0 || item.requiredRoles.includes(authStore.user?.role)).map((item: any) => (
             item.childs && item.childs?.length > 0
                 ? (<React.Fragment key={item.name}>
                     <ListItemButton onClick={() => toggleItem(item.name)}>

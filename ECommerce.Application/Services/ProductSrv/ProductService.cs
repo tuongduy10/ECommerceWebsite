@@ -372,6 +372,10 @@ namespace ECommerce.Application.Services.ProductSrv
                     .GetByAsync(_ => _.UserId == _userService.getCurrentUserId()))
                     .Select(_ => _.ShopId)
                     .ToList();
+                userShops.AddRange((await _uow.Repository<ShopUser>()
+                    .GetByAsync(_ => _.UserId == _userService.getCurrentUserId()))
+                    .Select(_ => _.ShopId)
+                    .ToList());
                 var userRole = _userService.getCurrentUserRole();
                 var extQuery = _DbContext.Products
                     .Include(_ => _.ProductImages)

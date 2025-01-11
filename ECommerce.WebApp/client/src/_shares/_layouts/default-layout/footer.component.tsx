@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FOOTER_MENU_COL_3, FOOTER_MENU_COL_4 } from "src/_configs/web.config";
 import CmsService from "src/_cores/_services/cms.service";
 import { ICON_NAME } from "src/_shares/_components/mui-icon/_enums/mui-icon.enum";
 import MuiIcon from "src/_shares/_components/mui-icon/mui-icon.component";
 
 const Footer = () => {
+    const navigate = useNavigate();
     const [blogs, setBlogs] = useState<any[]>([]);
     const [config, setConfig] = useState<any>(null);
 
@@ -130,6 +132,13 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
+            {config && (
+                <div className="flex fixed w-[60px] h-[60px] bottom-[20px] right-[20px] cursor-pointer">
+                    <a href={'https://zalo.me/' + config.phoneNumber} target="_blank" rel="rel">
+                        <img src="/assets/icons/zalo.png" alt="name" />
+                    </a>
+                </div>
+            )}
         </footer>
     );
 }

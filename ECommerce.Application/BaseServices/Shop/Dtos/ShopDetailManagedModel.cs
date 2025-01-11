@@ -20,6 +20,7 @@ namespace ECommerce.Application.BaseServices.Shop.Dtos
         public byte? Tax { get; set; }
         public byte Status { get; set; }
         public List<int> ShopBrands { get; set; }
+        public List<int> ShopUsers { get; set; }
         public ShopBankModel ShopBank { get; set; }
     }
 }
