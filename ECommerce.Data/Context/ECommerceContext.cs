@@ -59,6 +59,7 @@ namespace ECommerce.Data.Context
         public virtual DbSet<Shop> Shops { get; set; }
         public virtual DbSet<ShopBank> ShopBanks { get; set; }
         public virtual DbSet<ShopBrand> ShopBrands { get; set; }
+        public virtual DbSet<ShopUser> ShopUsers { get; set; }
         public virtual DbSet<SizeGuide> SizeGuides { get; set; }
         public virtual DbSet<Social> Socials { get; set; }
         public virtual DbSet<SubCategory> SubCategories { get; set; }
@@ -559,6 +560,25 @@ namespace ECommerce.Data.Context
                     .HasForeignKey(d => d.ShopId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_ShopBrand_Shop");
+            });
+
+            modelBuilder.Entity<ShopUser>(entity =>
+            {
+                entity.HasKey(e => new { e.ShopId, e.UserId });
+
+                entity.ToTable("ShopUser");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.ShopUsers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ShopUser_User");
+
+                entity.HasOne(d => d.Shop)
+                    .WithMany(p => p.ShopUsers)
+                    .HasForeignKey(d => d.ShopId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ShopUser_Shop");
             });
 
             modelBuilder.Entity<SizeGuide>(entity =>

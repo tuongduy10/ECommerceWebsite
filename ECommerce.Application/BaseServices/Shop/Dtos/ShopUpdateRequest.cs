@@ -19,5 +19,6 @@ namespace ECommerce.Application.BaseServices.Shop.Dtos
         public int tax { get; set; }
         public ShopBankModel shopbank { get; set; }
         public List<int> shopBrands { get; set; }
+        public List<int> shopUsers { get; set; }
     }
 }

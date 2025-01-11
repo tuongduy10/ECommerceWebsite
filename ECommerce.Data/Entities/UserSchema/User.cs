@@ -18,6 +18,7 @@ namespace ECommerce.Data.Entities.UserSchema
             RateUserReplieds = new HashSet<Rate>();
             RateUsers = new HashSet<Rate>();
             Shops = new HashSet<Shop>();
+            ShopUsers = new HashSet<ShopUser>();
         }
 
         public int UserId { get; set; }
@@ -47,5 +48,6 @@ namespace ECommerce.Data.Entities.UserSchema
         public virtual ICollection<Rate> RateUserReplieds { get; set; }
         public virtual ICollection<Rate> RateUsers { get; set; }
         public virtual ICollection<Shop> Shops { get; set; }
+        public virtual ICollection<ShopUser> ShopUsers { get; set; }
     }
 }

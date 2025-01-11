@@ -13,6 +13,8 @@ import { GlobalConfig } from "src/_configs/global.config";
 import { api } from "src/_cores/_api/api";
 import { INVENTORY_API_URL, SALES_API_URL } from "src/_cores/_enums/api-url.enum";
 import { DateTimeHelper } from "src/_shares/_helpers/datetime-helper";
+import UserService from "src/_cores/_services/user.service";
+import { IUserGetParam } from "src/_pages/admin/interfaces/user-interface";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -25,6 +27,7 @@ const ShopList = () => {
     const uploadRef = useRef<any>();
 
     const [brands, setBrands] = useState([]);
+    const [users, setUsers] = useState([]);
     const [shops, setShops] = useState([]);
     const [formData, setFormData] = useState<{ [key: string]: any }>();
 
@@ -35,7 +38,18 @@ const ShopList = () => {
                 setBrands(res.data);
             }
         }
+        async function getUsers() {
+            const params = {
+                pageIndex: 1,
+                pageSize: 1000,
+            } as IUserGetParam
+            const res = await UserService.getUserList(params) as any;
+            if (res?.isSucceed) {
+                setUsers(res.data.items);
+            }
+        }
         getBrands();
+        getUsers();
         getData();
     }, []);
 
@@ -60,6 +74,11 @@ const ShopList = () => {
     const onChangeBrands = (items: any[]) => {
         const _ids = items.map(_ => _.id);
         setFormData({ ...formData, shopBrands: _ids });
+    }
+
+    const onChangeUsers = (items: any[]) => {
+        const _ids = items.map(_ => _.userId);
+        setFormData({ ...formData, shopUsers: _ids });
     }
 
     const handleClickOpen = () => {
@@ -134,6 +153,7 @@ const ShopList = () => {
                         <TableRow>
                             <TableCell>Ngày tham gia</TableCell>
                             <TableCell>Tên</TableCell>
+                            <TableCell>Tên người để liên hệ</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -142,6 +162,7 @@ const ShopList = () => {
                             <TableRow key={_.shopId} sx={{ '& > *': { borderBottom: 'unset' } }}>
                                 <TableCell>{DateTimeHelper.getDateTimeFormated(_.shopJoinDate)}</TableCell>
                                 <TableCell>{_.shopName}</TableCell>
+                                <TableCell>{_.userFullName}</TableCell>
                                 <TableCell>
                                     <IconButton
                                         size="small"
@@ -233,6 +254,31 @@ const ShopList = () => {
                             sx={{ marginBottom: 2 }}
                             value={formData?.tax || 0}
                             onChange={(e) => handleChange(e)}
+                        />
+                        <Autocomplete
+                            multiple
+                            id="checkboxes-tags-demo"
+                            options={users}
+                            disableCloseOnSelect
+                            getOptionLabel={(item: any) => `${item.userId} - ${item.userFullName}`}
+                            value={users.length > 0 && formData?.shopUsers ? users.filter((item: any) => formData?.shopUsers.includes(item.userId)) : []}
+                            renderOption={(props, item: any, { selected }) => (
+                                <li {...props}>
+                                    <Checkbox
+                                        icon={icon}
+                                        checkedIcon={checkedIcon}
+                                        style={{ marginRight: 8 }}
+                                        checked={selected}
+                                        size="small"
+                                    />
+                                    {item.userId} - {item.userFullName}
+                                </li>
+                            )}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Người dùng" placeholder="Chọn người dùng" size="small" />
+                            )}
+                            onChange={(event, items: any) => onChangeUsers(items)}
+                            size="small"
                         />
                         {/* <TextField
                             required

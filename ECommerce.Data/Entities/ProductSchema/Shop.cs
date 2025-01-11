@@ -14,6 +14,7 @@ namespace ECommerce.Data.Entities.ProductSchema
             Products = new HashSet<Product>();
             ShopBanks = new HashSet<ShopBank>();
             ShopBrands = new HashSet<ShopBrand>();
+            ShopUsers = new HashSet<ShopUser>();
         }
 
         public int ShopId { get; set; }
@@ -35,5 +36,6 @@ namespace ECommerce.Data.Entities.ProductSchema
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<ShopBank> ShopBanks { get; set; }
         public virtual ICollection<ShopBrand> ShopBrands { get; set; }
+        public virtual ICollection<ShopUser> ShopUsers { get; set; }
     }
 }

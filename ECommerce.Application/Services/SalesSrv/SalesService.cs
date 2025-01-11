@@ -67,6 +67,10 @@ namespace ECommerce.Application.Services.SalesSrv
                         .GetByAsync(br => br.ShopId == shopId))
                         .Select(br => br.BrandId)
                         .ToList();
+            var users = (await _uow.Repository<ShopUser>()
+                        .GetByAsync(br => br.ShopId == shopId))
+                        .Select(br => br.UserId)
+                        .ToList();
             var bank = (await _uow.Repository<ShopBank>()
                         .GetByAsync(b => b.ShopId == shopId))
                         .Select(b => new ShopBankModel()
@@ -94,7 +98,8 @@ namespace ECommerce.Application.Services.SalesSrv
                     Status = (byte)i.Status,
                     Tax = (byte)i.Tax,
                     ShopBank = bank == null ? null : bank,
-                    ShopBrands = brands.Count() == 0 ? null : brands
+                    ShopBrands = brands.Count() == 0 ? null : brands,
+                    ShopUsers = users
                 })
                 .FirstOrDefault();
 
@@ -116,6 +121,7 @@ namespace ECommerce.Application.Services.SalesSrv
                     ShopJoinDate = (DateTime)i.ShopJoinDate,
                     ShopWardCode = i.ShopWardCode,
                     Status = (byte)i.Status,
+                    UserFullName = i.User == null ? "" : i.User.UserFullName
                 })
                 .ToList();
             var result = list.OrderByDescending(i => i.ShopId).ToList();
@@ -194,6 +200,27 @@ namespace ECommerce.Application.Services.SalesSrv
                             ShopId = shop.ShopId
                         };
                         await _uow.Repository<ShopBrand>().AddAsync(brand);
+                    }
+                    await _uow.SaveChangesAsync();
+                }
+                var users = await _uow.Repository<ShopUser>().GetByAsync(i => i.ShopId == request.id);
+                // Remove previous users if exist
+                if (users.Count() > 0)
+                {
+                    _uow.Repository<ShopUser>().Delete(users);
+                    await _uow.SaveChangesAsync();
+                }
+                // Add new brands if has items
+                if (request.shopUsers != null)
+                {
+                    foreach (var id in request.shopUsers)
+                    {
+                        var user = new ShopUser
+                        {
+                            UserId = id,
+                            ShopId = shop.ShopId
+                        };
+                        await _uow.Repository<ShopUser>().AddAsync(user);
                     }
                     await _uow.SaveChangesAsync();
                 }

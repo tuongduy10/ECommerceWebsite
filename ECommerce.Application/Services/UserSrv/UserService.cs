@@ -560,7 +560,7 @@ namespace ECommerce.Application.Services.UserSrv
         public async Task<Response<User>> getCurrentUser()
         {
             int id = getCurrentUserId();
-            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id && _.IsDeleted == false);
+            var user = await _uow.Repository<User>().FindByAsync(_ => _.UserId == id && _.IsDeleted == false, "Shops");
             return new SuccessResponse<User>(user);
         }
         public async Task updateUserName()

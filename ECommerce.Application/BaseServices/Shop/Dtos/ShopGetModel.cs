@@ -21,5 +21,6 @@ namespace ECommerce.Application.BaseServices.Shop.Dtos
         public int UserId { get; set; }
         public byte Status { get; set; }
         public string UserName { get; set; }
+        public string UserFullName { get; set; }
     }
 }
